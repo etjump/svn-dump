@@ -562,6 +562,7 @@ typedef struct clientInfo_s {
 	int				sprintTime;
 	int				pmoveFixed;
 	int				maxFPS;
+	int				CGaz;
 	int				weapHeat;
 	int				weaponState;
 	int				weaponState_last;
@@ -2234,13 +2235,14 @@ extern	vmCvar_t		cg_CGazY;
 extern	vmCvar_t		cg_CGazHeight;
 extern	vmCvar_t		cg_CGazWidth;
 extern	vmCvar_t		cg_CGazAlpha;
+extern	vmCvar_t		cg_drawCGazUsers;
+extern	vmCvar_t		cg_drawTJHud;
 
 extern pmove_t			cg_pmove;
 
 // Cheat cvars
 extern	vmCvar_t		cl_yawspeed;
 extern	vmCvar_t		cl_freelook;
-
 
 
 //

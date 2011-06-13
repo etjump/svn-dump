@@ -3532,6 +3532,19 @@ qboolean G_DesiredFollow(gentity_t *ent, gentity_t *other)
 			   || ent->client->sess.spec_team == other->client->sess.sessionTeam);
 }
 
+void Cmd_PrintCGazUsers_f(gentity_t *ent) {
+	int i;
+	CP("print \"Player                                     CGaz On\n\"");
+	for (i = 0; i < level.numConnectedClients; i++) {
+		if(level.clients[i].pers.cgaz) {
+			CP(va("print \"%s                                     Yes\n\"", level.clients[i].pers.netname));
+		}
+		else {
+			CP(va("print \"%s                                     No\n\"", level.clients[i].pers.netname));
+		}
+	}
+}
+
 /*
 =================
 Cmd_SwapPlacesWithBot_f
@@ -3645,6 +3658,7 @@ static command_t noIntermissionCommands[] =
 	{ "iwant",				qtrue,  Cmd_Call_f },
 	{ "load",				qfalse,	Cmd_Load_f },
 	{ "save",				qfalse,	Cmd_Save_f },
+	{ "CGazlist",			qfalse, Cmd_PrintCGazUsers_f },
 };
 
 qboolean ClientIsFlooding(gentity_t *ent)

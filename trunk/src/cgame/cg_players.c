@@ -244,6 +244,9 @@ void CG_NewClientInfo( int clientNum ) {
 	v = Info_ValueForKey(configstring, "fps");
 	newInfo.maxFPS = atoi(v);
 
+	v = Info_ValueForKey(configstring, "cgaz");
+	newInfo.CGaz = atoi(v);
+
 	// Gordon: detect rank/skill changes client side
 	if( clientNum == cg.clientNum ) {
 		int i;

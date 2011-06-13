@@ -109,6 +109,7 @@ void CG_topshotsUp_f(void)
 	}
 }
 
+
 void CG_ScoresDown_f( void ) {
 	if ( cg.scoresRequestTime + 2000 < cg.time ) {
 		// the scores are more than two seconds out of data,
@@ -1160,5 +1161,6 @@ void CG_InitConsoleCommands( void ) {
 	trap_AddCommand ("load");
 	trap_AddCommand ("goto");
 	trap_AddCommand ("call");
+	trap_AddCommand ("CGazlist");
 
 }

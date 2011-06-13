@@ -299,10 +299,12 @@ vmCvar_t	cg_CGazY;
 vmCvar_t	cg_CGazHeight;
 vmCvar_t	cg_CGazWidth;
 vmCvar_t	cg_CGazAlpha;
+vmCvar_t	cg_drawTJHud;
 
 // Cheat cvars
 vmCvar_t	cl_yawspeed;
 vmCvar_t	cl_freelook;
+vmCvar_t	cg_drawCGazUsers;
 
 typedef struct {
 	vmCvar_t	*vmCvar;
@@ -539,6 +541,8 @@ cvarTable_t		cvarTable[] = {
 	{ &cg_CGazAlpha,			"cg_CGazAlpha", "0.15", CVAR_ARCHIVE },
 	{ &cl_yawspeed,				"cl_yawspeed", "0", CVAR_ARCHIVE },
 	{ &cl_freelook,				"cl_freelook", "1", CVAR_ARCHIVE },
+	{ &cg_drawCGazUsers,		"cg_drawCGazUsers", "1", CVAR_ARCHIVE },
+	{ &cg_drawTJHud,			"cg_drawTJHud", "1", CVAR_ARCHIVE },
 };
 
 int		cvarTableSize = sizeof( cvarTable ) / sizeof( cvarTable[0] );
@@ -672,7 +676,7 @@ void CG_setClientFlags(void)
 												((cg_drawCGaz.integer > 0) ? CGF_CGAZ : 0) |
 												((cl_yawspeed.integer > 0) ? CGF_YAWSPEED : 0) |
 												((cl_freelook.integer > 0) ? 0 : CGF_FREELOOK) |
-												((int_m_pitch.value > 0) ? 0 : CGF_MPITCHFIX) 
+												((int_m_pitch.value > 0) ? 0 : CGF_MPITCHFIX)
 												// Add more in here, as needed
 											),
 											

@@ -1374,11 +1374,12 @@ void ClientUserinfoChanged( int clientNum ) {
 	}
 
 	s = Info_ValueForKey(userinfo, "cg_uinfo");
-	sscanf(s, "%i %i %i %i",
+	sscanf(s, "%i %i %i %i %i",
 							&client->pers.clientFlags,
 							&client->pers.clientTimeNudge,
 							&client->pers.clientMaxPackets,
-							&client->pers.maxFPS);
+							&client->pers.maxFPS,
+							&client->pers.cgaz);
 
 	client->pers.autoActivate = (client->pers.clientFlags & CGF_AUTOACTIVATE) ? PICKUP_TOUCH : PICKUP_ACTIVATE;
 	client->pers.predictItemPickup = ((client->pers.clientFlags & CGF_PREDICTITEMS) != 0);
@@ -1433,7 +1434,7 @@ void ClientUserinfoChanged( int clientNum ) {
 	// send over a subset of the userinfo keys so other clients can
 	// print scoreboards, display models, and play custom sounds
 	
-	s = va( "n\\%s\\t\\%i\\c\\%i\\r\\%i\\m\\%s\\s\\%s\\dn\\%s\\dr\\%i\\w\\%i\\lw\\%i\\sw\\%i\\mu\\%i\\ref\\%i\\pm\\%i\\fps\\%i",
+	s = va( "n\\%s\\t\\%i\\c\\%i\\r\\%i\\m\\%s\\s\\%s\\dn\\%s\\dr\\%i\\w\\%i\\lw\\%i\\sw\\%i\\mu\\%i\\ref\\%i\\pm\\%i\\fps\\%i\\cgaz\\%i",
 		client->pers.netname, 
 		client->sess.sessionTeam, 
 		client->sess.playerType, 
@@ -1448,7 +1449,8 @@ void ClientUserinfoChanged( int clientNum ) {
 		client->sess.muted ? 1 : 0,
 		client->sess.referee,
 		client->pers.pmoveFixed ? 1 : 0,
-		client->pers.maxFPS < 999 && client->pers.maxFPS > 0 ? client->pers.maxFPS : 0
+		client->pers.maxFPS < 999 && client->pers.maxFPS > 0 ? client->pers.maxFPS : 0,
+		client->pers.cgaz > 0 ? client->pers.cgaz : 0
 		);
 
 	trap_GetConfigstring( CS_PLAYERS + clientNum, oldname, sizeof( oldname ) );

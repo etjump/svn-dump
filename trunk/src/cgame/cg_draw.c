@@ -573,9 +573,9 @@ static void CG_DrawUpperRight( void ) {
 		( cgs.autoMapExpanded || ( !cgs.autoMapExpanded && ( cg.time - cgs.autoMapExpandTime < 250.f ) ) ) )
 		return;
 
-	if ( cg_drawRoundTimer.integer ) {
+	/*if ( cg_drawRoundTimer.integer ) {
 		y = CG_DrawTimer( y );
-	}
+	}*/
 
 	if ( cg_drawFPS.integer ) {
 		y = CG_DrawFPS( y );
@@ -4443,7 +4443,7 @@ static void CG_Draw2D( void ) {
 		if( cg.snap->ps.persistant[PERS_TEAM] != TEAM_SPECTATOR ) {
 			rectDef_t rect;
 
-			if( cg.snap->ps.stats[STAT_HEALTH] > 0 ) {
+			if( cg.snap->ps.stats[STAT_HEALTH] > 0 && !cg_drawTJHud.integer) {
 				CG_DrawPlayerStatusHead();
 				CG_DrawPlayerStatus();
 				CG_DrawPlayerStats();

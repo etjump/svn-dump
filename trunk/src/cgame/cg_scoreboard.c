@@ -15,7 +15,8 @@ WM_DrawObjectives
 
 #define INFO_XP_WIDTH			36
 #define INFO_LIVES_WIDTH		20
-#define INFO_PLAYER_WIDTH		135
+#define INFO_PLAYER_WIDTH		100
+#define INFO_CGAZ_WIDTH			35
 #define INFO_SCORE_WIDTH		56
 #define INFO_FPS_WIDTH			36
 #define INFO_CLASS_WIDTH		20
@@ -24,7 +25,7 @@ WM_DrawObjectives
 #define INFO_TEAM_HEIGHT		24
 #define INFO_BORDER				0
 #define INFO_LINE_HEIGHT		30
-#define INFO_TOTAL_WIDTH		(INFO_PLAYER_WIDTH + INFO_CLASS_WIDTH + INFO_FPS_WIDTH + INFO_SCORE_WIDTH + INFO_PMOVE_WIDTH + INFO_LATENCY_WIDTH)
+#define INFO_TOTAL_WIDTH		(INFO_PLAYER_WIDTH + INFO_CLASS_WIDTH + INFO_FPS_WIDTH + INFO_SCORE_WIDTH + INFO_PMOVE_WIDTH + INFO_LATENCY_WIDTH + INFO_CGAZ_WIDTH)
 
 int WM_DrawObjectives( int x, int y, int width, float fade ) {
 	const char *s, *str;
@@ -197,7 +198,7 @@ static void WM_DrawClientScore(int x, int y, score_t *score, float *color, float
 	vec4_t hcolor;
 	clientInfo_t *ci;
 	int w;
-	char *s;
+	char *s, *cgazOn;
 
 	if (y + SMALLCHAR_HEIGHT >= 470)
 		return;
@@ -211,24 +212,29 @@ static void WM_DrawClientScore(int x, int y, score_t *score, float *color, float
 
 		hcolor[3] = fade * 0.3;
 		VectorSet(hcolor, .5f, .5f, .2f);			// DARK-RED
-
-		CG_FillRect(tempx - 4, y + 1, INFO_PLAYER_WIDTH - INFO_BORDER + 4, SMALLCHAR_HEIGHT - 1, hcolor);
+	
+		// FIXME Removed INFO_CGAZ_WIDTH x1
+		CG_FillRect(tempx - 4, y + 1, INFO_PLAYER_WIDTH + INFO_CGAZ_WIDTH - INFO_BORDER + 4, SMALLCHAR_HEIGHT - 1, hcolor);
 		tempx += INFO_PLAYER_WIDTH;
 
 		if (ci->team == TEAM_SPECTATOR)
 		{
 			int width;
-			width = INFO_CLASS_WIDTH + INFO_SCORE_WIDTH + INFO_LATENCY_WIDTH * 2 - 6;
+			width = INFO_CLASS_WIDTH + INFO_SCORE_WIDTH  + INFO_CGAZ_WIDTH + INFO_LATENCY_WIDTH * 2 - 6;
 
 			CG_FillRect(tempx, y + 1, width - INFO_BORDER, SMALLCHAR_HEIGHT - 1, hcolor);
 			tempx += width;
 		}
 		else
 		{
-			CG_FillRect(tempx, y + 1, INFO_CLASS_WIDTH - INFO_BORDER, SMALLCHAR_HEIGHT - 1, hcolor);
-			tempx += INFO_CLASS_WIDTH;
+			int width;
+			width = INFO_CLASS_WIDTH + INFO_SCORE_WIDTH  + INFO_CGAZ_WIDTH + INFO_LATENCY_WIDTH * 2 - 6;
 
+			CG_FillRect(tempx, y + 1, width - INFO_BORDER, SMALLCHAR_HEIGHT - 1, hcolor);
 
+			// Not needed
+			 
+			/*
 			CG_FillRect(tempx, y + 1, INFO_FPS_WIDTH - INFO_BORDER, SMALLCHAR_HEIGHT - 1, hcolor);
 			tempx += INFO_FPS_WIDTH;
 
@@ -238,8 +244,12 @@ static void WM_DrawClientScore(int x, int y, score_t *score, float *color, float
 			tempx += INFO_PMOVE_WIDTH;
 
 
+			CG_FillRect(tempx, y + 1, INFO_CGAZ_WIDTH - 1, SMALLCHAR_HEIGHT - 1, hcolor);
+			tempx += INFO_CGAZ_WIDTH;
+
 			CG_FillRect(tempx, y + 1, INFO_LATENCY_WIDTH - 1, SMALLCHAR_HEIGHT - 1, hcolor);
 			tempx += INFO_LATENCY_WIDTH;
+			*/
 
 		}
 	}
@@ -255,7 +265,10 @@ static void WM_DrawClientScore(int x, int y, score_t *score, float *color, float
 	// Dini, Note, starts line with player infos etc
 	// CG_DrawSmallString( tempx, y, va("%i", cg.predictedPlayerState.clientnum), fade );
 	// draw name
-	CG_DrawStringExt(tempx, y, ci->name, hcolor, qfalse, qfalse, SMALLCHAR_WIDTH, SMALLCHAR_HEIGHT, 16);
+	if(cg_drawCGazUsers.integer)
+		CG_DrawStringExt(tempx, y, ci->name, hcolor, qfalse, qfalse, SMALLCHAR_WIDTH, SMALLCHAR_HEIGHT, 12);
+	else
+		CG_DrawStringExt(tempx, y, ci->name, hcolor, qfalse, qfalse, SMALLCHAR_WIDTH, SMALLCHAR_HEIGHT, 16);
 
 	tempx += INFO_PLAYER_WIDTH - offset;
 
@@ -264,7 +277,7 @@ static void WM_DrawClientScore(int x, int y, score_t *score, float *color, float
 		const char *s;
 		int totalwidth;
 
-		totalwidth = INFO_CLASS_WIDTH + INFO_SCORE_WIDTH + INFO_LATENCY_WIDTH - 8;
+		totalwidth = INFO_CLASS_WIDTH + INFO_SCORE_WIDTH + INFO_CGAZ_WIDTH + INFO_LATENCY_WIDTH - 8 + INFO_CGAZ_WIDTH;
 
 		if (score->ping == -1)
 		{
@@ -290,7 +303,10 @@ static void WM_DrawClientScore(int x, int y, score_t *score, float *color, float
 			trap_R_SetColor(NULL);
 		}
 
+		if(!cg_drawCGazUsers.integer) 
+			tempx += INFO_CGAZ_WIDTH;
 		// Dini, show ping for specs too..
+
 		CG_DrawSmallString(tempx + 10 + INFO_PMOVE_WIDTH + INFO_FPS_WIDTH, y, va("^z%5i", score->ping), fade);
 		return;
 	}
@@ -302,6 +318,9 @@ static void WM_DrawClientScore(int x, int y, score_t *score, float *color, float
 
 		int playerType;
 		playerType = ci->cls;
+
+		if(!cg_drawCGazUsers.integer)
+			tempx += INFO_CGAZ_WIDTH;
 
 		if (playerType == PC_MEDIC)
 		{
@@ -335,7 +354,19 @@ static void WM_DrawClientScore(int x, int y, score_t *score, float *color, float
 	// Dini, shows current Pmove..
 	CG_DrawSmallString(tempx + 15, y, va("%4i", ci->pmoveFixed), fade);
 	tempx += (INFO_PMOVE_WIDTH / 2) - 5;
+
+	if(cg_drawCGazUsers.integer) {
+
+		if(ci->CGaz) {
+			cgazOn = "Yes";
+		} else {
+			cgazOn = " No";
+		}
 	
+		CG_DrawSmallString(tempx + 50, y, va("%s", cgazOn), fade);
+		tempx += (INFO_CGAZ_WIDTH / 2) - 5;
+
+	}
 
 	// Ping
 	CG_DrawSmallString(tempx + 45, y, va("%5i", score->ping), fade);
@@ -535,7 +566,8 @@ static int WM_TeamScoreboard(int x, int y, team_t team, float fade, int maxrows)
 	vec4_t tclr =	{ 0.6f,		0.6f,		0.6f,		1.0f };
 
 	height = SMALLCHAR_HEIGHT * maxrows;
-	width = INFO_PLAYER_WIDTH + INFO_CLASS_WIDTH + INFO_PMOVE_WIDTH + INFO_FPS_WIDTH + INFO_LATENCY_WIDTH;
+
+	width = INFO_PLAYER_WIDTH + INFO_CLASS_WIDTH + INFO_PMOVE_WIDTH + INFO_FPS_WIDTH + INFO_LATENCY_WIDTH + INFO_CGAZ_WIDTH;
 
 	CG_FillRect(x - 5, y - 2, width + 5, 21, clrUiBack);
 	CG_FillRect(x - 5, y - 2, width + 5, 21, clrUiBar);
@@ -610,7 +642,10 @@ static int WM_TeamScoreboard(int x, int y, team_t team, float fade, int maxrows)
 
 	// draw player info headings
 	CG_DrawSmallString(tempx, y, CG_TranslateString("Name"), fade);
-	tempx += INFO_PLAYER_WIDTH;
+	if(cg_drawCGazUsers.integer) 
+		tempx += INFO_PLAYER_WIDTH;
+	else 
+		tempx += (INFO_PLAYER_WIDTH + 35);
 
 	CG_DrawSmallString(tempx + 2, y, CG_TranslateString("C"), fade);
 	tempx += INFO_CLASS_WIDTH;
@@ -619,7 +654,15 @@ static int WM_TeamScoreboard(int x, int y, team_t team, float fade, int maxrows)
 	tempx += INFO_FPS_WIDTH;
 
 	CG_DrawSmallString(tempx, y, CG_TranslateString("Pmove"), fade);
-	tempx += INFO_PMOVE_WIDTH;
+	if(cg_drawCGazUsers.integer)
+		tempx += INFO_PMOVE_WIDTH - 10;
+	else
+		tempx += INFO_PMOVE_WIDTH;
+
+	if(cg_drawCGazUsers.integer) {
+		CG_DrawSmallString(tempx, y, CG_TranslateString("CGaz"), fade);
+		tempx += INFO_CGAZ_WIDTH;
+	}
 
 	CG_DrawSmallString(tempx, y, CG_TranslateString("Ping"), fade);
 	tempx += INFO_LATENCY_WIDTH;
