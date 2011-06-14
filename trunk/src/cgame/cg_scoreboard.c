@@ -214,7 +214,7 @@ static void WM_DrawClientScore(int x, int y, score_t *score, float *color, float
 		VectorSet(hcolor, .5f, .5f, .2f);			// DARK-RED
 	
 		// FIXME Removed INFO_CGAZ_WIDTH x1
-		CG_FillRect(tempx - 4, y + 1, INFO_PLAYER_WIDTH + INFO_CGAZ_WIDTH - INFO_BORDER + 4, SMALLCHAR_HEIGHT - 1, hcolor);
+		CG_FillRect(tempx - 4, y + 1, INFO_PLAYER_WIDTH - INFO_BORDER + 4, SMALLCHAR_HEIGHT - 1, hcolor);
 		tempx += INFO_PLAYER_WIDTH;
 
 		if (ci->team == TEAM_SPECTATOR)
@@ -262,9 +262,7 @@ static void WM_DrawClientScore(int x, int y, score_t *score, float *color, float
 
 	offset = 0;
 
-	// Dini, Note, starts line with player infos etc
-	// CG_DrawSmallString( tempx, y, va("%i", cg.predictedPlayerState.clientnum), fade );
-	// draw name
+	// draw name, 12 chars if drawing cgaz users, else 16
 	if(cg_drawCGazUsers.integer)
 		CG_DrawStringExt(tempx, y, ci->name, hcolor, qfalse, qfalse, SMALLCHAR_WIDTH, SMALLCHAR_HEIGHT, 12);
 	else

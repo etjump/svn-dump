@@ -1838,6 +1838,7 @@ extern vmCvar_t g_ghostPlayers;
 extern vmCvar_t	g_nofatigue;
 extern vmCvar_t	g_blockCheatCvars;
 extern vmCvar_t	g_weapons;
+extern vmCvar_t	g_noclip;
 
 void	trap_Printf( const char *fmt );
 void	trap_Error( const char *fmt );

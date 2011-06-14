@@ -618,7 +618,7 @@ void Cmd_Noclip_f( gentity_t *ent ) {
 
 	char	*name = ConcatArgs( 1 );
 
-	if ( !CheatsOk( ent ) ) {
+	if ( !CheatsOk( ent ) && !g_noclip.integer) {
 		return;
 	}
 
