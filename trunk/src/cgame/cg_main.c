@@ -294,6 +294,7 @@ vmCvar_t	cg_hide;
 vmCvar_t	cg_hideDistance;
 vmCvar_t	cg_nofatigue;
 vmCvar_t	com_maxfps;
+vmCvar_t	com_hunkmegs;
 vmCvar_t	cg_drawCGaz;
 vmCvar_t	cg_CGazY;
 vmCvar_t	cg_CGazHeight;
@@ -534,6 +535,7 @@ cvarTable_t		cvarTable[] = {
 	{ &cg_hideDistance,			"cg_hideDistance", "128", CVAR_ARCHIVE },
 	{ &cg_nofatigue,			"cg_nofatigue", "1", CVAR_ARCHIVE },
 	{ &com_maxfps,				"com_maxfps", "76", CVAR_ARCHIVE },
+	{ &com_hunkmegs,			"com_hunkmegs", "128", CVAR_ARCHIVE },
 	{ &cg_drawCGaz,				"cg_drawCGaz", "0", CVAR_ARCHIVE },
 	{ &cg_CGazY,				"cg_CGazY", "260", CVAR_ARCHIVE },
 	{ &cg_CGazHeight,			"cg_CGazHeight", "20", CVAR_ARCHIVE },

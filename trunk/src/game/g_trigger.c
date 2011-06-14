@@ -335,13 +335,13 @@ void trigger_savereset_touch(gentity_t *self, gentity_t *other, trace_t *trace)
 	if (self->timestamp > level.time)
 		return;
 
-	self->timestamp = level.time + 1000;
+	self->timestamp = level.time + FRAMETIME;
 
 	for (i = 0; i < 2; i++)
 		for (j = 0; j < MAX_SAVE_POSITIONS; j++)
 			saves[i][j].isValid = qfalse;
 
-	CPx(other - g_entities, "cpm \"^7 Your saves were removed.\n\"");
+	CPx(other - g_entities, "cp \"^7 Your saves were removed.\n\"");
 }
 
 void savereset_think(gentity_t *ent)

@@ -2230,6 +2230,7 @@ extern	vmCvar_t		cg_hide;
 extern	vmCvar_t		cg_hideDistance;
 extern	vmCvar_t		cg_nofatigue;
 extern	vmCvar_t		com_maxfps;
+extern	vmCvar_t		com_hunkmegs;
 extern	vmCvar_t		cg_drawCGaz;
 extern	vmCvar_t		cg_CGazY;
 extern	vmCvar_t		cg_CGazHeight;
