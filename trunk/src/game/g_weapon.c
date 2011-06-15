@@ -2232,7 +2232,8 @@ void G_AddAirstrikeToCounters( gentity_t* ent ) {
 
 #define NUMBOMBS 10
 #define BOMBSPREAD 150
-extern void G_SayTo( gentity_t *ent, gentity_t *other, int mode, int color, const char *name, const char *message, qboolean localize );
+extern void G_SayTo(gentity_t *ent, gentity_t *other, int mode, int color,
+			 const char *name, const char *message, qboolean localize, qboolean encoded);
 
 void weapon_checkAirStrikeThink1( gentity_t *ent ) {
 	if( !weapon_checkAirStrike( ent ) ) {
@@ -2293,7 +2294,7 @@ qboolean weapon_checkAirStrike( gentity_t *ent ) {
 
 	if( ent->s.teamNum == TEAM_AXIS ) {
 		if( level.numActiveAirstrikes[0] > 6 || !G_AvailableAirstrikes( ent->parent ) ) {
-			G_SayTo( ent->parent, ent->parent, 2, COLOR_YELLOW, "HQ: ", "All available planes are already en-route.", qtrue );
+			G_SayTo( ent->parent, ent->parent, 2, COLOR_YELLOW, "HQ: ", "All available planes are already en-route.", qtrue , qfalse);
 
 			G_GlobalClientEvent( EV_AIRSTRIKEMESSAGE, 0, ent->parent-g_entities );
 
@@ -2313,7 +2314,7 @@ qboolean weapon_checkAirStrike( gentity_t *ent ) {
 		}
 	} else {
 		if( level.numActiveAirstrikes[1] > 6 || !G_AvailableAirstrikes( ent->parent ) ) {
-			G_SayTo( ent->parent, ent->parent, 2, COLOR_YELLOW, "HQ: ", "All available planes are already en-route.", qtrue );
+			G_SayTo( ent->parent, ent->parent, 2, COLOR_YELLOW, "HQ: ", "All available planes are already en-route.", qtrue, qfalse );
 
 			G_GlobalClientEvent( EV_AIRSTRIKEMESSAGE, 0, ent->parent-g_entities );
 
@@ -2365,7 +2366,7 @@ void weapon_callAirStrike( gentity_t *ent ) {
 
 	trap_Trace( &tr, ent->s.pos.trBase, NULL, NULL, bomboffset, ent->s.number, MASK_SHOT );
 	if ((tr.fraction < 1.0) && (!(tr.surfaceFlags & SURF_NOIMPACT)) ) { //SURF_SKY)) ) { // JPW NERVE changed for trenchtoast foggie prollem
-		G_SayTo( ent->parent, ent->parent, 2, COLOR_YELLOW, "Pilot: ", "Aborting, can't see target.", qtrue );
+		G_SayTo( ent->parent, ent->parent, 2, COLOR_YELLOW, "Pilot: ", "Aborting, can't see target.", qtrue, qfalse );
 
 		G_GlobalClientEvent( EV_AIRSTRIKEMESSAGE, 1, ent->parent-g_entities );
 
@@ -2585,7 +2586,7 @@ void Weapon_Artillery(gentity_t *ent) {
 
 	if( ent->client->sess.sessionTeam == TEAM_AXIS ) {
 		if( !G_AvailableAirstrikes( ent ) ) {
-			G_SayTo( ent, ent, 2, COLOR_YELLOW, "Fire Mission: ", "Insufficient fire support.", qtrue );
+			G_SayTo( ent, ent, 2, COLOR_YELLOW, "Fire Mission: ", "Insufficient fire support.", qtrue, qfalse );
 			ent->active = qfalse;
 
 			G_GlobalClientEvent( EV_ARTYMESSAGE, 0, ent-g_entities );
@@ -2598,7 +2599,7 @@ void Weapon_Artillery(gentity_t *ent) {
 		}
 	} else {
 		if( !G_AvailableAirstrikes( ent ) ) {
-			G_SayTo( ent, ent, 2, COLOR_YELLOW, "Fire Mission: ", "Insufficient fire support.", qtrue );
+			G_SayTo( ent, ent, 2, COLOR_YELLOW, "Fire Mission: ", "Insufficient fire support.", qtrue, qfalse );
 			ent->active = qfalse;
 
 			G_GlobalClientEvent( EV_ARTYMESSAGE, 0, ent-g_entities );
@@ -2628,7 +2629,7 @@ void Weapon_Artillery(gentity_t *ent) {
 
 	trap_Trace(&trace, pos, NULL, NULL, bomboffset, ent->s.number, MASK_SHOT);
 	if ((trace.fraction < 1.0) && (!(trace.surfaceFlags & SURF_NOIMPACT)) ) { // JPW NERVE was SURF_SKY)) ) {
-		G_SayTo( ent, ent, 2, COLOR_YELLOW, "Fire Mission: ", "Aborting, can't see target.", qtrue );
+		G_SayTo( ent, ent, 2, COLOR_YELLOW, "Fire Mission: ", "Aborting, can't see target.", qtrue, qfalse );
 
 		G_GlobalClientEvent( EV_ARTYMESSAGE, 1, ent-g_entities );
 
@@ -2646,7 +2647,7 @@ void Weapon_Artillery(gentity_t *ent) {
 
 	G_AddAirstrikeToCounters( ent );
 
-	G_SayTo( ent, ent, 2, COLOR_YELLOW, "Fire Mission: ", "Firing for effect!", qtrue );
+	G_SayTo( ent, ent, 2, COLOR_YELLOW, "Fire Mission: ", "Firing for effect!", qtrue, qfalse );
 
 	G_GlobalClientEvent( EV_ARTYMESSAGE, 2, ent-g_entities );
 

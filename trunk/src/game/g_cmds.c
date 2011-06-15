@@ -3413,6 +3413,10 @@ void Cmd_Goto_f(gentity_t *ent) {
 
 	other = g_entities + clientNum;
 
+	if(other->client->sess.noGoto) {
+		CP("cpm \"^7Target player has disabled ^3goto^7!\n\"");
+	}
+
 	if (ent->client->sess.sessionTeam == TEAM_SPECTATOR)
 	{
 		CP("cpm \"^7You can not ^3goto ^7as spectator!\n\"");
@@ -3472,6 +3476,10 @@ void Cmd_Call_f(gentity_t *ent)
 		return;
 	}
 
+	if(other->client->sess.noCall) {
+		CP("cpm \"^7Target player has disabled ^3call^7!\n\"");
+	}
+
 	VectorCopy(other->client->ps.origin, other->client->sess.goto_backup_pos.origin);
 	other->client->sess.goto_backup_pos.isValid = qtrue;
 	VectorCopy(ent->client->ps.origin, other->client->ps.origin);
@@ -3513,6 +3521,32 @@ void Cmd_PrivateMessage_f(gentity_t *ent)
 		CP(va("print \"Private message to %s was ignored by the player.\n\"", other->client->pers.netname));
 }
 
+void Cmd_noGoto_f(gentity_t *ent) {
+	char *msg;
+	if(ent->client->sess.noGoto) {
+		ent->client->sess.noGoto = qfalse;
+		msg = "disabled";
+	} else {
+		ent->client->sess.noGoto = qtrue;
+		msg = "enabled";
+	}
+	CP(va("print \"^7You have %s goto\n\"", msg));
+}
+
+void Cmd_noCall_f(gentity_t *ent) {
+	char *msg;
+	if(ent->client->sess.noCall) {
+		ent->client->sess.noCall = qfalse;
+		msg = "disabled";
+	} else {
+		ent->client->sess.noCall = qtrue;
+		msg = "enabled";
+	}
+	CP(va("print \"^7You have %s goto\n\"", msg));
+}
+
+
+
 /*
  * Figures out if we are allowed to follow a given client.
  */
@@ -3530,19 +3564,6 @@ qboolean G_DesiredFollow(gentity_t *ent, gentity_t *other)
 	return G_AllowFollow(ent, other)
 		   && (ent->client->sess.spec_team == 0
 			   || ent->client->sess.spec_team == other->client->sess.sessionTeam);
-}
-
-void Cmd_PrintCGazUsers_f(gentity_t *ent) {
-	int i;
-	CP("print \"Player                                     CGaz On\n\"");
-	for (i = 0; i < level.numConnectedClients; i++) {
-		if(level.clients[i].pers.cgaz) {
-			CP(va("print \"%s                                     Yes\n\"", level.clients[i].pers.netname));
-		}
-		else {
-			CP(va("print \"%s                                     No\n\"", level.clients[i].pers.netname));
-		}
-	}
 }
 
 /*
@@ -3635,6 +3656,8 @@ static command_t anyTimeCommands[] =
 	{ "ws",					qfalse,	Cmd_WeaponStat_f },
 	{ "rs",					qfalse,	Cmd_ResetSetup_f },
 	{ "m",					qtrue,	Cmd_PrivateMessage_f },
+	{ "nogoto",				qfalse, Cmd_noGoto_f },
+	{ "nocall",				qfalse, Cmd_noCall_f },
 };
 
 static command_t noIntermissionCommands[] =
@@ -3658,7 +3681,6 @@ static command_t noIntermissionCommands[] =
 	{ "iwant",				qtrue,  Cmd_Call_f },
 	{ "load",				qfalse,	Cmd_Load_f },
 	{ "save",				qfalse,	Cmd_Save_f },
-	{ "CGazlist",			qfalse, Cmd_PrintCGazUsers_f },
 };
 
 qboolean ClientIsFlooding(gentity_t *ent)

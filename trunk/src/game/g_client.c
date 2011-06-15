@@ -1823,6 +1823,9 @@ void ClientBegin( int clientNum )
 	}
 	// End Xian
 
+	client->sess.noGoto = qfalse;
+	client->sess.noCall = qfalse;
+
 	// count current clients and rank for scoreboard
 	CalculateRanks();
 

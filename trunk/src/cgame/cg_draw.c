@@ -4369,6 +4369,7 @@ CG_Draw2D
 =================
 */
 static void CG_Draw2D( void ) {
+	rectDef_t	rect;
 	CG_ScreenFade();
 
 	// Arnout: no 2d when in esc menu
@@ -4447,6 +4448,22 @@ static void CG_Draw2D( void ) {
 				CG_DrawPlayerStatusHead();
 				CG_DrawPlayerStatus();
 				CG_DrawPlayerStats();
+			}
+
+			if(cg.snap->ps.stats[STAT_HEALTH] > 0 && cg_drawTJHud.integer) {
+				rect.x = 24;
+				rect.y = 480 - 92;
+				rect.w = 12;
+				rect.h = 72;
+				CG_DrawPlayerHealthBar( &rect );
+	// ==
+
+	// ==
+				rect.x = 4;
+				rect.y = 480 - 92;
+				rect.w = 12;
+				rect.h = 72;
+				CG_DrawStaminaBar( &rect );
 			}
 
 			CG_DrawLivesLeft();

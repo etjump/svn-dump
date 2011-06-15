@@ -611,6 +611,9 @@ typedef struct {
 
 	save_position_t goto_backup_pos;
 
+	qboolean	noGoto;
+	qboolean	noCall;
+
 	// SpamProtection
 
 	int			nextReliableTime;
@@ -1175,6 +1178,8 @@ void G_EntitySoundNoCut( gentity_t *ent, const char *soundId, int volume );
 int ClientNumberFromString( gentity_t *to, char *s );
 void SanitizeString( char *in, char *out, qboolean fToLower );
 void Cmd_PrivateMessage_f(gentity_t *ent);
+void Cmd_noGoto_f(gentity_t *ent);
+void Cmd_noCall_f(gentity_t *ent);
 qboolean G_AllowFollow(gentity_t *ent, gentity_t *other);
 qboolean G_DesiredFollow(gentity_t *ent, gentity_t *other);
 void Cmd_FollowCycle_f(gentity_t *ent, int dir);
@@ -1454,7 +1459,8 @@ void G_SendScore( gentity_t *client );
 //
 // g_cmds.c
 //
-void G_SayTo(gentity_t *ent, gentity_t *other, int mode, int color, const char *name, const char *message, qboolean localize, qboolean encoded); // JPW NERVE removed static declaration so it would link
+void G_SayTo(gentity_t *ent, gentity_t *other, int mode, int color,
+			 const char *name, const char *message, qboolean localize, qboolean encoded); // JPW NERVE removed static declaration so it would link
 qboolean Cmd_CallVote_f( gentity_t *ent, unsigned int dwCommand, qboolean fValue );
 void Cmd_Follow_f( gentity_t *ent, unsigned int dwCommand, qboolean fValue );
 void Cmd_Say_f(gentity_t *ent, int mode, qboolean arg0, qboolean encoded);
