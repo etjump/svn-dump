@@ -3121,7 +3121,14 @@ CheckVote
 ==================
 */
 void CheckVote( void ) {
+	gentity_t *other = g_entities + level.voteInfo.voter_cn;
 	if(!level.voteInfo.voteTime || level.voteInfo.vote_fn == NULL || level.time - level.voteInfo.voteTime < 1000) return;
+
+	if (level.voteInfo.voter_team != other->client->sess.sessionTeam)
+	{
+		AP("cpm \"^7Vote canceled: voter switched teams\n\"");
+		G_LogPrintf("Vote Failed: %s (voter %s switched teams)\n", level.voteInfo.voteString, other->client->pers.netname);
+	}
 
 	if(level.time - level.voteInfo.voteTime >= VOTE_TIME) {
 		AP(va("cpm \"^2Vote FAILED! ^3(%s)\n\"", level.voteInfo.voteString));

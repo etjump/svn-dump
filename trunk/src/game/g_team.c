@@ -91,6 +91,24 @@ qboolean OnSameTeam( gentity_t *ent1, gentity_t *ent2 ) {
 	return qfalse;
 }
 
+qboolean OnAnyTeam(gentity_t *ent1, gentity_t *ent2)
+{
+	// XXX setup - what is this for?
+	if (!ent1->client || !ent2->client)
+	{
+		return qfalse;
+	}
+
+	if (ent1->client->sess.sessionTeam == ent2->client->sess.sessionTeam
+			||	(ent1->client->sess.sessionTeam == TEAM_AXIS && ent2->client->sess.sessionTeam == TEAM_ALLIES)
+			||	(ent1->client->sess.sessionTeam == TEAM_ALLIES && ent2->client->sess.sessionTeam == TEAM_AXIS))
+	{
+		return qtrue;
+	}
+
+	return qfalse;
+}
+
 // JPW NERVE moved these up
 #define WCP_ANIM_NOFLAG				0
 #define WCP_ANIM_RAISE_AXIS			1

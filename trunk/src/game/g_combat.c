@@ -1266,9 +1266,11 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker,  vec3
 	if ( knockback > 200 ) {
 		knockback = 200;
 	}
+
 	if ( targ->flags & FL_NO_KNOCKBACK ) {
 		knockback = 0;
 	}
+
 	if ( dflags & DAMAGE_NO_KNOCKBACK ) {
 		knockback = 0;
 	} else if( dflags & DAMAGE_HALF_KNOCKBACK ) {
@@ -1279,18 +1281,16 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker,  vec3
 	if( client && (client->ps.weapon == WP_MORTAR_SET || client->ps.weapon == WP_MOBILE_MG42_SET) )
 		knockback *= 0.5;
 
-	if( targ->client && g_friendlyFire.integer && OnSameTeam(targ, attacker) ) {
-		knockback = 0;
-	}
-	
-	if(targ->client != attacker->client) {
+	if(targ->client != attacker->client && attacker->client) {
 		knockback = 0;
 	}
 
 	// figure momentum add, even if the damage won't be taken
-	if ( knockback && targ->client ) {
+	if ( knockback && targ->client ) {		
 		vec3_t	kvel;
 		float	mass;
+
+		AP(va("print \"Knockback %i\n\"", knockback));
 
 		mass = 200;
 
@@ -1339,11 +1339,11 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker,  vec3
 		}
 	}
 
-	if(attacker->client)
-		return;
-
 	// check for completely getting out of the damage
 	if ( !(dflags & DAMAGE_NO_PROTECTION) ) {
+
+		if (OnAnyTeam(targ, attacker))
+			return;
 
 		// if TF_NO_FRIENDLY_FIRE is set, don't do damage to the target
 		// if the attacker was on the same team
