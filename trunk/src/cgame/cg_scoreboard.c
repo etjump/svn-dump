@@ -141,7 +141,10 @@ int WM_DrawObjectives( int x, int y, int width, float fade ) {
 			s = va( "%s   %2.0f:%i%i", CG_TranslateString( "MISSION TIME:" ), (float)mins, tens, seconds ); // float cast to line up with reinforce time
 		}
 
-		CG_Text_Paint_Ext( x, y + 13, 0.25f, 0.25f, tclr, s, 0, 0, 0, &cgs.media.limboFont1 );
+	//	CG_Text_Paint_Ext( x, y + 13, 0.25f, 0.25f, tclr, s, 0, 0, 0, &cgs.media.limboFont1 );
+
+		s = va(CG_TranslateString(va("^<%s", cgs.rawmapname)));
+		CG_Text_Paint_Ext(640 / 2 - CG_Text_Width_Ext(s, 0.25f, 0, &cgs.media.limboFont2) / 2, y + 13, 0.25f, 0.25f, tclr, s, 0, 0, 0, &cgs.media.limboFont2);
 
 		if( cgs.gametype != GT_WOLF_LMS ) {
 			if(cgs.clientinfo[cg.snap->ps.clientNum].team == TEAM_AXIS || cgs.clientinfo[cg.snap->ps.clientNum].team == TEAM_ALLIES) {
@@ -158,7 +161,7 @@ int WM_DrawObjectives( int x, int y, int width, float fade ) {
 				seconds -= tens * 10;
 
 				s = va( "%s %2.0f:%i%i", CG_TranslateString( "REINFORCE TIME:" ), (float)mins, tens, seconds );
-				CG_Text_Paint_Ext( 640 - 20 - CG_Text_Width_Ext( s, 0.25f, 0, &cgs.media.limboFont1 ), y + 13, 0.25f, 0.25f, tclr, s, 0, 0, 0, &cgs.media.limboFont1 );
+			//	CG_Text_Paint_Ext( 640 - 20 - CG_Text_Width_Ext( s, 0.25f, 0, &cgs.media.limboFont1 ), y + 13, 0.25f, 0.25f, tclr, s, 0, 0, 0, &cgs.media.limboFont1 );
 			}
 		}
 
@@ -169,19 +172,19 @@ int WM_DrawObjectives( int x, int y, int width, float fade ) {
 
 			w = CG_Text_Width_Ext( s, 0.25f, 0, &cgs.media.limboFont1 );
 
-			CG_Text_Paint_Ext( x + 300 - w*0.5f, y + 13, 0.25f, 0.25f, tclr, s, 0, 0, 0, &cgs.media.limboFont1 );
+			//CG_Text_Paint_Ext( x + 300 - w*0.5f, y + 13, 0.25f, 0.25f, tclr, s, 0, 0, 0, &cgs.media.limboFont1 );
 		} else if( cgs.gametype == GT_WOLF_LMS ) {
 			int w;
 			s = va( "%s %i  %s %i-%i", CG_TranslateString( "ROUND" ), cgs.currentRound + 1, CG_TranslateString( "SCORE" ), cg.teamWonRounds[1], cg.teamWonRounds[0] );
 			w = CG_Text_Width_Ext( s, 0.25f, 0, &cgs.media.limboFont1 );
 
-			CG_Text_Paint_Ext( x + 300 - w*0.5f, y + 13, 0.25f, 0.25f, tclr, s, 0, 0, 0, &cgs.media.limboFont1 );
+			//CG_Text_Paint_Ext( x + 300 - w*0.5f, y + 13, 0.25f, 0.25f, tclr, s, 0, 0, 0, &cgs.media.limboFont1 );
 		} else if( cgs.gametype == GT_WOLF_CAMPAIGN ) {
 			int w;
 			s = va( "MAP %i of %i", cgs.currentCampaignMap + 1, cgs.campaignData.mapCount );
 			w = CG_Text_Width_Ext( s, 0.25f, 0, &cgs.media.limboFont1 );
 
-			CG_Text_Paint_Ext( x + 300 - w*0.5f, y + 13, 0.25f, 0.25f, tclr, s, 0, 0, 0, &cgs.media.limboFont1 );
+			//CG_Text_Paint_Ext( x + 300 - w*0.5f, y + 13, 0.25f, 0.25f, tclr, s, 0, 0, 0, &cgs.media.limboFont1 );
 		}
 		
 		y += SMALLCHAR_HEIGHT * 2;
