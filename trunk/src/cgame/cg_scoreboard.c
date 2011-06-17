@@ -231,26 +231,6 @@ static void WM_DrawClientScore(int x, int y, score_t *score, float *color, float
 			width = INFO_CLASS_WIDTH + INFO_SCORE_WIDTH  + INFO_CGAZ_WIDTH + INFO_LATENCY_WIDTH * 2 - 6;
 
 			CG_FillRect(tempx, y + 1, width - INFO_BORDER, SMALLCHAR_HEIGHT - 1, hcolor);
-
-			// Not needed
-			 
-			/*
-			CG_FillRect(tempx, y + 1, INFO_FPS_WIDTH - INFO_BORDER, SMALLCHAR_HEIGHT - 1, hcolor);
-			tempx += INFO_FPS_WIDTH;
-
-
-			// Shows pmove now, cba to rename everything :P
-			CG_FillRect(tempx, y + 1, INFO_PMOVE_WIDTH, SMALLCHAR_HEIGHT - 1, hcolor);
-			tempx += INFO_PMOVE_WIDTH;
-
-
-			CG_FillRect(tempx, y + 1, INFO_CGAZ_WIDTH - 1, SMALLCHAR_HEIGHT - 1, hcolor);
-			tempx += INFO_CGAZ_WIDTH;
-
-			CG_FillRect(tempx, y + 1, INFO_LATENCY_WIDTH - 1, SMALLCHAR_HEIGHT - 1, hcolor);
-			tempx += INFO_LATENCY_WIDTH;
-			*/
-
 		}
 	}
 
@@ -265,9 +245,9 @@ static void WM_DrawClientScore(int x, int y, score_t *score, float *color, float
 	// draw name, 12 chars if drawing cgaz users, else 16
 	if(cg_drawCGazUsers.integer)
 		CG_DrawStringExt(tempx, y, ci->name, hcolor, qfalse, qfalse, SMALLCHAR_WIDTH, SMALLCHAR_HEIGHT, 12);
-	else
+	else 
 		CG_DrawStringExt(tempx, y, ci->name, hcolor, qfalse, qfalse, SMALLCHAR_WIDTH, SMALLCHAR_HEIGHT, 16);
-
+	
 	tempx += INFO_PLAYER_WIDTH - offset;
 
 	if (ci->team == TEAM_SPECTATOR)
@@ -276,6 +256,11 @@ static void WM_DrawClientScore(int x, int y, score_t *score, float *color, float
 		int totalwidth;
 
 		totalwidth = INFO_CLASS_WIDTH + INFO_SCORE_WIDTH + INFO_CGAZ_WIDTH + INFO_LATENCY_WIDTH - 8 + INFO_CGAZ_WIDTH;
+
+		if(!cg_drawCGazUsers.integer)
+			tempx += INFO_CGAZ_WIDTH;
+
+		tempx += 19;
 
 		if (score->ping == -1)
 		{
@@ -295,25 +280,17 @@ static void WM_DrawClientScore(int x, int y, score_t *score, float *color, float
 
 			// Draws max 12 chars of the name
 			CG_DrawStringExt(tempx + 3, y, s, hcolor, qfalse, qfalse, SMALLCHAR_WIDTH, SMALLCHAR_HEIGHT, 12);
-
-			trap_R_SetColor(colorYellow);
+		
 			CG_DrawSmallString(tempx - 16, y, CG_TranslateString("^3>"), fade);
-			trap_R_SetColor(NULL);
 		}
 
-		if(!cg_drawCGazUsers.integer) 
-			tempx += INFO_CGAZ_WIDTH;
-		// Dini, show ping for specs too..
-
+		if(!cg_drawCGazUsers.integer)
+				tempx -= 27;
 		CG_DrawSmallString(tempx + 10 + INFO_PMOVE_WIDTH + INFO_FPS_WIDTH, y, va("^z%5i", score->ping), fade);
 		return;
 	}
-	// Dini, Draw small image \ icon for class
 	else
 	{
-		//CG_DrawSmallString( tempx, y, CG_TranslateString( BG_ShortClassnameForNumber( score->playerClass ) ), fade );
-		// cg_drawpic, x, y, w, h, pic
-
 		int playerType;
 		playerType = ci->cls;
 
@@ -364,12 +341,15 @@ static void WM_DrawClientScore(int x, int y, score_t *score, float *color, float
 		CG_DrawSmallString(tempx + 50, y, va("%s", cgazOn), fade);
 		tempx += (INFO_CGAZ_WIDTH / 2) - 5;
 
+	} else {
+		tempx -= 13;
 	}
 
 	// Ping
-	CG_DrawSmallString(tempx + 45, y, va("%5i", score->ping), fade);
+	CG_DrawSmallString(tempx + 50, y, va("%5i", score->ping), fade);
 
 }
+
 const char* WM_TimeToString( float msec ) {
 	int mins, seconds, tens;
 

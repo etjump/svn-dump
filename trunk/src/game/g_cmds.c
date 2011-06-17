@@ -11,7 +11,8 @@ G_SendScore
 Sends current scoreboard information
 ==================
 */
-void G_SendScore( gentity_t *ent ) {
+void G_SendScore(gentity_t *ent)
+{
 	char		entry[128];
 	int			i;
 	gclient_t	*cl;
@@ -22,87 +23,92 @@ void G_SendScore( gentity_t *ent ) {
 
 	// send the latest information on all clients
 	numSorted = level.numConnectedClients;
-	if ( numSorted > 64 ) {
+	if (numSorted > 64)
+	{
 		numSorted = 64;
 	}
 
 	i = 0;
 	// Gordon: team doesnt actually mean team, ignore...
-	for(team = 0; team < 2; team++) {
+	for (team = 0; team < 2; team++)
+	{
 		*buffer = '\0';
 		*startbuffer = '\0';
-		if( team == 0 ) {
-			Q_strncpyz(startbuffer, va("sc0 %i %i", level.teamScores[TEAM_AXIS], level.teamScores[TEAM_ALLIES]), 32 );
-		} else {
-			Q_strncpyz(startbuffer, "sc1", 32 );
+		if (team == 0)
+		{
+			Q_strncpyz(startbuffer, va("sc0 %i %i", level.teamScores[TEAM_AXIS], level.teamScores[TEAM_ALLIES]), 32);
+		}
+		else
+		{
+			Q_strncpyz(startbuffer, "sc1", 32);
 		}
 		size = strlen(startbuffer) + 1;
 		count = 0;
 
-		for(; i < numSorted ; i++) {
+		for (; i < numSorted ; i++)
+		{
+			int j, totalXP;
 			int		ping, playerClass, respawnsLeft;
 
 			cl = &level.clients[level.sortedClients[i]];
 
-			if(g_entities[level.sortedClients[i]].r.svFlags & SVF_POW) {
+			if (g_entities[level.sortedClients[i]].r.svFlags & SVF_POW)
+			{
 				continue;
 			}
 
-			// NERVE - SMF - if on same team, send across player class
-			// Gordon: FIXME: remove/move elsewhere?
-			if ( cl->ps.persistant[PERS_TEAM] == ent->client->ps.persistant[PERS_TEAM] || G_smvLocateEntityInMVList(ent, level.sortedClients[i], qfalse)) {
-				playerClass = cl->ps.stats[STAT_PLAYER_CLASS];
-			} else {
-				playerClass = 0;
-			}
+			playerClass = cl->ps.stats[STAT_PLAYER_CLASS];
 
 			// NERVE - SMF - number of respawns left
 			respawnsLeft = cl->ps.persistant[PERS_RESPAWNS_LEFT];
-			if( g_gametype.integer == GT_WOLF_LMS ) {
-				if( g_entities[level.sortedClients[i]].health <= 0 ) {
-					respawnsLeft = -2;
-				}
-			} else {
-				if( (respawnsLeft == 0 && ((cl->ps.pm_flags & PMF_LIMBO) || (( level.intermissiontime ) && g_entities[level.sortedClients[i]].health <= 0))) ) {
-					respawnsLeft = -2;
-				}
+			if ((respawnsLeft == 0 && ((cl->ps.pm_flags & PMF_LIMBO) || ((level.intermissiontime) && g_entities[level.sortedClients[i]].health <= 0))))
+			{
+				respawnsLeft = -2;
 			}
 
-			if ( cl->pers.connected == CON_CONNECTING ) {
+
+			if (cl->pers.connected == CON_CONNECTING)
+			{
 				ping = -1;
-			} else {
+			}
+			else
+			{
 				ping = cl->ps.ping < 999 ? cl->ps.ping : 999;
 			}
 
-			if( g_gametype.integer == GT_WOLF_LMS ) {
-				Com_sprintf (entry, sizeof(entry), " %i %i %i %i %i %i %i", level.sortedClients[i], cl->ps.persistant[PERS_SCORE], ping, 
-					(level.time - cl->pers.enterTime) / 60000, g_entities[level.sortedClients[i]].s.powerups, playerClass, respawnsLeft );
-			} else {
-				int j, totalXP;
-
-				for( totalXP = 0, j = 0; j < SK_NUM_SKILLS; j++ ) {
-					totalXP += cl->sess.skillpoints[j];
-				}
-
-				Com_sprintf (entry, sizeof(entry), " %i %i %i %i %i %i %i", level.sortedClients[i], totalXP, ping, 
-					(level.time - cl->pers.enterTime) / 60000, g_entities[level.sortedClients[i]].s.powerups, playerClass, respawnsLeft );
+			for (totalXP = 0, j = 0; j < SK_NUM_SKILLS; j++)
+			{
+				totalXP += cl->sess.skillpoints[j];
 			}
 
-			if(size + strlen(entry) > 1000) {
-				i--; // we need to redo this client in the next buffer (if we can)
+			Com_sprintf(entry, sizeof(entry), " %i %i %i %i %i %i %i %i",
+						level.sortedClients[i],
+						totalXP,
+						ping,
+						(level.time - cl->pers.enterTime) / 60000,
+						g_entities[level.sortedClients[i]].s.powerups,
+						playerClass,
+						respawnsLeft,
+						cl->ps.clientNum);
+
+
+			if (size + strlen(entry) > 1000)
+			{
 				break;
 			}
 			size += strlen(entry);
 
 			Q_strcat(buffer, 1024, entry);
-			if( ++count >= 32 ) {
-				i--; // we need to redo this client in the next buffer (if we can)
+			if (++count >= 32)
+			{
+				i++; // we need to redo this client in the next buffer (if we can)
 				break;
 			}
 		}
 
-		if(count > 0 || team == 0) {
-			trap_SendServerCommand( ent-g_entities, va("%s %i%s", startbuffer, count, buffer));
+		if (count > 0 || team == 0)
+		{
+			trap_SendServerCommand(ent - g_entities, va("%s %i%s", startbuffer, count, buffer));
 		}
 	}
 }

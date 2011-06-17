@@ -894,7 +894,7 @@ void SetWolfSpawnWeapons( gclient_t *client )
 			{
 				AddWeaponToPlayer(client, WP_AMMO, 0, 1, qfalse);
 
-				AddWeaponToPlayer(client, WP_SMOKE_MARKER, GetAmmoTableData(WP_SMOKE_MARKER)->defaultStartingAmmo, GetAmmoTableData(WP_SMOKE_MARKER)->defaultStartingClip, qfalse);
+				//AddWeaponToPlayer(client, WP_SMOKE_MARKER, GetAmmoTableData(WP_SMOKE_MARKER)->defaultStartingAmmo, GetAmmoTableData(WP_SMOKE_MARKER)->defaultStartingClip, qfalse);
 
 				if (client->sess.sessionTeam == TEAM_AXIS)
 				{
