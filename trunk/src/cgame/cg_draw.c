@@ -4211,10 +4211,12 @@ static void CG_DrawPlayerStats( void ) {
 	float				w;
 	vec_t*				clr;
 
-	str = va( "%i", cg.snap->ps.stats[STAT_HEALTH] );
-	w = CG_Text_Width_Ext( str, 0.25f, 0, &cgs.media.limboFont1 );
-	CG_Text_Paint_Ext( SKILLS_X - 28 - w, 480 - 4, 0.25f, 0.25f, colorWhite, str, 0, 0, ITEM_TEXTSTYLE_SHADOWED, &cgs.media.limboFont1 );
-	CG_Text_Paint_Ext( SKILLS_X - 28 + 2, 480 - 4, 0.2f, 0.2f, colorWhite, "HP", 0, 0, ITEM_TEXTSTYLE_SHADOWED, &cgs.media.limboFont1 );
+	if(!cg_drawTJHud.integer) {
+		str = va( "%i", cg.snap->ps.stats[STAT_HEALTH] );
+		w = CG_Text_Width_Ext( str, 0.25f, 0, &cgs.media.limboFont1 );
+		CG_Text_Paint_Ext( SKILLS_X - 28 - w, 480 - 4, 0.25f, 0.25f, colorWhite, str, 0, 0, ITEM_TEXTSTYLE_SHADOWED, &cgs.media.limboFont1 );
+		CG_Text_Paint_Ext( SKILLS_X - 28 + 2, 480 - 4, 0.2f, 0.2f, colorWhite, "HP", 0, 0, ITEM_TEXTSTYLE_SHADOWED, &cgs.media.limboFont1 );
+	}
 
 	if( cgs.gametype == GT_WOLF_LMS ) {
 		return;
@@ -4223,12 +4225,13 @@ static void CG_DrawPlayerStats( void ) {
 	ps = &cg.snap->ps;
 	ci = &cgs.clientinfo[ ps->clientNum ];
 
+	if(!cg_drawTJHud.integer) {
+		for( i = 0; i < 3; i++ ) {
+			skill = CG_ClassSkillForPosition( ci, i );
 
-	for( i = 0; i < 3; i++ ) {
-		skill = CG_ClassSkillForPosition( ci, i );
-
-		CG_DrawSkillBar( i * SKILL_BAR_X_SCALE + SKILL_BAR_X, 480 - (5 * SKILL_BAR_Y_SCALE) + SKILL_BAR_Y, SKILL_BAR_WIDTH, 4 * SKILL_ICON_SIZE, ci->skill[skill] );
-		CG_DrawPic( i * SKILL_ICON_X_SCALE + SKILL_ICON_X, 480 + SKILL_ICON_Y, SKILL_ICON_SIZE, SKILL_ICON_SIZE, cgs.media.skillPics[skill] );
+			CG_DrawSkillBar( i * SKILL_BAR_X_SCALE + SKILL_BAR_X, 480 - (5 * SKILL_BAR_Y_SCALE) + SKILL_BAR_Y, SKILL_BAR_WIDTH, 4 * SKILL_ICON_SIZE, ci->skill[skill] );
+			CG_DrawPic( i * SKILL_ICON_X_SCALE + SKILL_ICON_X, 480 + SKILL_ICON_Y, SKILL_ICON_SIZE, SKILL_ICON_SIZE, cgs.media.skillPics[skill] );
+		}
 	}
 
 	if( cg.time - cg.xpChangeTime < 1000 ) {
@@ -4237,12 +4240,12 @@ static void CG_DrawPlayerStats( void ) {
 		clr = colorWhite;
 	}
 
-
-	str = va( "%i", cg.snap->ps.stats[STAT_XP] );
-	w = CG_Text_Width_Ext( str, 0.25f, 0, &cgs.media.limboFont1 );
-	CG_Text_Paint_Ext( SKILLS_X + 28 - w, 480 - 4, 0.25f, 0.25f, clr, str, 0, 0, ITEM_TEXTSTYLE_SHADOWED, &cgs.media.limboFont1 );
-	CG_Text_Paint_Ext( SKILLS_X + 28 + 2, 480 - 4, 0.2f, 0.2f, clr, "XP", 0, 0, ITEM_TEXTSTYLE_SHADOWED, &cgs.media.limboFont1 );
-
+	if(!cg_drawTJHud.integer) {
+		str = va( "%i", cg.snap->ps.stats[STAT_XP] );
+		w = CG_Text_Width_Ext( str, 0.25f, 0, &cgs.media.limboFont1 );
+		CG_Text_Paint_Ext( SKILLS_X + 28 - w, 480 - 4, 0.25f, 0.25f, clr, str, 0, 0, ITEM_TEXTSTYLE_SHADOWED, &cgs.media.limboFont1 );
+		CG_Text_Paint_Ext( SKILLS_X + 28 + 2, 480 - 4, 0.2f, 0.2f, clr, "XP", 0, 0, ITEM_TEXTSTYLE_SHADOWED, &cgs.media.limboFont1 );
+	}
 	// draw treasure icon if we have the flag
 	// rain - #274 - use the playerstate instead of the clientinfo
 	if( ps->powerups[PW_REDFLAG] || ps->powerups[PW_BLUEFLAG] ) {
@@ -4444,8 +4447,9 @@ static void CG_Draw2D( void ) {
 		if( cg.snap->ps.persistant[PERS_TEAM] != TEAM_SPECTATOR ) {
 			rectDef_t rect;
 
-			if( cg.snap->ps.stats[STAT_HEALTH] > 0 && !cg_drawTJHud.integer) {
-				CG_DrawPlayerStatusHead();
+			if( cg.snap->ps.stats[STAT_HEALTH] > 0) {
+				if(!cg_drawTJHud.integer)
+					CG_DrawPlayerStatusHead();
 				CG_DrawPlayerStatus();
 				CG_DrawPlayerStats();
 			}

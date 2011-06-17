@@ -1923,6 +1923,31 @@ qboolean Cmd_CallVote_f( gentity_t *ent, unsigned int dwCommand, qboolean fRefCo
 		return(qfalse);
 	}
 
+	if (!Q_stricmp(arg1, "map"))
+	{
+		char			mapfile[MAX_QPATH];
+		fileHandle_t    f;
+		int				len;
+
+		if (arg2[0] == '\0' || trap_Argc() == 1)
+		{
+			CP("print \"^3Callvote: ^7No map specified.\n\"");
+			return qfalse;
+		}
+
+		Com_sprintf(mapfile, sizeof(mapfile), "maps/%s.bsp", arg2);
+
+		len = trap_FS_FOpenFile(mapfile, &f, FS_READ);
+
+		trap_FS_FCloseFile(f);
+
+		if (!f)
+		{
+			CP(va("print \"^3Callvote: ^7The map is not on the server.\n\"", arg2));
+			return qfalse;
+		}
+	}
+
 
 	if(trap_Argc() > 1 && (i = G_voteCmdCheck(ent, arg1, arg2, fRefCommand)) != G_NOTFOUND) {	//  --OSP
 		if(i != G_OK)	 {
@@ -3382,10 +3407,18 @@ void Cmd_Save_f(gentity_t *ent)
 	}
 
 	trap_TraceCapsule(&trace, ent->client->ps.origin, ent->r.mins, ent->r.maxs, ent->client->ps.origin, ent->s.number, CONTENTS_NOSAVE);
-	if (trace.fraction != 1.0f)
-	{
-		CP("cp \"^7You can not ^3save ^7inside this area!\n\"");
-		return;
+
+	if(level.noSave) {
+		if(!trace.fraction != 1.0f) {
+			CP("cp \"^7You can not ^3save ^7inside this area!\n\"");
+			return;
+		}
+	} else {
+		if (trace.fraction != 1.0f)
+		{
+			CP("cp \"^7You can not ^3save ^7inside this area!\n\"");
+			return;
+		}
 	}
 
 	if (ent->client->sess.sessionTeam == TEAM_ALLIES)
@@ -3421,6 +3454,7 @@ void Cmd_Goto_f(gentity_t *ent) {
 
 	if(other->client->sess.noGoto) {
 		CP("cpm \"^7Target player has disabled ^3goto^7!\n\"");
+		return;
 	}
 
 	if (ent->client->sess.sessionTeam == TEAM_SPECTATOR)
@@ -3484,6 +3518,7 @@ void Cmd_Call_f(gentity_t *ent)
 
 	if(other->client->sess.noCall) {
 		CP("cpm \"^7Target player has disabled ^3call^7!\n\"");
+		return;
 	}
 
 	VectorCopy(other->client->ps.origin, other->client->sess.goto_backup_pos.origin);

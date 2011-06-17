@@ -763,7 +763,7 @@ static qboolean PM_CheckJump( void ) {
 		return qfalse;
 	}
 
-	pml.groundPlane = qfalse;		// jumping away
+	pml.groundPlane = qfalse;			// jumping away
 	pml.walking = qfalse;
 	pm->ps->pm_flags |= PMF_JUMP_HELD;
 

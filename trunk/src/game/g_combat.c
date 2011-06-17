@@ -1283,6 +1283,10 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker,  vec3
 		knockback = 0;
 	}
 	
+	if(targ->client != attacker->client) {
+		knockback = 0;
+	}
+
 	// figure momentum add, even if the damage won't be taken
 	if ( knockback && targ->client ) {
 		vec3_t	kvel;
@@ -1334,6 +1338,9 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker,  vec3
 			targ->client->ps.pm_flags |= PMF_TIME_KNOCKBACK;
 		}
 	}
+
+	if(attacker->client)
+		return;
 
 	// check for completely getting out of the damage
 	if ( !(dflags & DAMAGE_NO_PROTECTION) ) {
@@ -1445,7 +1452,8 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker,  vec3
 		}
 
 		if( !(targ->client->ps.eFlags & EF_HEADSHOT) ) {	// only toss hat on first headshot
-			G_AddEvent( targ, EV_LOSE_HAT, DirToByte(dir) );
+			//Zero: should never lose helmet
+			//G_AddEvent( targ, EV_LOSE_HAT, DirToByte(dir) );
 
 			if( mod != MOD_K43_SCOPE &&
 				mod != MOD_GARAND_SCOPE ) {

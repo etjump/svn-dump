@@ -984,6 +984,10 @@ void SP_worldspawn( void ) {
 	if (atoi(s))
 		level.noExplosives = qtrue;
 
+	G_SpawnString("nosave", "0", &s);
+	if (atoi(s))
+		level.noSave = qtrue;
+
 	level.mapcoordsValid = qfalse;
 	if( G_SpawnVector2D( "mapcoordsmins", "-128 128", level.mapcoordsMins ) &&	// top left
 		G_SpawnVector2D( "mapcoordsmaxs", "128 -128", level.mapcoordsMaxs ) ) {	// bottom right

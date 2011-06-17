@@ -1125,6 +1125,7 @@ typedef struct {
 	qboolean	tempTraceIgnoreEnts[ MAX_GENTITIES ];
 
 	qboolean	noExplosives;
+	qboolean	noSave;
 } level_locals_t;
 
 typedef struct {
@@ -1519,6 +1520,7 @@ qboolean ReadyToConstruct(gentity_t *ent, gentity_t *constructible, qboolean upd
 // g_team.c
 //
 qboolean OnSameTeam( gentity_t *ent1, gentity_t *ent2 );
+qboolean OnAnyTeam ( gentity_t *ent1, gentity_t *ent2 );
 int Team_ClassForString( char *string );
 
 

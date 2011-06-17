@@ -892,7 +892,8 @@ void SetWolfSpawnWeapons( gclient_t *client )
 			// Field ops gets binoculars, ammo pack, artillery, and a grenade
 			if (pc == PC_FIELDOPS)
 			{
-				AddWeaponToPlayer(client, WP_AMMO, 0, 1, qfalse);
+				// Zero: Do not need these as they're not needed and can just be abused.
+				//AddWeaponToPlayer(client, WP_AMMO, 0, 1, qfalse);
 
 				//AddWeaponToPlayer(client, WP_SMOKE_MARKER, GetAmmoTableData(WP_SMOKE_MARKER)->defaultStartingAmmo, GetAmmoTableData(WP_SMOKE_MARKER)->defaultStartingClip, qfalse);
 

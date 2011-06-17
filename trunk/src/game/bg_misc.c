@@ -2909,6 +2909,7 @@ qboolean BG_AddMagicAmmo( playerState_t *ps, int *skill, int teamNum, int numOfC
 	int			weapNumOfClips;
 
 	// Gordon: handle grenades first
+	
 	i = BG_GrenadesForClass( ps->stats[STAT_PLAYER_CLASS], skill );
 	weapon = BG_GrenadeTypeForTeam( teamNum );
 
