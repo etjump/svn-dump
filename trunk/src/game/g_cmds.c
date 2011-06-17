@@ -3564,24 +3564,24 @@ void Cmd_PrivateMessage_f(gentity_t *ent)
 
 void Cmd_noGoto_f(gentity_t *ent) {
 	char *msg;
-	if(ent->client->sess.noGoto) {
+	if(ent->client->sess.noGoto == qtrue) {
 		ent->client->sess.noGoto = qfalse;
-		msg = "disabled";
+		msg = "enabled";
 	} else {
 		ent->client->sess.noGoto = qtrue;
-		msg = "enabled";
+		msg = "disabled";
 	}
 	CP(va("print \"^7You have %s goto\n\"", msg));
 }
 
 void Cmd_noCall_f(gentity_t *ent) {
 	char *msg;
-	if(ent->client->sess.noCall) {
+	if(ent->client->sess.noCall == qtrue) {
 		ent->client->sess.noCall = qfalse;
-		msg = "disabled";
+		msg = "enabled";
 	} else {
 		ent->client->sess.noCall = qtrue;
-		msg = "enabled";
+		msg = "disabled";
 	}
 	CP(va("print \"^7You have %s goto\n\"", msg));
 }

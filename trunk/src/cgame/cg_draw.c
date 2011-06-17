@@ -2058,78 +2058,19 @@ static void CG_DrawCrosshairNames( void ) {
 	// show debug info regardless
 
 	// we only want to see players on our team
-	if ( !isTank &&	!( cgs.clientinfo[cg.snap->ps.clientNum].team != TEAM_SPECTATOR && cgs.clientinfo[ cg.crosshairClientNum ].team != cgs.clientinfo[cg.snap->ps.clientNum].team ) ) {
+	if (!isTank)
+	{
 		drawStuff = qtrue;
 
-		// determine player class
-		playerClass = BG_ClassLetterForNumber( cg_entities[ cg.crosshairClientNum ].currentState.teamNum );
-
 		name = cgs.clientinfo[ cg.crosshairClientNum ].name;
-
-		playerRank = cgs.clientinfo[cg.crosshairClientNum].team == TEAM_AXIS ? rankNames_Axis[cgs.clientinfo[cg.crosshairClientNum].rank] : rankNames_Allies[cgs.clientinfo[cg.crosshairClientNum].rank];
-		s = va( "[%s] %s %s", CG_TranslateString( playerClass ), playerRank, name );
-		w = CG_DrawStrlen( s ) * SMALLCHAR_WIDTH;
+		s = va("%s", name);
+		w = CG_DrawStrlen(s) * SMALLCHAR_WIDTH;
 
 		// draw the name and class
-		CG_DrawSmallStringColor( 320 - w / 2, 170, s, color );
-
-		// set the health
-		if( cg.crosshairClientNum == cg.snap->ps.identifyClient ) {
-			playerHealth = cg.snap->ps.identifyClientHealth;
-		} else {
-			playerHealth = cgs.clientinfo[ cg.crosshairClientNum ].health;
-		}
-
-		maxHealth = 100;
-		for( i = 0; i < MAX_CLIENTS; i++ ) {
-			if( !cgs.clientinfo[i].infoValid ) {
-				continue;
-			}
-
-			if( cgs.clientinfo[i].team != cgs.clientinfo[cg.snap->ps.clientNum].team ) {
-				continue;
-			}
-
-			if( cgs.clientinfo[i].cls != PC_MEDIC ) {
-				continue;
-			}
-
-			maxHealth += 10;
-
-			if( maxHealth >= 125 ) {
-				maxHealth = 125;
-				break;
-			}
-		}
-
-		if( cgs.clientinfo[ cg.crosshairClientNum ].skill[SK_BATTLE_SENSE] >= 3 ) {
-			maxHealth += 15;
-		}
-
-		if( cgs.clientinfo[ cg.crosshairClientNum ].cls == PC_MEDIC ) {
-			maxHealth *= 1.12f;
-		}
-	}
-
-	// draw the health bar
-//	if ( isTank || (cg.crosshairClientNum == cg.snap->ps.identifyClient && drawStuff && cgs.clientinfo[cg.snap->ps.clientNum].team != TEAM_SPECTATOR ) ) 
-	{
-		vec4_t bgcolor;
-
-		barFrac = (float)playerHealth / maxHealth;
-
-		if ( barFrac > 1.0 )
-			barFrac = 1.0;
-		else if ( barFrac < 0 )
-			barFrac = 0;
-
-		c[0] = 1.0f;
-		c[1] = c[2] = barFrac;
-		c[3] = (0.25 + barFrac * 0.5) * color[3];
-
-		Vector4Set( bgcolor, 1.f, 1.f, 1.f, .25f * color[3] );
-
-		CG_FilledBar( 320 - 110/*w*/ / 2, 190, 110, 10, c, NULL, bgcolor, barFrac, 16 );
+		if (cg_drawCrosshairNames.integer == 2)
+			CG_DrawSmallStringColor(320 - w / 2, 170, s, color);
+		else
+			CG_DrawStringExt(320 - w / 2, 170, s, color, qfalse, qtrue, SMALLCHAR_WIDTH, SMALLCHAR_HEIGHT, 0);
 	}
 
 	// -NERVE - SMF
