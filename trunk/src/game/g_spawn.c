@@ -813,7 +813,8 @@ Spawn an entity and fill in all of the level fields from
 level.spawnVars[], then call the class specfic spawn function
 ===================
 */
-void G_SpawnGEntityFromSpawnVars( void ) {
+void G_SpawnGEntityFromSpawnVars(void)
+{
 	int			i;
 	gentity_t	*ent;
 	char		*str;
@@ -821,53 +822,60 @@ void G_SpawnGEntityFromSpawnVars( void ) {
 	// get the next free entity
 	ent = G_Spawn();
 
-	for ( i = 0 ; i < level.numSpawnVars ; i++ ) {
-		G_ParseField( level.spawnVars[i][0], level.spawnVars[i][1], ent );
+	for (i = 0 ; i < level.numSpawnVars ; i++)
+	{
+		G_ParseField(level.spawnVars[i][0], level.spawnVars[i][1], ent);
 	}
 
 	// check for "notteam" / "notfree" flags
-	G_SpawnInt( "notteam", "0", &i );
-	if ( i ) {
-		G_FreeEntity( ent );
+	G_SpawnInt("notteam", "0", &i);
+	if (i)
+	{
+		G_FreeEntity(ent);
 		return;
 	}
 
 	// allowteams handling
-	G_SpawnString( "allowteams", "", &str );
-	if( str[0] ) {
-		str = Q_strlwr( str );
-		if( strstr( str, "axis" ) ) {
+	G_SpawnString("allowteams", "", &str);
+	if (str[0])
+	{
+		str = Q_strlwr(str);
+		if (strstr(str, "axis"))
+		{
 			ent->allowteams |= ALLOW_AXIS_TEAM;
 		}
-		if( strstr( str, "allies" ) ) {
+		if (strstr(str, "allies"))
+		{
 			ent->allowteams |= ALLOW_ALLIED_TEAM;
 		}
-		if( strstr( str, "cvops" ) ) {
+		if (strstr(str, "cvops"))
+		{
 			ent->allowteams |= ALLOW_DISGUISED_CVOPS;
 		}
 	}
 
-	if( ent->targetname && *ent->targetname ) {
-		ent->targetnamehash = BG_StringHashValue( ent->targetname );
-	} else {
+	if (ent->targetname && *ent->targetname)
+	{
+		ent->targetnamehash = BG_StringHashValue(ent->targetname);
+	}
+	else
+	{
 		ent->targetnamehash = -1;
 	}
 
 	// move editor origin to pos
-	VectorCopy( ent->s.origin, ent->s.pos.trBase );
-	VectorCopy( ent->s.origin, ent->r.currentOrigin );
+	VectorCopy(ent->s.origin, ent->s.pos.trBase);
+	VectorCopy(ent->s.origin, ent->r.currentOrigin);
 
 	// if we didn't get a classname, don't bother spawning anything
-	if ( !G_CallSpawn( ent ) ) {
-		G_FreeEntity( ent );
+	if (!G_CallSpawn(ent))
+	{
+		G_FreeEntity(ent);
 	}
 
 	// RF, try and move it into the bot entities if possible
-//	BotCheckBotGameEntity( ent );
+	//	BotCheckBotGameEntity( ent );
 }
-
-
-
 /*
 ====================
 G_AddSpawnVarToken

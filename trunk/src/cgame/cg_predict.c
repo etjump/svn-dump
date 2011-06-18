@@ -112,8 +112,10 @@ CG_ClipMoveToEntities
 
 ====================
 */
-static void CG_ClipMoveToEntities ( const vec3_t start, const vec3_t mins, const vec3_t maxs, const vec3_t end,
-							int skipNumber, int mask, int capsule, trace_t *tr ) {
+static void CG_ClipMoveToEntities(const vec3_t start, const vec3_t mins,
+								  const vec3_t maxs, const vec3_t end, int skipNumber, int mask,
+								  int capsule, qboolean tracePlayers, trace_t *tr)
+{
 	int			i, x, zd, zu;
 	trace_t		trace;
 	entityState_t	*ent;
@@ -122,55 +124,73 @@ static void CG_ClipMoveToEntities ( const vec3_t start, const vec3_t mins, const
 	vec3_t		origin, angles;
 	centity_t	*cent;
 
-	for ( i = 0 ; i < cg_numSolidEntities ; i++ ) {
+	for (i = 0 ; i < cg_numSolidEntities ; i++)
+	{
 		cent = cg_solidEntities[ i ];
 		ent = &cent->currentState;
 
-		if ( ent->number == skipNumber ) {
+		if (ent->number == skipNumber || (!tracePlayers && ent->eType == ET_PLAYER))
 			continue;
-		}
 
-		if ( ent->solid == SOLID_BMODEL ) {
+		if (ent->solid == SOLID_BMODEL)
+		{
 			// special value for bmodel
-			cmodel = trap_CM_InlineModel( ent->modelindex );
-//			VectorCopy( cent->lerpAngles, angles );
-//			VectorCopy( cent->lerpOrigin, origin );
-			BG_EvaluateTrajectory( &cent->currentState.apos, cg.physicsTime, angles, qtrue, cent->currentState.effect2Time );
-			BG_EvaluateTrajectory( &cent->currentState.pos, cg.physicsTime, origin, qfalse, cent->currentState.effect2Time );
-		} else {
-			// encoded bbox
-			x = (ent->solid & 255);
-			zd = ((ent->solid>>8) & 255);
-			zu = ((ent->solid>>16) & 255) - 32;
+			cmodel = trap_CM_InlineModel(ent->modelindex);
+			//			VectorCopy( cent->lerpAngles, angles );
+			//			VectorCopy( cent->lerpOrigin, origin );
+			BG_EvaluateTrajectory(&cent->currentState.apos, cg.physicsTime, angles, qtrue, cent->currentState.effect2Time);
+			BG_EvaluateTrajectory(&cent->currentState.pos, cg.physicsTime, origin, qfalse, cent->currentState.effect2Time);
+		}
+		else
+		{
+			// see g_misc.c SP_func_fakebrush...
+			if (ent->eFlags & EF_FAKEBMODEL)
+			{
+				VectorCopy(ent->origin2, bmins);
+				VectorCopy(ent->angles2, bmaxs);
+			}
+			else
+			{
+				// encoded bbox
+				x = (ent->solid & 255);
+				zd = ((ent->solid >> 8) & 255);
+				zu = ((ent->solid >> 16) & 255) - 32;
 
-			bmins[0] = bmins[1] = -x;
-			bmaxs[0] = bmaxs[1] = x;
-			bmins[2] = -zd;
-			bmaxs[2] = zu;
+				bmins[0] = bmins[1] = -x;
+				bmaxs[0] = bmaxs[1] = x;
+				bmins[2] = -zd;
+				bmaxs[2] = zu;
+			}
 
 			//cmodel = trap_CM_TempCapsuleModel( bmins, bmaxs );
-			cmodel = trap_CM_TempBoxModel( bmins, bmaxs );
+			cmodel = trap_CM_TempBoxModel(bmins, bmaxs);
 
-			VectorCopy( vec3_origin, angles );
-			VectorCopy( cent->lerpOrigin, origin );
+			VectorCopy(vec3_origin, angles);
+			VectorCopy(cent->lerpOrigin, origin);
 		}
 		// MrE: use bbox of capsule
-		if (capsule) {
-			trap_CM_TransformedCapsuleTrace ( &trace, start, end,
-				mins, maxs, cmodel,  mask, origin, angles);
+		if (capsule)
+		{
+			trap_CM_TransformedCapsuleTrace(&trace, start, end,
+											mins, maxs, cmodel,  mask, origin, angles);
 		}
-		else {
-			trap_CM_TransformedBoxTrace ( &trace, start, end,
-				mins, maxs, cmodel,  mask, origin, angles);
+		else
+		{
+			trap_CM_TransformedBoxTrace(&trace, start, end,
+										mins, maxs, cmodel,  mask, origin, angles);
 		}
 
-		if (trace.allsolid || trace.fraction < tr->fraction) {
+		if (trace.allsolid || trace.fraction < tr->fraction)
+		{
 			trace.entityNum = ent->number;
 			*tr = trace;
-		} else if (trace.startsolid) {
+		}
+		else if (trace.startsolid)
+		{
 			tr->startsolid = qtrue;
 		}
-		if ( tr->allsolid ) {
+		if (tr->allsolid)
+		{
 			return;
 		}
 	}
@@ -250,7 +270,7 @@ void	CG_Trace( trace_t *result, const vec3_t start, const vec3_t mins, const vec
 	trap_CM_BoxTrace ( &t, start, end, mins, maxs, 0, mask );
 	t.entityNum = t.fraction != 1.0 ? ENTITYNUM_WORLD : ENTITYNUM_NONE;
 	// check all other solid models
-	CG_ClipMoveToEntities (start, mins, maxs, end, skipNumber, mask, qfalse, &t);
+	CG_ClipMoveToEntities (start, mins, maxs, end, skipNumber, mask, qfalse, qtrue, &t);
 
 	*result = t;
 }
@@ -290,7 +310,20 @@ void CG_TraceCapsule( trace_t *result, const vec3_t start, const vec3_t mins, co
 	trap_CM_CapsuleTrace ( &t, start, end, mins, maxs, 0, mask );
 	t.entityNum = t.fraction != 1.0 ? ENTITYNUM_WORLD : ENTITYNUM_NONE;
 	// check all other solid models
-	CG_ClipMoveToEntities (start, mins, maxs, end, skipNumber, mask, qtrue, &t);
+	CG_ClipMoveToEntities (start, mins, maxs, end, skipNumber, mask, qtrue, qtrue, &t);
+
+	*result = t;
+}
+
+void CG_TraceCapsule_NoPlayers(trace_t *result, const vec3_t start, const vec3_t mins,
+							   const vec3_t maxs, const vec3_t end, int skipNumber, int mask)
+{
+	trace_t	t;
+
+	trap_CM_CapsuleTrace(&t, start, end, mins, maxs, 0, mask);
+	t.entityNum = t.fraction != 1.0 ? ENTITYNUM_WORLD : ENTITYNUM_NONE;
+	// check all other solid models
+	CG_ClipMoveToEntities(start, mins, maxs, end, skipNumber, mask, qtrue, qfalse, &t);
 
 	*result = t;
 }
@@ -861,7 +894,11 @@ void CG_PredictPlayerState( void ) {
 
 	cg_pmove.skill = cgs.clientinfo[cg.snap->ps.clientNum].skill;
 
-	cg_pmove.trace = CG_TraceCapsule;
+	if(cg_ghostPlayers.integer) {
+		cg_pmove.trace = CG_TraceCapsule_NoPlayers;
+	} else {
+		cg_pmove.trace = CG_TraceCapsule;
+	}
 	//cg_pmove.trace = CG_Trace;
 	cg_pmove.pointcontents = CG_PointContents;
 	if ( cg_pmove.ps->pm_type == PM_DEAD ) {
@@ -876,7 +913,7 @@ void CG_PredictPlayerState( void ) {
 		cg_pmove.tracemask = MASK_PLAYERSOLID;
 	}
 
-	if (( cg.snap->ps.persistant[PERS_TEAM] == TEAM_SPECTATOR ) || (cg.snap->ps.pm_flags & PMF_LIMBO) || (cg_ghostPlayers.integer)) { // JPW NERVE limbo
+	if (( cg.snap->ps.persistant[PERS_TEAM] == TEAM_SPECTATOR ) || (cg.snap->ps.pm_flags & PMF_LIMBO)) { // JPW NERVE limbo
 		cg_pmove.tracemask &= ~CONTENTS_BODY;	// spectators can fly through bodies
 	}
 
@@ -942,10 +979,13 @@ void CG_PredictPlayerState( void ) {
 		// get the previous command
 		trap_GetUserCmd( cmdNum-1, &cg_pmove.oldcmd );
 
+		// Zero: This caused prone to be bugged with pmove_fixed on.
+		/*
 		if ( cg_pmove.pmove_fixed ) {
 			// rain - added tracemask
 			PM_UpdateViewAngles( cg_pmove.ps, cg_pmove.pmext, &cg_pmove.cmd, CG_Trace, cg_pmove.tracemask );
 		}
+		*/
 		
 		// don't do anything if the time is before the snapshot player time
 		if ( cg_pmove.cmd.serverTime <= cg.predictedPlayerState.commandTime ) {

@@ -4292,3 +4292,50 @@ qboolean etpro_ScriptAction_SetValues( gentity_t *ent, char *params ) {
 
 	return qtrue;
 }
+
+/*
+===================
+G_ScriptAction_Create (inspired by etpro_ScriptAction_SetValues)
+setup - made in a rush...
+===================
+*/
+qboolean G_ScriptAction_Create(gentity_t *ent, char *params)
+{
+	char	*token;
+	char	*p;
+	char	key[MAX_TOKEN_CHARS];
+
+	// reset and fill in the spawnVars info so that spawn functions can use
+	// them
+	level.numSpawnVars = 0;
+	level.numSpawnVarChars = 0;
+
+	p = params;
+
+	// get each key/value pair
+	while (1)
+	{
+		token = COM_ParseExt(&p, qfalse);
+		if (!token[0])
+			break;
+
+		strcpy(key, token);
+
+		token = COM_ParseExt(&p, qfalse);
+		if (!token[0])
+		{
+			G_Error("key \"%s\" has no value", key);
+			break;
+		}
+
+		// add spawn var so that spawn functions can use them
+		if (level.numSpawnVars == MAX_SPAWN_VARS)
+			G_Error("G_ScriptAction_Create: MAX_SPAWN_VARS");
+		level.spawnVars[level.numSpawnVars][0] = G_AddSpawnVarToken(key);
+		level.spawnVars[level.numSpawnVars][1] = G_AddSpawnVarToken(token);
+		level.numSpawnVars++;
+	}
+	G_SpawnGEntityFromSpawnVars();
+
+	return qtrue;
+}

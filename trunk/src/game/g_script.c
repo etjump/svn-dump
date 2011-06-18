@@ -117,6 +117,7 @@ qboolean G_ScriptAction_ConstructibleDuration( gentity_t *ent, char *params ) ;
 
 //bani
 qboolean etpro_ScriptAction_SetValues( gentity_t *ent, char *params );
+qboolean G_ScriptAction_Create(gentity_t *ent, char *params);
 
 // these are the actions that each event can call
 g_script_stack_action_t gScriptActions[] =
@@ -196,6 +197,8 @@ g_script_stack_action_t gScriptActions[] =
 	{"setdebuglevel",					G_ScriptAction_SetDebugLevel},
 	{"setposition",						G_ScriptAction_SetPosition},
 	{"setautospawn",					G_ScriptAction_SetAutoSpawn},
+
+	{"create",							G_ScriptAction_Create},
 
 	// Gordon: going for longest silly script command ever here :) (sets a model for a brush to one stolen from a func_brushmodel
 	{"setmodelfrombrushmodel",			G_ScriptAction_SetModelFromBrushmodel},
@@ -591,23 +594,27 @@ void G_Script_ScriptParse( gentity_t *ent )
 				memset( params, 0, sizeof(params) );
 
 				// Ikkyo - Parse for {}'s if this is a set command
-				if( !Q_stricmp( action->actionString, "set" ) ) {
-					token = COM_Parse( &pScript );
-					if( token[0] != '{' ) {
-						COM_ParseError( "'{' expected, found: %s.\n", token );
+				// parse for {}'s if this is a set or create command
+				if (!Q_stricmp(action->actionString, "set") || !Q_stricmp(action->actionString, "create"))
+				{
+					token = COM_Parse(&pScript);
+					if (token[0] != '{')
+					{
+						COM_ParseError("'{' expected, found: %s.\n", token);
 					}
 
-					while( ( token = COM_Parse( &pScript ) ) && ( token[0] != '}') ) {
-						if ( strlen( params ) )   // add a space between each param
-							Q_strcat( params, sizeof( params ), " " );
+					while ((token = COM_Parse(&pScript)) && (token[0] != '}'))
+					{
+						if (strlen(params))       // add a space between each param
+							Q_strcat(params, sizeof(params), " ");
 
-						if ( strrchr( token,' ') ) // need to wrap this param in quotes since it has more than one word
-							Q_strcat( params, sizeof( params ), "\"" );
+						if (strrchr(token, ' '))    // need to wrap this param in quotes since it has more than one word
+							Q_strcat(params, sizeof(params), "\"");
 
-						Q_strcat( params, sizeof( params ), token );
+						Q_strcat(params, sizeof(params), token);
 
-						if ( strrchr( token,' ') ) // need to wrap this param in quotes since it has mor
-							Q_strcat( params, sizeof( params ), "\"" );
+						if (strrchr(token, ' '))    // need to wrap this param in quotes since it has mor
+							Q_strcat(params, sizeof(params), "\"");
 					}
 				} else
 				// hackly precaching of custom characters
