@@ -308,6 +308,8 @@ vmCvar_t	cg_drawKeys;
 vmCvar_t	cg_keysX;
 vmCvar_t	cg_keysY;
 vmCvar_t	cg_keysSize;
+vmCvar_t	cg_drawspeedColor;
+vmCvar_t	cg_loadviewangles;
 
 // forty - speedometer
 vmCvar_t	cg_drawspeed;
@@ -319,6 +321,9 @@ vmCvar_t	cg_speedunit;
 vmCvar_t	cl_yawspeed;
 vmCvar_t	cl_freelook;
 vmCvar_t	cg_drawCGazUsers;
+
+vmCvar_t	cg_viewlog;
+vmCvar_t	cg_drawClock;
 
 typedef struct {
 	vmCvar_t	*vmCvar;
@@ -369,9 +374,9 @@ cvarTable_t		cvarTable[] = {
 	{ &cg_markTime, "cg_marktime", "20000", CVAR_ARCHIVE },
 	{ &cg_lagometer, "cg_lagometer", "0", CVAR_ARCHIVE },
 	{ &cg_railTrailTime, "cg_railTrailTime", "400", CVAR_ARCHIVE  },
-	{ &cg_gun_x, "cg_gunX", "0", CVAR_CHEAT },
-	{ &cg_gun_y, "cg_gunY", "0", CVAR_CHEAT },
-	{ &cg_gun_z, "cg_gunZ", "0", CVAR_CHEAT },
+	{ &cg_gun_x, "cg_gunX", "0", CVAR_ARCHIVE },
+	{ &cg_gun_y, "cg_gunY", "0", CVAR_ARCHIVE },
+	{ &cg_gun_z, "cg_gunZ", "0", CVAR_ARCHIVE },
 	{ &cg_centertime, "cg_centertime", "5", CVAR_CHEAT },		// DHM - Nerve :: changed from 3 to 5
 	{ &cg_runpitch, "cg_runpitch", "0.002", CVAR_ARCHIVE},
 	{ &cg_runroll, "cg_runroll", "0.005", CVAR_ARCHIVE },
@@ -482,6 +487,7 @@ cvarTable_t		cvarTable[] = {
 	{ &cg_crosshairAlpha, "cg_crosshairAlpha", "1.0", CVAR_ARCHIVE },
 	{ &cg_crosshairAlphaAlt, "cg_crosshairAlphaAlt", "1.0", CVAR_ARCHIVE },
 	{ &cg_crosshairColor, "cg_crosshairColor", "White", CVAR_ARCHIVE },
+	{ &cg_drawspeedColor, "cg_drawspeedcolor", "Red", CVAR_ARCHIVE },
 	{ &cg_crosshairColorAlt, "cg_crosshairColorAlt", "White", CVAR_ARCHIVE },
 	{ &cg_crosshairPulse, "cg_crosshairPulse", "1", CVAR_ARCHIVE },
 	{ &cg_drawReinforcementTime, "cg_drawReinforcementTime", "1", CVAR_ARCHIVE },
@@ -565,12 +571,15 @@ cvarTable_t		cvarTable[] = {
 	{ &cg_keysSize,				"cg_keysSize", "48", CVAR_ARCHIVE },
 	{ &cg_keysX,				"cg_keysX", "585", CVAR_ARCHIVE },
 	{ &cg_keysY,				"cg_keysY", "200", CVAR_ARCHIVE },
+	{ &cg_loadviewangles,		"cg_loadviewangles", "0", CVAR_ARCHIVE },
 
 	// forty - speedometer
 	{ &cg_drawspeed, "cg_drawspeed", "1", CVAR_ARCHIVE },
 	{ &cg_speedXYonly, "cg_speedXYonly", "1", CVAR_ARCHIVE },
 	{ &cg_speedinterval, "cg_speedinterval", "100", CVAR_ARCHIVE },
 	{ &cg_speedunit, "cg_speedunit", "0", CVAR_ARCHIVE },
+	{ &cg_viewlog, "cg_viewlog", "1", CVAR_ARCHIVE },
+	{ &cg_drawClock, "cg_drawClock", "1", CVAR_ARCHIVE },
 };
 
 int		cvarTableSize = sizeof( cvarTable ) / sizeof( cvarTable[0] );
@@ -653,6 +662,11 @@ void CG_UpdateCvars( void ) {
 					BG_setCrosshair(cg_crosshairColorAlt.string, cg.xhairColorAlt, cg_crosshairAlphaAlt.value, "cg_crosshairColorAlt");
 				}
 
+				else if (cv->vmCvar == &cg_drawspeedColor || cv->vmCvar == &cg_drawspeedColor)
+				{
+					BG_setColor(cg_drawspeedColor.string, cg.drawspeedColor, 1, "cg_drawspeedColor");
+				}
+
 				else if(cv->vmCvar == &cg_rconPassword && *cg_rconPassword.string) {
 					trap_SendConsoleCommand( va( "rconAuth %s", cg_rconPassword.string ) );
 				}
@@ -676,6 +690,8 @@ void CG_UpdateCvars( void ) {
 					} else if (cg_errorDecay.value > 500.0) {
 						trap_Cvar_Set("cg_errorDecay", "500");
 					}
+				} else if (cv->vmCvar == &cg_viewlog) {
+					trap_Cvar_Set("viewlog", cg_viewlog.string);
 				}
 			}
 		}
@@ -704,7 +720,8 @@ void CG_setClientFlags(void)
 												((cg_drawCGaz.integer > 0) ? CGF_CGAZ : 0) |
 												((cl_yawspeed.integer > 0) ? CGF_YAWSPEED : 0) |
 												((cl_freelook.integer > 0) ? 0 : CGF_FREELOOK) |
-												((int_m_pitch.value > 0) ? 0 : CGF_MPITCHFIX)
+												((int_m_pitch.value > 0) ? 0 : CGF_MPITCHFIX) |
+												((cg_loadviewangles.integer > 0) ? CGF_LOADVIEWANGLES : 0)
 												// Add more in here, as needed
 											),
 											

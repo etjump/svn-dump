@@ -311,6 +311,7 @@ extern const unsigned int aReinfSeeds[MAX_REINFSEEDS];
 #define CGF_YAWSPEED		0x80
 #define CGF_FREELOOK		0x100
 #define CGF_MPITCHFIX		0x200
+#define CGF_LOADVIEWANGLES	0x400
 
 #define MAX_MOTDLINES	6
 
@@ -2272,6 +2273,8 @@ int BG_cleanName(const char *pszIn, char *pszOut, unsigned int dwMaxLength, qboo
 
 // Crosshair support
 void BG_setCrosshair(char *colString, float *col, float alpha, char *cvarName);
+// color support
+void BG_setColor(char *colString, vec4_t col, float alpha, char *cvarName);
 
 // Voting
 #define VOTING_DISABLED		((1 << numVotesAvailable) - 1)

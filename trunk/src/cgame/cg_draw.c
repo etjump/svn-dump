@@ -517,15 +517,15 @@ static float CG_DrawSpeed(float y)
 				default:
 				case 0:
 					// Units per second
-					s = va("%.1f", speed);
+					s = va("%.0f", speed);
 					break;
 				case 1:
 					// Miles per hour
-					s = va("%.1f", (speed / SPEED_US_TO_MPH));
+					s = va("%.0f", (speed / SPEED_US_TO_MPH));
 					break;
 				case 2:
 					// Kilometers per hour
-					s = va("%.1f", (speed / SPEED_US_TO_KPH));
+					s = va("%.0f", (speed / SPEED_US_TO_KPH));
 					break;
 			}
 			break;
@@ -539,7 +539,7 @@ static float CG_DrawSpeed(float y)
 		y = cg_drawspeedY.integer;
 		w = CG_Text_Width_Ext(s, 0.19f, 0, &cgs.media.limboFont1);
 		CG_Text_Paint_Ext(x + 0.5 * (cg.refdef_current->width), y + 0.5 * (cg.refdef_current->height), 
-			0.19f, 0.19f, tclr, s, 0, 0, 0, &cgs.media.limboFont1);
+			0.19f, 0.19f, cg.drawspeedColor, s, 0, 0, 0, &cgs.media.limboFont1);
 
 
 	} else {
@@ -551,6 +551,46 @@ static float CG_DrawSpeed(float y)
 		CG_Text_Paint_Ext(UPPERRIGHT_X - w, y + 11, 0.19f, 0.19f, tclr, s, 0, 0, 0, &cgs.media.limboFont1);
 	return y + 12 + 4;
 	}
+}
+
+float CG_DrawTime(float y)
+{
+	char displayTime[12];
+	int w;
+	qtime_t tm;
+	vec4_t	timerBackground = { 0.16f, 0.2f, 0.17f, 0.8f };
+	vec4_t	timerBorder     = { 0.5f, 0.5f,	0.5f, 0.5f };
+	vec4_t	tclr		= { 0.625f, 0.625f, 0.6f, 1.0f };
+
+	trap_RealTime(&tm);
+	displayTime[0] = '\0';
+
+	if (cg_drawClock.integer == 1)
+	{
+		Q_strcat(displayTime, sizeof(displayTime),
+				 va("%d:%02d", tm.tm_hour, tm.tm_min));
+		Q_strcat(displayTime, sizeof(displayTime),
+				 va(":%02d", tm.tm_sec));
+	}
+	else
+	{
+		Q_strcat(displayTime, sizeof(displayTime),
+				 va("%d:%02d",
+					((tm.tm_hour == 0 || tm.tm_hour == 12)
+					 ? 12 : tm.tm_hour % 12),
+					tm.tm_min));
+		Q_strcat(displayTime, sizeof(displayTime),
+				 va(":%02d", tm.tm_sec));
+		Q_strcat(displayTime, sizeof(displayTime),
+				 (tm.tm_hour < 12) ? " am" : " pm");
+	}
+	w = CG_Text_Width_Ext(displayTime, 0.19f, 0, &cgs.media.limboFont1);
+	CG_FillRect(UPPERRIGHT_X - w - 2, y, w + 5, 12 + 2, timerBackground);
+	CG_DrawRect_FixedBorder(UPPERRIGHT_X - w - 2, y, w + 5, 12 + 2, 1,
+							timerBorder);
+	CG_Text_Paint_Ext(UPPERRIGHT_X - w, y + 11, 0.19f, 0.19f, tclr,
+					  displayTime, 0, 0, 0, &cgs.media.limboFont1);
+	return y + 12 + 4;
 }
 
 /*
@@ -713,6 +753,11 @@ static void CG_DrawUpperRight( void ) {
 	/*if ( cg_drawRoundTimer.integer ) {
 		y = CG_DrawTimer( y );
 	}*/
+
+	if (cg_drawClock.integer)
+	{
+		y = CG_DrawTime(y);
+	}
 
 	if ( cg_drawFPS.integer ) {
 		y = CG_DrawFPS( y );
@@ -2985,7 +3030,6 @@ static void CG_DrawKeys(void)
 {
 	playerState_t *ps;
 	float x, y, size;
-	int i;
 	int skew;
 
 	if (cg_drawKeys.integer <= 0)
@@ -3081,8 +3125,9 @@ static qboolean CG_DrawFollow(void)
 
 	if (cg.snap->ps.clientNum != cg.clientNum)
 	{
+		// Show in colors
 		CG_DrawStringExt(INFOTEXT_STARTX, 118,
-				CG_TranslateString(va("Following %s", cgs.clientinfo[cg.snap->ps.clientNum].cleanname)),
+				CG_TranslateString(va("Following %s", cgs.clientinfo[cg.snap->ps.clientNum].name)),
 				colorWhite, qtrue, qtrue, BIGCHAR_WIDTH / 2, BIGCHAR_HEIGHT, 0);
 	}
 
@@ -4215,6 +4260,10 @@ static void CG_DrawPlayerHealthBar( rectDef_t *rect ) {
 	int flags = 1|4|16|64;
 	float frac;
 
+	if(cg_drawTJHud.integer == 2) {
+		return;
+	}
+
 	CG_ColorForHealth( colour );
 	colour[3] = 0.5f;
 
@@ -4239,6 +4288,9 @@ static void CG_DrawStaminaBar( rectDef_t *rect ) {
 	vec_t* color = colour;
 	int flags = 1|4|16|64;
 	float frac = cg.pmext.sprintTime / (float)SPRINTTIME;
+
+	if(cg_drawTJHud.integer == 2)
+		return;
 
 	if( cg.snap->ps.powerups[PW_ADRENALINE] ) {
 		if ( cg.snap->ps.pm_flags & PMF_FOLLOW ) {
@@ -4276,6 +4328,9 @@ static void CG_DrawWeapRecharge( rectDef_t *rect ) {
 	flags = 1|4|16;
 
 	weap = cg.snap->ps.weapon;
+
+	if(cg_drawTJHud.integer == 2)
+		return;
 
 //	if( !(cg.snap->ps.eFlags & EF_ZOOMING) ) {
 //		if ( weap != WP_PANZERFAUST && weap != WP_DYNAMITE && weap != WP_MEDKIT && weap != WP_SMOKE_GRENADE && weap != WP_PLIERS && weap != WP_AMMO ) {
@@ -4332,28 +4387,30 @@ static void CG_DrawPlayerStatus( void ) {
 	rect.y = 480 - 56;
 	rect.w = 60;
 	rect.h = 32;
-	CG_DrawWeapHeat( &rect, HUD_HORIZONTAL );
-	if( cg.mvTotalClients < 1 && cg_drawWeaponIconFlash.integer == 0 ) {
-		CG_DrawPlayerWeaponIcon(&rect, qtrue, ITEM_ALIGN_RIGHT, &colorWhite);
-	} else {
-		int ws = (cg.mvTotalClients > 0) ? cgs.clientinfo[cg.snap->ps.clientNum].weaponState : BG_simpleWeaponState(cg.snap->ps.weaponstate);
-		CG_DrawPlayerWeaponIcon(&rect, (ws != WSTATE_IDLE), ITEM_ALIGN_RIGHT, ((ws == WSTATE_SWITCH) ? &colorWhite : (ws == WSTATE_FIRE) ? &colorRed : &colorYellow));
-	}
+	if(cg_drawTJHud.integer != 2) {
+		CG_DrawWeapHeat( &rect, HUD_HORIZONTAL );
+		if( cg.mvTotalClients < 1 && cg_drawWeaponIconFlash.integer == 0 ) {
+			CG_DrawPlayerWeaponIcon(&rect, qtrue, ITEM_ALIGN_RIGHT, &colorWhite);
+		} else {
+			int ws = (cg.mvTotalClients > 0) ? cgs.clientinfo[cg.snap->ps.clientNum].weaponState : BG_simpleWeaponState(cg.snap->ps.weaponstate);
+			CG_DrawPlayerWeaponIcon(&rect, (ws != WSTATE_IDLE), ITEM_ALIGN_RIGHT, ((ws == WSTATE_SWITCH) ? &colorWhite : (ws == WSTATE_FIRE) ? &colorRed : &colorYellow));
+		}
 
-	// Draw ammo
-	weap = CG_PlayerAmmoValue( &value, &value2, &value3 );
-	if( value3 >= 0 ) {
-		Com_sprintf( buffer, sizeof(buffer), "%i|%i/%i", value3, value, value2 );
-		CG_Text_Paint_Ext( 640 - 22 - CG_Text_Width_Ext( buffer, .25f, 0, &cgs.media.limboFont1 ), 480 - 1 * ( 16 + 2 ) + 12 - 4, .25f, .25f, colorWhite, buffer, 0, 0, ITEM_TEXTSTYLE_SHADOWED, &cgs.media.limboFont1 );
-//		CG_DrawPic( 640 - 2 * ( 12 + 2 ) - 16 - 4, 480 - 1 * ( 16 + 2 ) - 4, 16, 16, cgs.media.SPPlayerInfoAmmoIcon );
-	} else if( value2 >= 0 ) {
-		Com_sprintf( buffer, sizeof(buffer), "%i/%i", value, value2 );
-		CG_Text_Paint_Ext( 640 - 22 - CG_Text_Width_Ext( buffer, .25f, 0, &cgs.media.limboFont1 ), 480 - 1 * ( 16 + 2 ) + 12 - 4, .25f, .25f, colorWhite, buffer, 0, 0, ITEM_TEXTSTYLE_SHADOWED, &cgs.media.limboFont1 );
-//		CG_DrawPic( 640 - 2 * ( 12 + 2 ) - 16 - 4, 480 - 1 * ( 16 + 2 ) - 4, 16, 16, cgs.media.SPPlayerInfoAmmoIcon );
-	} else if( value >= 0 ) {
-		Com_sprintf( buffer, sizeof(buffer), "%i", value );
-		CG_Text_Paint_Ext( 640 - 22 - CG_Text_Width_Ext( buffer, .25f, 0, &cgs.media.limboFont1 ), 480 - 1 * ( 16 + 2 ) + 12 - 4, .25f, .25f, colorWhite, buffer, 0, 0, ITEM_TEXTSTYLE_SHADOWED, &cgs.media.limboFont1 );
-//		CG_DrawPic( 640 - 2 * ( 12 + 2 ) - 16 - 4, 480 - 1 * ( 16 + 2 ) - 4, 16, 16, cgs.media.SPPlayerInfoAmmoIcon );
+		// Draw ammo
+		weap = CG_PlayerAmmoValue( &value, &value2, &value3 );
+		if( value3 >= 0 ) {
+			Com_sprintf( buffer, sizeof(buffer), "%i|%i/%i", value3, value, value2 );
+			CG_Text_Paint_Ext( 640 - 22 - CG_Text_Width_Ext( buffer, .25f, 0, &cgs.media.limboFont1 ), 480 - 1 * ( 16 + 2 ) + 12 - 4, .25f, .25f, colorWhite, buffer, 0, 0, ITEM_TEXTSTYLE_SHADOWED, &cgs.media.limboFont1 );
+	//		CG_DrawPic( 640 - 2 * ( 12 + 2 ) - 16 - 4, 480 - 1 * ( 16 + 2 ) - 4, 16, 16, cgs.media.SPPlayerInfoAmmoIcon );
+		} else if( value2 >= 0 ) {
+			Com_sprintf( buffer, sizeof(buffer), "%i/%i", value, value2 );
+			CG_Text_Paint_Ext( 640 - 22 - CG_Text_Width_Ext( buffer, .25f, 0, &cgs.media.limboFont1 ), 480 - 1 * ( 16 + 2 ) + 12 - 4, .25f, .25f, colorWhite, buffer, 0, 0, ITEM_TEXTSTYLE_SHADOWED, &cgs.media.limboFont1 );
+	//		CG_DrawPic( 640 - 2 * ( 12 + 2 ) - 16 - 4, 480 - 1 * ( 16 + 2 ) - 4, 16, 16, cgs.media.SPPlayerInfoAmmoIcon );
+		} else if( value >= 0 ) {
+			Com_sprintf( buffer, sizeof(buffer), "%i", value );
+			CG_Text_Paint_Ext( 640 - 22 - CG_Text_Width_Ext( buffer, .25f, 0, &cgs.media.limboFont1 ), 480 - 1 * ( 16 + 2 ) + 12 - 4, .25f, .25f, colorWhite, buffer, 0, 0, ITEM_TEXTSTYLE_SHADOWED, &cgs.media.limboFont1 );
+	//		CG_DrawPic( 640 - 2 * ( 12 + 2 ) - 16 - 4, 480 - 1 * ( 16 + 2 ) - 4, 16, 16, cgs.media.SPPlayerInfoAmmoIcon );
+		}
 	}
 
 
@@ -4379,6 +4436,7 @@ static void CG_DrawPlayerStatus( void ) {
 	rect.w = 12;
 	rect.h = 72;
 	CG_DrawWeapRecharge( &rect );
+	
 // ==
 }
 

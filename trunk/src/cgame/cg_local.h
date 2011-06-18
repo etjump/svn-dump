@@ -1087,6 +1087,7 @@ typedef struct {
 	cg_windowHandler_t	winHandler;
 	vec4_t				xhairColor;
 	vec4_t				xhairColorAlt;
+	vec4_t				drawspeedColor;
 
 	// Arnout: allow overriding of countdown sounds
 	char		fiveMinuteSound_g[MAX_QPATH];
@@ -2267,6 +2268,7 @@ extern	vmCvar_t		cg_drawKeys;
 extern	vmCvar_t		cg_keysSize;
 extern	vmCvar_t		cg_keysX;
 extern	vmCvar_t		cg_keysY;
+extern	vmCvar_t		cg_loadviewangles;
 
 // forty - speedometer
 extern	vmCvar_t		cg_drawspeed;
@@ -2279,6 +2281,8 @@ extern pmove_t			cg_pmove;
 // Cheat cvars
 extern	vmCvar_t		cl_yawspeed;
 extern	vmCvar_t		cl_freelook;
+extern	vmCvar_t		cg_viewlog;
+extern	vmCvar_t		cg_drawClock;
 
 
 //

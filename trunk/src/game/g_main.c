@@ -3126,8 +3126,10 @@ void CheckVote( void ) {
 
 	if (level.voteInfo.voter_team != other->client->sess.sessionTeam)
 	{
-		AP("cpm \"^7Vote canceled: voter switched teams\n\"");
+		AP("cpm \"^7Vote canceled: voter switched teams.\n\"");
 		G_LogPrintf("Vote Failed: %s (voter %s switched teams)\n", level.voteInfo.voteString, other->client->pers.netname);
+		level.voteInfo.voteYes = 0;
+		level.voteInfo.voteNo = level.numConnectedClients;
 	}
 
 	if(level.time - level.voteInfo.voteTime >= VOTE_TIME) {

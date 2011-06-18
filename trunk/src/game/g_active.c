@@ -580,10 +580,14 @@ qboolean ClientInactivityTimer( gclient_t *client ) {
 												g_spectatorInactivity.integer);
 
 	} else if ( !client->pers.localClient ) {
-		if ( level.time > client->inactivityTime && client->inactivityWarning) {
+		if (level.time > client->inactivityTime && client->inactivityWarning)
+		{
 			client->inactivityWarning = qfalse;
 			client->inactivityTime = level.time + 60 * 1000;
-			trap_DropClient(client - level.clients, "Dropped due to inactivity", 0 );
+
+			AP(va("cpm \" %s ^7was removed from teams due to inactivity! (%i seconds) \n\"", client->pers.netname, g_inactivity.integer));
+			SetTeam(g_entities + (client - level.clients), "s", qtrue, -1, -1, qfalse);
+
 			return(qfalse);
 		}
 

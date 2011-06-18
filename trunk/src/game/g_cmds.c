@@ -3377,6 +3377,8 @@ void Cmd_Load_f(gentity_t *ent)
 	{
 		VectorCopy(pos->origin, ent->client->ps.origin);
 		VectorClear(ent->client->ps.velocity);
+		if(ent->client->pers.clientFlags & CGF_LOADVIEWANGLES)
+			SetClientViewAngle(ent, pos->vangles);
 	}
 	else
 		CP("cp \"^7Use ^3save ^7first!\n\"");
@@ -3602,6 +3604,18 @@ void Cmd_noCall_f(gentity_t *ent) {
 	CP(va("print \"^7You have %s ^3call^7.\n\"", msg));
 }
 
+void Cmd_NoNading_f(gentity_t *ent) {
+	char *msg;
+	if(ent->client->sess.noNading) {
+		ent->client->sess.noNading = qfalse;
+		msg = "enabled";
+	} else {
+		ent->client->sess.noNading = qtrue;
+		msg = "disabled";
+	}
+	CP(va("print \"Other players' ability to nade you has been %s.\n\"", msg));
+}
+
 
 
 /*
@@ -3621,6 +3635,82 @@ qboolean G_DesiredFollow(gentity_t *ent, gentity_t *other)
 	return G_AllowFollow(ent, other)
 		   && (ent->client->sess.spec_team == 0
 			   || ent->client->sess.spec_team == other->client->sess.sessionTeam);
+}
+
+void Cmd_Class_f(gentity_t *ent)
+{
+	char ptype[4];
+	char weap[4], weap2[4];
+	weapon_t	w, w2;
+
+	if (trap_Argc() < 2)
+	{
+		CP("Print \"^dUsage:\n\n\"");
+		CP("Print \"^dMedic - /class m\n\"");
+		CP("Print \"^dEngineer with SMG - /class e 1\n\"");
+		CP("Print \"^dEngineer with Rifle - /class e 2\n\"");
+		CP("Print \"^dField ops - /class f\n\"");
+		CP("Print \"^dCovert ops with sten - /class c 1\n\"");
+		CP("Print \"^dCovert ops with FG42 - /class c 2\n\"");
+		CP("Print \"^dCovert ops with Rifle - /class c 3\n\"");
+		CP("Print \"^dSoldier with SMG - /class s 1\n\"");
+		CP("Print \"^dSoldier with MG42 - /class s 2\n\"");
+		CP("Print \"^dSoldier with Flamethrower - /class s 3\n\"");
+		CP("Print \"^dSoldier with Panzerfaust - /class s 4\n\"");
+		CP("Print \"^dSoldier with Mortar - /class s 5\n\"");
+		return;
+	}
+
+	trap_Argv(1, ptype, sizeof(ptype));
+	trap_Argv(2, weap,	sizeof(weap));
+	trap_Argv(3, weap2, sizeof(weap2));
+
+
+	if (!Q_stricmp(ptype, "m"))
+		Q_strncpyz(ptype, "1", sizeof(ptype));
+
+	if (!Q_stricmp(ptype, "e"))
+	{
+		Q_strncpyz(ptype, "2", sizeof(ptype));
+		if (!Q_stricmp(weap, "2"))
+			Q_strncpyz(weap, "23", sizeof(weap));
+	}
+
+	if (!Q_stricmp(ptype, "f"))
+		Q_strncpyz(ptype, "3", sizeof(ptype));
+
+	if (!Q_stricmp(ptype, "c"))
+	{
+		Q_strncpyz(ptype, "4", sizeof(ptype));
+		if (!Q_stricmp(weap, "2"))
+			Q_strncpyz(weap, "33", sizeof(weap));
+		else if (!Q_stricmp(weap, "3"))
+			Q_strncpyz(weap, "25", sizeof(weap));
+	}
+
+	if (!Q_stricmp(ptype, "s"))
+	{
+		Q_strncpyz(ptype, "5", sizeof(ptype));
+		if (!Q_stricmp(weap, "2"))
+			Q_strncpyz(weap, "31", sizeof(weap));
+		else if (!Q_stricmp(weap, "3"))
+			Q_strncpyz(weap, "6", sizeof(weap));
+		else if (!Q_stricmp(weap, "4"))
+			Q_strncpyz(weap, "5", sizeof(weap));
+		else if (!Q_stricmp(weap, "5"))
+			Q_strncpyz(weap, "35", sizeof(weap));
+	}
+
+
+
+	w =		atoi(weap);
+	w2 =	atoi(weap2);
+
+	ent->client->sess.latchPlayerType = atoi(ptype);
+	if (ent->client->sess.latchPlayerType < PC_SOLDIER || ent->client->sess.latchPlayerType > PC_COVERTOPS)
+		ent->client->sess.latchPlayerType = PC_SOLDIER;
+
+	G_SetClientWeapons(ent, w, w2, qtrue);
 }
 
 /*
@@ -3715,10 +3805,12 @@ static command_t anyTimeCommands[] =
 	{ "m",					qtrue,	Cmd_PrivateMessage_f },
 	{ "nogoto",				qfalse, Cmd_noGoto_f },
 	{ "nocall",				qfalse, Cmd_noCall_f },
+	{ "nonading",			qfalse, Cmd_NoNading_f },
 };
 
 static command_t noIntermissionCommands[] =
 {
+	{ "class",				qfalse, Cmd_Class_f },
 	{ "give",				qfalse,	Cmd_Give_f },
 	{ "god",				qfalse,	Cmd_God_f },
 	{ "notarget",			qfalse,	Cmd_Notarget_f },

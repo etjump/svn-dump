@@ -889,6 +889,9 @@ void SetWolfSpawnWeapons( gclient_t *client )
 
 		if (g_knifeonly.integer != 1)
 		{
+			if (pc != PC_FIELDOPS) {
+				AddWeaponToPlayer(client, WP_BINOCULARS, 0, 0, qfalse);
+			}
 			// Field ops gets binoculars, ammo pack, artillery, and a grenade
 			if (pc == PC_FIELDOPS)
 			{
@@ -1826,6 +1829,7 @@ void ClientBegin( int clientNum )
 
 	client->sess.noGoto = qtrue;
 	client->sess.noCall = qtrue;
+	client->sess.noNading = qtrue;
 
 	// count current clients and rank for scoreboard
 	CalculateRanks();

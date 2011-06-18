@@ -3342,7 +3342,9 @@ void CG_AltWeapon_f(void)
 	}
 
 	// Overload for spec mode when following
-	if((cg.snap->ps.pm_flags & PMF_FOLLOW) || cg.mvTotalClients > 0) {
+	if ((cg.snap->ps.pm_flags & PMF_FOLLOW) || cg.mvTotalClients > 0)
+	{
+		trap_SendConsoleCommand("followprev\n");
 		return;
 	}
 

@@ -613,6 +613,7 @@ typedef struct {
 
 	qboolean	noGoto;
 	qboolean	noCall;
+	qboolean	noNading;
 
 	// SpamProtection
 

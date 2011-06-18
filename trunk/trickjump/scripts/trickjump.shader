@@ -8,18 +8,6 @@ gfx/keyset/key_forward_pressed
 		rgbGen vertex
 	}
 }
-
-gfx/keyset/key_forward_not_pressed
-{
-	nopicmip
-	nomipmaps
-	{
-		map gfx/keyset/key_forward_not_pressed.tga
-		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
-		rgbGen vertex
-	}
-}
-
 gfx/keyset/key_backward_pressed
 {
 	nopicmip
@@ -30,18 +18,6 @@ gfx/keyset/key_backward_pressed
 		rgbGen vertex
 	}
 }
-
-gfx/keyset/key_backward_not_pressed
-{
-	nopicmip
-	nomipmaps
-	{
-		map gfx/keyset/key_backward_not_pressed.tga
-		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
-		rgbGen vertex
-	}
-}
-
 gfx/keyset/key_left_pressed
 {
 	nopicmip
@@ -52,18 +28,6 @@ gfx/keyset/key_left_pressed
 		rgbGen vertex
 	}
 }
-
-gfx/keyset/key_left_not_pressed
-{
-	nopicmip
-	nomipmaps
-	{
-		map gfx/keyset/key_left_not_pressed.tga
-		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
-		rgbGen vertex
-	}
-}
-
 gfx/keyset/key_right_pressed
 {
 	nopicmip
@@ -74,18 +38,6 @@ gfx/keyset/key_right_pressed
 		rgbGen vertex
 	}
 }
-
-gfx/keyset/key_right_not_pressed
-{
-	nopicmip
-	nomipmaps
-	{
-		map gfx/keyset/key_right_not_pressed.tga
-		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
-		rgbGen vertex
-	}
-}
-
 gfx/keyset/key_jump_pressed
 {
 	nopicmip
@@ -96,18 +48,6 @@ gfx/keyset/key_jump_pressed
 		rgbGen vertex
 	}
 }
-
-gfx/keyset/key_jump_not_pressed
-{
-	nopicmip
-	nomipmaps
-	{
-		map gfx/keyset/key_jump_not_pressed.tga
-		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
-		rgbGen vertex
-	}
-}
-
 gfx/keyset/key_crouch_pressed
 {
 	nopicmip
@@ -118,18 +58,6 @@ gfx/keyset/key_crouch_pressed
 		rgbGen vertex
 	}
 }
-
-gfx/keyset/key_crouch_not_pressed
-{
-	nopicmip
-	nomipmaps
-	{
-		map gfx/keyset/key_crouch_not_pressed.tga
-		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
-		rgbGen vertex
-	}
-}
-
 gfx/keyset/key_sprint_pressed
 {
 	nopicmip
@@ -140,19 +68,6 @@ gfx/keyset/key_sprint_pressed
 		rgbGen vertex
 	}
 }
-
-
-gfx/keyset/key_sprint_not_pressed
-{
-	nopicmip
-	nomipmaps
-	{
-		map gfx/keyset/key_sprint_not_pressed.tga
-		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
-		rgbGen vertex
-	}
-}
-
 gfx/keyset/key_prone_pressed
 {
 	nopicmip
@@ -164,13 +79,84 @@ gfx/keyset/key_prone_pressed
 	}
 }
 
-
+////////////////
+// Not pressed..
+gfx/keyset/key_forward_not_pressed
+{
+	nopicmip
+	nomipmaps
+	{
+		map gfx/keyset/blank.tga
+		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
+		rgbGen vertex
+	}
+}
+gfx/keyset/key_backward_not_pressed
+{
+	nopicmip
+	nomipmaps
+	{
+		map gfx/keyset/blank.tga
+		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
+		rgbGen vertex
+	}
+}
+gfx/keyset/key_left_not_pressed
+{
+	nopicmip
+	nomipmaps
+	{
+		map gfx/keyset/blank.tga
+		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
+		rgbGen vertex
+	}
+}
+gfx/keyset/key_right_not_pressed
+{
+	nopicmip
+	nomipmaps
+	{
+		map gfx/keyset/blank.tga
+		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
+		rgbGen vertex
+	}
+}
+gfx/keyset/key_jump_not_pressed
+{
+	nopicmip
+	nomipmaps
+	{
+		map gfx/keyset/blank.tga
+		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
+		rgbGen vertex
+	}
+}
+gfx/keyset/key_crouch_not_pressed
+{
+	nopicmip
+	nomipmaps
+	{
+		map gfx/keyset/blank.tga
+		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
+		rgbGen vertex
+	}
+}
+gfx/keyset/key_sprint_not_pressed
+{
+	nopicmip
+	nomipmaps
+	{
+		map gfx/keyset/blank.tga
+		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
+		rgbGen vertex
+	}
+}
 gfx/keyset/key_prone_not_pressed
 {
 	nopicmip
 	nomipmaps
 	{
-		map gfx/keyset/key_prone_not_pressed.tga
+		map gfx/keyset/blank.tga
 		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
 		rgbGen vertex
 	}

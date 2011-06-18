@@ -1,0 +1,56 @@
+#include "ui/menudef.h"
+
+// Defines //
+
+#define WINDOW_X		16
+#define WINDOW_Y		16
+#define WINDOW_WIDTH	608
+#define WINDOW_HEIGHT	448
+#define GROUP_NAME		"grpOptionsControls"
+
+// Macros //
+
+#include "ui/menumacros.h"
+		
+// System Menu //
+	
+menuDef {
+	name		"options_controls"
+	visible		0
+	fullscreen	0
+	rect		WINDOW_X WINDOW_Y WINDOW_WIDTH WINDOW_HEIGHT
+	style		WINDOW_STYLE_FILLED
+	
+	onESC {
+		close options_controls ;
+		open options
+	}
+
+// Window //
+
+	WINDOW( "CONTROLS", 90 )
+	
+// Subwindows //
+
+#define SUBWINDOW_WIDTH		.5*(WINDOW_WIDTH-18)
+	
+// Move //
+
+	SUBWINDOW( 6, 32, (SUBWINDOW_WIDTH), 160, "MOVE" )
+	BIND( 8, 48, (SUBWINDOW_WIDTH)-4, 10, "Save:", .2, 8, "save", "" )
+	BIND( 8, 60, (SUBWINDOW_WIDTH)-4, 10, "Load:", .2, 8, "load", "" )
+	BIND( 8, 72, (SUBWINDOW_WIDTH)-4, 10, "noGoto:", .2, 8, "nogoto", "" )
+	BIND( 8, 84, (SUBWINDOW_WIDTH)-4, 10, "noCall:", .2, 8, "nocall", "" )
+	BIND( 8, 96, (SUBWINDOW_WIDTH)-4, 10, "noNading:", .2, 8, "nonading", "" )
+	MULTI( 8, 108, (SUBWINDOW_WIDTH)-4, 10, "CGaz:", .2, 8, "cg_drawCGaz", cvarFloatList { "Off" 0 "1" 1 "2" 2 "3" 3 }, "" )
+	SLIDER( 8, 120, (SUBWINDOW_WIDTH)-4, 10, "Pressed keys X:", .2, 8, "sensitivity" 550 0 550, "Use the slider to move pressed keys horizontally" )
+	SLIDER( 8, 132, (SUBWINDOW_WIDTH)-4, 10, "Pressed keys Y:", .2, 8, "sensitivity" 200 0 400, "Use the slider to move pressed keys vertically" )
+
+
+// Buttons //
+
+	BUTTON( 6, WINDOW_HEIGHT-24, .5*(WINDOW_WIDTH-18), 18, "BACK", .3, 14,
+		close options_controls ; open options )
+	BUTTON( 6+.5*(WINDOW_WIDTH-18)+6, WINDOW_HEIGHT-24, .5*(WINDOW_WIDTH-18), 18, "DEFAULT", .3, 14,
+		open options_controls_default )
+}

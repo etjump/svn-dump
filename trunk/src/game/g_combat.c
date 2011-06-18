@@ -1281,7 +1281,7 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker,  vec3
 	if( client && (client->ps.weapon == WP_MORTAR_SET || client->ps.weapon == WP_MOBILE_MG42_SET) )
 		knockback *= 0.5;
 
-	if(targ->client != attacker->client && attacker->client) {
+	if(targ->client != attacker->client && attacker->client && targ->client->sess.noNading == qtrue) {
 		knockback = 0;
 	}
 
@@ -1289,8 +1289,6 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker,  vec3
 	if ( knockback && targ->client ) {		
 		vec3_t	kvel;
 		float	mass;
-
-		AP(va("print \"Knockback %i\n\"", knockback));
 
 		mass = 200;
 
