@@ -988,6 +988,14 @@ void SP_worldspawn( void ) {
 	if (atoi(s))
 		level.noSave = qtrue;
 
+	G_SpawnString("nonoclip", "0", &s);
+	if (atoi(s))
+		level.noNoclip = qtrue;
+
+	G_SpawnString("nogod", "0", &s);
+	if (atoi(s))
+		level.noGod = qtrue;
+
 	level.mapcoordsValid = qfalse;
 	if( G_SpawnVector2D( "mapcoordsmins", "-128 128", level.mapcoordsMins ) &&	// top left
 		G_SpawnVector2D( "mapcoordsmaxs", "128 -128", level.mapcoordsMaxs ) ) {	// bottom right

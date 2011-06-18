@@ -1128,6 +1128,8 @@ typedef struct {
 
 	qboolean	noExplosives;
 	qboolean	noSave;
+	qboolean	noNoclip;
+	qboolean	noGod;
 } level_locals_t;
 
 typedef struct {

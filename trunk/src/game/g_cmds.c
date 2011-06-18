@@ -496,6 +496,11 @@ void Cmd_God_f (gentity_t *ent)
 		return;
 	}
 
+	if (level.noGod) {
+		CP("cp \"God has been disabled on this map.\n\"");
+		return;
+	}
+
 	name = ConcatArgs( 1 );
 
 	// are we supposed to make all our teammates gods too?
@@ -625,6 +630,11 @@ void Cmd_Noclip_f( gentity_t *ent ) {
 	char	*name = ConcatArgs( 1 );
 
 	if ( !CheatsOk( ent ) && !g_noclip.integer) {
+		return;
+	}
+
+	if (level.noNoclip) {
+		CP("cp \"Noclip has been disabled on this map.\n\"");
 		return;
 	}
 

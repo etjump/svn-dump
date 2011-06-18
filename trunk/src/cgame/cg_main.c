@@ -301,6 +301,13 @@ vmCvar_t	cg_CGazHeight;
 vmCvar_t	cg_CGazWidth;
 vmCvar_t	cg_CGazAlpha;
 vmCvar_t	cg_drawTJHud;
+vmCvar_t	cg_drawOB;
+
+// forty - speedometer
+vmCvar_t	cg_drawspeed;
+vmCvar_t	cg_speedinterval;
+vmCvar_t	cg_speedXYonly;
+vmCvar_t	cg_speedunit;
 
 // Cheat cvars
 vmCvar_t	cl_yawspeed;
@@ -537,6 +544,7 @@ cvarTable_t		cvarTable[] = {
 	{ &com_maxfps,				"com_maxfps", "76", CVAR_ARCHIVE },
 	{ &com_hunkmegs,			"com_hunkmegs", "128", CVAR_ARCHIVE },
 	{ &cg_drawCGaz,				"cg_drawCGaz", "0", CVAR_ARCHIVE },
+	{ &cg_drawOB,				"cg_drawOB", "0", CVAR_ARCHIVE },
 	{ &cg_CGazY,				"cg_CGazY", "260", CVAR_ARCHIVE },
 	{ &cg_CGazHeight,			"cg_CGazHeight", "20", CVAR_ARCHIVE },
 	{ &cg_CGazWidth,			"cg_CGazWidth", "300", CVAR_ARCHIVE },
@@ -545,6 +553,11 @@ cvarTable_t		cvarTable[] = {
 	{ &cl_freelook,				"cl_freelook", "1", CVAR_ARCHIVE },
 	{ &cg_drawCGazUsers,		"cg_drawCGazUsers", "1", CVAR_ARCHIVE },
 	{ &cg_drawTJHud,			"cg_drawTJHud", "1", CVAR_ARCHIVE },
+	// forty - speedometer
+	{ &cg_drawspeed, "cg_drawspeed", "1", CVAR_ARCHIVE },
+	{ &cg_speedXYonly, "cg_speedXYonly", "1", CVAR_ARCHIVE },
+	{ &cg_speedinterval, "cg_speedinterval", "100", CVAR_ARCHIVE },
+	{ &cg_speedunit, "cg_speedunit", "0", CVAR_ARCHIVE },
 };
 
 int		cvarTableSize = sizeof( cvarTable ) / sizeof( cvarTable[0] );

@@ -418,6 +418,113 @@ static float CG_DrawSnapshot( float y ) {
 
 /*
 ==================
+CG_DrawSpeed, TJ
+==================
+*/
+// forty - chruker's speed constants
+// kw: TO_KPH was 15.56 but should be 14.56
+#define   SPEED_US_TO_KPH   14.56f
+#define   SPEED_US_TO_MPH   23.44f
+
+/*
+	cg_drawspeed:
+		1 draw ups only
+		2 draw ups (max: xx) only
+*/
+
+// forty - originally from chruker's speedometer code
+static float CG_DrawSpeed(float y)
+{
+	char *s;
+	int	w;
+	static vec_t highestSpeed, speed;
+	static int lasttime;
+	int thistime;
+	vec4_t timerBackground = { 0.16f, 0.2f, 0.17f, 0.8f };
+	vec4_t timerBorder     = { 0.5f, 0.5f,	0.5f, 0.5f };
+	vec4_t tclr			= { 0.625f, 0.625f, 0.6f, 1.0f };
+
+	if (cg.resetmaxspeed)
+	{
+		highestSpeed = 0;
+		cg.resetmaxspeed = qfalse;
+	}
+
+	thistime = trap_Milliseconds();
+
+	if (thistime > (lasttime + cg_speedinterval.integer))
+	{
+
+		if (cg_speedXYonly.integer)
+			speed = sqrt(cg.predictedPlayerState.velocity[0] * cg.predictedPlayerState.velocity[0] + cg.predictedPlayerState.velocity[1] * cg.predictedPlayerState.velocity[1]);
+		else
+			speed = VectorLength(cg.predictedPlayerState.velocity);
+
+		if (speed > highestSpeed)
+		{
+			highestSpeed = speed;
+		}
+
+		lasttime = thistime;
+
+
+	}
+
+	switch (cg_drawspeed.integer)
+	{
+		default:
+		case 1:
+			// kw: swapped 1 and 2 to match etpro's b_speedunit
+			switch (cg_speedunit.integer)
+			{
+				default:
+				case 0:
+					// Units per second
+					s = va("%.1f UPS", speed);
+					break;
+				case 1:
+					// Miles per hour
+					s = va("%.1f MPH", (speed / SPEED_US_TO_MPH));
+					break;
+				case 2:
+					// Kilometers per hour
+					s = va("%.1f KPH", (speed / SPEED_US_TO_KPH));
+					break;
+			}
+			break;
+
+		case 2:
+			switch (cg_speedunit.integer)
+			{
+				default:
+				case 0:
+					// Units per second
+					s = va("%.1f UPS (%.1f MAX)", speed, highestSpeed);
+					break;
+				case 1:
+					// Miles per hour
+					s = va("%.1f MPH (%.1f MAX)", (speed / SPEED_US_TO_MPH), (highestSpeed / SPEED_US_TO_MPH));
+					break;
+				case 2:
+					// Kilometers per hour
+					s = va("%.1f KPH (%.1f MAX)", (speed / SPEED_US_TO_KPH), (highestSpeed / SPEED_US_TO_KPH));
+					break;
+			}
+			break;
+	}
+
+	w = CG_Text_Width_Ext(s, 0.19f, 0, &cgs.media.limboFont1);
+
+	CG_FillRect(UPPERRIGHT_X - w - 2, y, w + 5, 12 + 2, timerBackground);
+	CG_DrawRect_FixedBorder(UPPERRIGHT_X - w - 2, y, w + 5, 12 + 2, 1, timerBorder);
+
+	CG_Text_Paint_Ext(UPPERRIGHT_X - w, y + 11, 0.19f, 0.19f, tclr, s, 0, 0, 0, &cgs.media.limboFont1);
+
+	return y + 12 + 4;
+}
+
+/*
+==================
 CG_DrawFPS
 ==================
 */
@@ -579,6 +686,10 @@ static void CG_DrawUpperRight( void ) {
 
 	if ( cg_drawFPS.integer ) {
 		y = CG_DrawFPS( y );
+	}
+
+	if ( cg_drawspeed.integer ) {
+		y = CG_DrawSpeed( y );
 	}
 
 	if ( cg_drawSnapshot.integer ) {
@@ -1934,13 +2045,10 @@ static void CG_DrawCrosshairNames( void ) {
 	float		w;
 	const char	*s, *playerClass;
 	int			playerHealth = 0;
-	vec4_t		c;
-	float		barFrac;
 	qboolean	drawStuff = qfalse;
 	const char *playerRank;
 	qboolean	isTank = qfalse;
 	int			maxHealth = 1;
-	int			i;
 
 	// Distance to the entity under the crosshair
 	float		dist;
@@ -2753,6 +2861,93 @@ static void CG_DrawCGazHUD(void)
 				 SCREEN_CENTER_X + vel_size * sin(vel_relang - per_angle),
 				 SCREEN_CENTER_Y - vel_size * cos(vel_relang - per_angle), colorRed);
 		return;
+	}
+}
+
+/*
+=========
+CG_DrawOB
+
+Fast OB detection.
+TODO below ob
+===========
+*/
+static void CG_DrawOB(void)
+{
+	double a, b, c;
+	float psec;
+	int gravity;
+	vec3_t snap;
+	float rintv;
+	float v0;
+	float h0, hn;
+	float t;
+	trace_t trace;
+	vec3_t start, end;
+	float n1, n2;
+	int n;
+
+	if (cg_thirdPerson.integer)
+		return;
+
+	psec = pmove_msec.integer / 1000.0;
+	gravity = cg.predictedPlayerState.gravity;
+	v0 = cg.predictedPlayerState.velocity[2];
+	h0 = cg.predictedPlayerState.origin[2] + cg.predictedPlayerState.mins[2];
+	//CG_Printf("psec: %f, gravity: %d\n", psec, gravity);
+
+	VectorSet(snap, 0, 0, gravity * psec);
+	trap_SnapVector(snap);
+	rintv = snap[2];
+
+	// use origin from playerState?
+	VectorCopy(cg.refdef.vieworg, start);
+	VectorMA(start, 131072, cg.refdef.viewaxis[0], end);
+
+	CG_Trace(&trace, start, vec3_origin, vec3_origin, end,
+			 cg.predictedPlayerState.clientNum, CONTENTS_SOLID);
+
+	// we didn't hit anything
+	if (trace.fraction == 1.0)
+		return;
+
+	// not a floor
+	if (trace.plane.type != 2)
+		return;
+
+	t = trace.endpos[2];
+	//CG_Printf("h0: %f, t: %f\n", h0, t);
+
+	// fall ob
+	a = -psec * rintv / 2;
+	b = psec * (v0 - gravity * psec / 2 + rintv / 2);
+	c = h0 - t;
+	n1 = (-b + sqrt(b * b - 4 * a * c)) / (2 * a);
+	n2 = (-b - sqrt(b * b - 4 * a * c)) / (2 * a);
+	//CG_Printf("%f, %f\n", n1, n2);
+
+	n = floor(n2);
+	hn = h0 + psec * n * (v0 - gravity * psec / 2 - (n - 1) * rintv / 2);
+	//CG_Printf("h0: %f, v0: %f, n: %d, hn: %f, t: %f\n", h0, v0, n, hn, t);
+	if (n && hn < t + 0.25 && hn > t)
+		CG_DrawStringExt(320, 220, "F", colorWhite, qfalse, qtrue,
+						 TINYCHAR_WIDTH, TINYCHAR_HEIGHT, 0);
+
+	if (cg.predictedPlayerState.groundEntityNum != ENTITYNUM_NONE)
+	{
+		// jump ob
+		v0 += 270; // JUMP_VELOCITY
+		b = psec * (v0 - gravity * psec / 2 + rintv / 2);
+		n1 = (-b + sqrt(b * b - 4 * a * c)) / (2 * a);
+		n2 = (-b - sqrt(b * b - 4 * a * c)) / (2 * a);
+		//CG_Printf("%f, %f\n", n1, n2);
+
+		n = floor(n2);
+		hn = h0 + psec * n * (v0 - gravity * psec / 2 - (n - 1) * rintv / 2);
+		//CG_Printf("h0: %f, v0: %f, n: %d, hn: %f, t: %f\n", h0, v0, n, hn, t);
+		if (hn < t + 0.25 && hn > t)
+			CG_DrawStringExt(330, 220, "J", colorWhite, qfalse, qtrue,
+							 TINYCHAR_WIDTH, TINYCHAR_HEIGHT, 0);
 	}
 }
 
@@ -4313,7 +4508,6 @@ CG_Draw2D
 =================
 */
 static void CG_Draw2D( void ) {
-	rectDef_t	rect;
 	CG_ScreenFade();
 
 	// Arnout: no 2d when in esc menu
@@ -4454,6 +4648,7 @@ static void CG_Draw2D( void ) {
 		CG_DrawLimboMessage();
 
 		CG_DrawCGazHUD();
+		CG_DrawOB();
 	} else {
 		if(cgs.eventHandling != CGAME_EVENT_NONE) {
 //			qboolean old = cg.showGameView;

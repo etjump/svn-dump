@@ -1166,6 +1166,7 @@ typedef struct {
 	char			objDescription_Allied[MAX_OBJECTIVES][256];
 
 	int				waterundertime;
+	qboolean		resetmaxspeed;
 } cg_t;
 
 #define	NUM_FUNNEL_SPRITES	21
@@ -2238,6 +2239,13 @@ extern	vmCvar_t		cg_CGazWidth;
 extern	vmCvar_t		cg_CGazAlpha;
 extern	vmCvar_t		cg_drawCGazUsers;
 extern	vmCvar_t		cg_drawTJHud;
+extern	vmCvar_t		cg_drawOB;
+
+// forty - speedometer
+extern	vmCvar_t		cg_drawspeed;
+extern	vmCvar_t		cg_speedinterval;
+extern	vmCvar_t		cg_speedXYonly;
+extern	vmCvar_t		cg_speedunit;
 
 extern pmove_t			cg_pmove;
 
