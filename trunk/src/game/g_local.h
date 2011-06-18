@@ -620,6 +620,9 @@ typedef struct {
 	int			numReliableCmds;
 	int			thresholdTime;
 
+	// Kill cmd spam prot
+	int			lastKillTime;
+
 	qboolean	specLocked;
 	int			specInvitedClients[MAX_CLIENTS / (sizeof(int) * 8)];
 

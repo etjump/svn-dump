@@ -511,16 +511,46 @@ static float CG_DrawSpeed(float y)
 					break;
 			}
 			break;
+		case 3:
+			switch (cg_speedunit.integer)
+			{
+				default:
+				case 0:
+					// Units per second
+					s = va("%.1f", speed);
+					break;
+				case 1:
+					// Miles per hour
+					s = va("%.1f", (speed / SPEED_US_TO_MPH));
+					break;
+				case 2:
+					// Kilometers per hour
+					s = va("%.1f", (speed / SPEED_US_TO_KPH));
+					break;
+			}
+			break;
+
+
 	}
 
-	w = CG_Text_Width_Ext(s, 0.19f, 0, &cgs.media.limboFont1);
+	if(cg_drawspeed.integer == 3) {
+		int x, y;
+		x = cg_drawspeedX.integer;
+		y = cg_drawspeedY.integer;
+		w = CG_Text_Width_Ext(s, 0.19f, 0, &cgs.media.limboFont1);
+		CG_Text_Paint_Ext(x + 0.5 * (cg.refdef_current->width), y + 0.5 * (cg.refdef_current->height), 
+			0.19f, 0.19f, tclr, s, 0, 0, 0, &cgs.media.limboFont1);
 
-	CG_FillRect(UPPERRIGHT_X - w - 2, y, w + 5, 12 + 2, timerBackground);
-	CG_DrawRect_FixedBorder(UPPERRIGHT_X - w - 2, y, w + 5, 12 + 2, 1, timerBorder);
 
-	CG_Text_Paint_Ext(UPPERRIGHT_X - w, y + 11, 0.19f, 0.19f, tclr, s, 0, 0, 0, &cgs.media.limboFont1);
+	} else {
+		w = CG_Text_Width_Ext(s, 0.19f, 0, &cgs.media.limboFont1);
 
+		CG_FillRect(UPPERRIGHT_X - w - 2, y, w + 5, 12 + 2, timerBackground);
+		CG_DrawRect_FixedBorder(UPPERRIGHT_X - w - 2, y, w + 5, 12 + 2, 1, timerBorder);
+
+		CG_Text_Paint_Ext(UPPERRIGHT_X - w, y + 11, 0.19f, 0.19f, tclr, s, 0, 0, 0, &cgs.media.limboFont1);
 	return y + 12 + 4;
+	}
 }
 
 /*

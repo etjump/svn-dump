@@ -302,6 +302,8 @@ vmCvar_t	cg_CGazWidth;
 vmCvar_t	cg_CGazAlpha;
 vmCvar_t	cg_drawTJHud;
 vmCvar_t	cg_drawOB;
+vmCvar_t	cg_drawspeedX;
+vmCvar_t	cg_drawspeedY;
 
 // forty - speedometer
 vmCvar_t	cg_drawspeed;
@@ -553,6 +555,8 @@ cvarTable_t		cvarTable[] = {
 	{ &cl_freelook,				"cl_freelook", "1", CVAR_ARCHIVE },
 	{ &cg_drawCGazUsers,		"cg_drawCGazUsers", "1", CVAR_ARCHIVE },
 	{ &cg_drawTJHud,			"cg_drawTJHud", "1", CVAR_ARCHIVE },
+	{ &cg_drawspeedX,			"cg_drawspeedX", "-10", CVAR_ARCHIVE },
+	{ &cg_drawspeedY,			"cg_drawspeedY", "-20", CVAR_ARCHIVE },
 	// forty - speedometer
 	{ &cg_drawspeed, "cg_drawspeed", "1", CVAR_ARCHIVE },
 	{ &cg_speedXYonly, "cg_speedXYonly", "1", CVAR_ARCHIVE },

@@ -668,6 +668,9 @@ void Cmd_Kill_f( gentity_t *ent )
 		return;
 	}
 
+	if(ent->client->sess.lastKillTime + 1000 > level.time)
+		return;
+
 #ifdef SAVEGAME_SUPPORT
 	if( g_gametype.integer == GT_SINGLE_PLAYER && g_reloading.integer )
 		return;
@@ -677,6 +680,7 @@ void Cmd_Kill_f( gentity_t *ent )
 	ent->client->ps.stats[STAT_HEALTH] = ent->health = 0;
 	ent->client->ps.persistant[PERS_HWEAPON_USE] = 0; // TTimo - if using /kill while at MG42
 	player_die(ent, ent, ent, (g_gamestate.integer == GS_PLAYING) ? 100000 : 135, MOD_SUICIDE);
+	ent->client->sess.lastKillTime = level.time;
 }
 
 void BotRecordTeamChange( int client );
@@ -3581,7 +3585,7 @@ void Cmd_noGoto_f(gentity_t *ent) {
 		ent->client->sess.noGoto = qtrue;
 		msg = "disabled";
 	}
-	CP(va("print \"^7You have %s goto\n\"", msg));
+	CP(va("print \"^7You have %s ^3goto^7.\n\"", msg));
 }
 
 void Cmd_noCall_f(gentity_t *ent) {
@@ -3593,7 +3597,7 @@ void Cmd_noCall_f(gentity_t *ent) {
 		ent->client->sess.noCall = qtrue;
 		msg = "disabled";
 	}
-	CP(va("print \"^7You have %s goto\n\"", msg));
+	CP(va("print \"^7You have %s ^3call^7.\n\"", msg));
 }
 
 

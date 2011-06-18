@@ -2240,6 +2240,8 @@ extern	vmCvar_t		cg_CGazAlpha;
 extern	vmCvar_t		cg_drawCGazUsers;
 extern	vmCvar_t		cg_drawTJHud;
 extern	vmCvar_t		cg_drawOB;
+extern	vmCvar_t		cg_drawspeedX;
+extern	vmCvar_t		cg_drawspeedY;
 
 // forty - speedometer
 extern	vmCvar_t		cg_drawspeed;
