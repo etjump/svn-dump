@@ -304,6 +304,10 @@ vmCvar_t	cg_drawTJHud;
 vmCvar_t	cg_drawOB;
 vmCvar_t	cg_drawspeedX;
 vmCvar_t	cg_drawspeedY;
+vmCvar_t	cg_drawKeys;
+vmCvar_t	cg_keysX;
+vmCvar_t	cg_keysY;
+vmCvar_t	cg_keysSize;
 
 // forty - speedometer
 vmCvar_t	cg_drawspeed;
@@ -557,6 +561,11 @@ cvarTable_t		cvarTable[] = {
 	{ &cg_drawTJHud,			"cg_drawTJHud", "1", CVAR_ARCHIVE },
 	{ &cg_drawspeedX,			"cg_drawspeedX", "-10", CVAR_ARCHIVE },
 	{ &cg_drawspeedY,			"cg_drawspeedY", "-20", CVAR_ARCHIVE },
+	{ &cg_drawKeys,				"cg_drawKeys", "1", CVAR_ARCHIVE },
+	{ &cg_keysSize,				"cg_keysSize", "48", CVAR_ARCHIVE },
+	{ &cg_keysX,				"cg_keysX", "585", CVAR_ARCHIVE },
+	{ &cg_keysY,				"cg_keysY", "200", CVAR_ARCHIVE },
+
 	// forty - speedometer
 	{ &cg_drawspeed, "cg_drawspeed", "1", CVAR_ARCHIVE },
 	{ &cg_speedXYonly, "cg_speedXYonly", "1", CVAR_ARCHIVE },
@@ -2025,6 +2034,39 @@ static void CG_RegisterGraphics( void ) {
 	for( i = 0; i < 6; i++ ) {
 		cgs.media.fireteamicons[i] =			trap_R_RegisterShaderNoMip( va( "gfx/hud/fireteam/fireteam%i", i+1 ) );
 	}
+
+	cgs.media.keys.ForwardPressedShader
+	= trap_R_RegisterShaderNoMip("gfx/keyset/key_forward_pressed");
+	cgs.media.keys.ForwardNotPressedShader
+	= trap_R_RegisterShaderNoMip("gfx/keyset/key_forward_not_pressed");
+	cgs.media.keys.BackwardPressedShader
+	= trap_R_RegisterShaderNoMip("gfx/keyset/key_backward_pressed");
+	cgs.media.keys.BackwardNotPressedShader
+	= trap_R_RegisterShaderNoMip("gfx/keyset/key_backward_not_pressed");
+	cgs.media.keys.RightPressedShader
+	= trap_R_RegisterShaderNoMip("gfx/keyset/key_right_pressed");
+	cgs.media.keys.RightNotPressedShader
+	= trap_R_RegisterShaderNoMip("gfx/keyset/key_right_not_pressed");
+	cgs.media.keys.LeftPressedShader
+	= trap_R_RegisterShaderNoMip("gfx/keyset/key_left_pressed");
+	cgs.media.keys.LeftNotPressedShader
+	= trap_R_RegisterShaderNoMip("gfx/keyset/key_left_not_pressed");
+	cgs.media.keys.JumpPressedShader
+	= trap_R_RegisterShaderNoMip("gfx/keyset/key_jump_pressed");
+	cgs.media.keys.JumpNotPressedShader
+	= trap_R_RegisterShaderNoMip("gfx/keyset/key_jump_not_pressed");
+	cgs.media.keys.CrouchPressedShader
+	= trap_R_RegisterShaderNoMip("gfx/keyset/key_crouch_pressed");
+	cgs.media.keys.CrouchNotPressedShader
+	= trap_R_RegisterShaderNoMip("gfx/keyset/key_crouch_not_pressed");
+	cgs.media.keys.SprintPressedShader
+	= trap_R_RegisterShaderNoMip("gfx/keyset/key_sprint_pressed");
+	cgs.media.keys.SprintNotPressedShader
+	= trap_R_RegisterShaderNoMip("gfx/keyset/key_sprint_not_pressed");
+	cgs.media.keys.PronePressedShader
+	= trap_R_RegisterShaderNoMip("gfx/keyset/key_prone_pressed");
+	cgs.media.keys.ProneNotPressedShader
+	= trap_R_RegisterShaderNoMip("gfx/keyset/key_prone_not_pressed");
 
 	CG_LoadingString( " - game media done" );
 }

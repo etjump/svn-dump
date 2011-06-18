@@ -1171,6 +1171,26 @@ typedef struct {
 
 #define	NUM_FUNNEL_SPRITES	21
 
+typedef struct
+{
+	qhandle_t		ForwardPressedShader;
+	qhandle_t		ForwardNotPressedShader;
+	qhandle_t		BackwardPressedShader;
+	qhandle_t		BackwardNotPressedShader;
+	qhandle_t		RightPressedShader;
+	qhandle_t		RightNotPressedShader;
+	qhandle_t		LeftPressedShader;
+	qhandle_t		LeftNotPressedShader;
+	qhandle_t		JumpPressedShader;
+	qhandle_t		JumpNotPressedShader;
+	qhandle_t		CrouchPressedShader;
+	qhandle_t		CrouchNotPressedShader;
+	qhandle_t		SprintPressedShader;
+	qhandle_t		SprintNotPressedShader;
+	qhandle_t		PronePressedShader;
+	qhandle_t		ProneNotPressedShader;
+} keys_set_t;
+
 #define MAX_LOCKER_DEBRIS	5
 
 // all of the model, shader, and sound references that are
@@ -1713,6 +1733,7 @@ typedef struct {
 	qhandle_t		disconnectIcon;
 
 	qhandle_t		fireteamicons[6];
+	keys_set_t		keys;
 } cgMedia_t;
 
 typedef struct {
@@ -2242,6 +2263,10 @@ extern	vmCvar_t		cg_drawTJHud;
 extern	vmCvar_t		cg_drawOB;
 extern	vmCvar_t		cg_drawspeedX;
 extern	vmCvar_t		cg_drawspeedY;
+extern	vmCvar_t		cg_drawKeys;
+extern	vmCvar_t		cg_keysSize;
+extern	vmCvar_t		cg_keysX;
+extern	vmCvar_t		cg_keysY;
 
 // forty - speedometer
 extern	vmCvar_t		cg_drawspeed;

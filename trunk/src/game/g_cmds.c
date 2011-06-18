@@ -2002,6 +2002,8 @@ qboolean Cmd_CallVote_f( gentity_t *ent, unsigned int dwCommand, qboolean fRefCo
 
 	level.voteInfo.voteTime = level.time;
 	level.voteInfo.voteNo = 0;
+	level.voteInfo.voter_cn = ent->client->ps.clientNum;
+	level.voteInfo.voter_team = ent->client->sess.sessionTeam;
 
 	// Don't send the vote info if a ref initiates (as it will automatically pass)
 	if(!fRefCommand) {
@@ -2017,7 +2019,7 @@ qboolean Cmd_CallVote_f( gentity_t *ent, unsigned int dwCommand, qboolean fRefCo
 		trap_SetConfigstring(CS_VOTE_STRING, level.voteInfo.voteString);	
 		trap_SetConfigstring(CS_VOTE_TIME,	 va("%i", level.voteInfo.voteTime));
 	}
-
+	
 	return(qtrue);
 }
 

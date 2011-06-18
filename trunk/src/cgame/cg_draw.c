@@ -2981,6 +2981,85 @@ static void CG_DrawOB(void)
 	}
 }
 
+static void CG_DrawKeys(void)
+{
+	playerState_t *ps;
+	float x, y, size;
+	int i;
+	int skew;
+
+	if (cg_drawKeys.integer <= 0)
+		return;
+
+	// some checks
+	if (cg_keysSize.value < 0 || cg_keysX.value < 0 || cg_keysY.value < 0
+			|| cg_keysX.value > SCREEN_WIDTH || cg_keysY.value > SCREEN_HEIGHT)
+		return;
+
+	skew = 0;
+
+	ps = &cg.predictedPlayerState;
+
+	size = cg_keysSize.value / 3;
+	// first (upper) row
+	// sprint (upper left)
+	x = cg_keysX.value + 2 * skew;
+	y = cg_keysY.value;
+	if (ps->stats[STAT_USERCMD_BUTTONS] & (BUTTON_SPRINT << 8))
+		CG_DrawPic(x, y, size, size, cgs.media.keys.SprintPressedShader);
+	else
+		CG_DrawPic(x, y, size, size, cgs.media.keys.SprintNotPressedShader);
+	// forward
+	x += size;
+	if (ps->stats[STAT_USERCMD_MOVE] & UMOVE_FORWARD)
+		CG_DrawPic(x, y, size, size, cgs.media.keys.ForwardPressedShader);
+	else
+		CG_DrawPic(x, y, size, size, cgs.media.keys.ForwardNotPressedShader);
+	// jump (upper right)
+	x += size;
+	if (ps->stats[STAT_USERCMD_MOVE] & UMOVE_UP)
+		CG_DrawPic(x, y, size, size, cgs.media.keys.JumpPressedShader);
+	else
+		CG_DrawPic(x, y, size, size, cgs.media.keys.JumpNotPressedShader);
+
+	// second (middle) row
+	// left
+	x = cg_keysX.value + skew;
+	y += size;
+	if (ps->stats[STAT_USERCMD_MOVE] & UMOVE_LEFT)
+		CG_DrawPic(x, y, size, size, cgs.media.keys.LeftPressedShader);
+	else
+		CG_DrawPic(x, y, size, size, cgs.media.keys.LeftNotPressedShader);
+	// right
+	x += 2 * size;
+	if (ps->stats[STAT_USERCMD_MOVE] & UMOVE_RIGHT)
+		CG_DrawPic(x, y, size, size, cgs.media.keys.RightPressedShader);
+	else
+		CG_DrawPic(x, y, size, size, cgs.media.keys.RightNotPressedShader);
+
+	// third (bottom) row
+	x = cg_keysX.value;
+	y += size;
+	// prone (bottom left)
+	if (ps->stats[STAT_USERCMD_BUTTONS] & WBUTTON_PRONE)
+		CG_DrawPic(x, y, size, size, cgs.media.keys.PronePressedShader);
+	else
+		CG_DrawPic(x, y, size, size, cgs.media.keys.ProneNotPressedShader);
+	// backward
+	x += size;
+	if (ps->stats[STAT_USERCMD_MOVE] & UMOVE_BACKWARD)
+		CG_DrawPic(x, y, size, size, cgs.media.keys.BackwardPressedShader);
+	else
+		CG_DrawPic(x, y, size, size, cgs.media.keys.BackwardNotPressedShader);
+	// crouch (bottom right)
+	x += size;
+	if (ps->stats[STAT_USERCMD_MOVE] & UMOVE_DOWN)
+		CG_DrawPic(x, y, size, size, cgs.media.keys.CrouchPressedShader);
+	else
+		CG_DrawPic(x, y, size, size, cgs.media.keys.CrouchNotPressedShader);
+
+}
+
 
 /*
 =================
@@ -4678,7 +4757,10 @@ static void CG_Draw2D( void ) {
 		CG_DrawLimboMessage();
 
 		CG_DrawCGazHUD();
+
 		CG_DrawOB();
+
+		CG_DrawKeys();
 	} else {
 		if(cgs.eventHandling != CGAME_EVENT_NONE) {
 //			qboolean old = cg.showGameView;

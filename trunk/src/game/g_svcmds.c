@@ -1342,6 +1342,14 @@ qboolean	ConsoleCommand( void ) {
 			trap_SendServerCommand( -1, va("cpm \"server: %s\n\"", ConcatArgs(1) ) );
 			return qtrue;
 		}
+		else if( !Q_stricmp (cmd, "qsay")) {
+			trap_SendServerCommand( -1, va("cpm \"%s\n\"", ConcatArgs(1) ) );
+			return qtrue;
+		}
+		else if( !Q_stricmp (cmd, "cp")) {
+			trap_SendServerCommand( -1, va("cp \"%s\n\"", ConcatArgs(1) ) );
+			return qtrue;
+		}
 
 		// OSP - console also gets ref command
 

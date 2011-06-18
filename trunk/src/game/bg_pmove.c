@@ -625,7 +625,7 @@ static float PM_CmdScale( usercmd_t *cmd ) {
 	}
 	
 	if (pm->ps->weapon == WP_FLAMETHROWER) { // trying some different balance for the FT
-		if( !(pm->skill[SK_HEAVY_WEAPONS] >= 3) || pm->cmd.buttons & BUTTON_ATTACK )
+		if( pm->cmd.buttons & BUTTON_ATTACK )
 			scale *= 0.7;
 	}
 
