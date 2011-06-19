@@ -15,6 +15,7 @@
 #include "cg_public.h"
 #include "../ui/ui_shared.h"
 
+#define TRICKJUMP_VER "Trickjump 1.0"
 
 #define MAX_LOCATIONS		256
 #define	POWERUP_BLINKS		5
@@ -1088,6 +1089,7 @@ typedef struct {
 	vec4_t				xhairColor;
 	vec4_t				xhairColorAlt;
 	vec4_t				speedColor;
+	vec4_t				keysColor;
 
 	// Arnout: allow overriding of countdown sounds
 	char		fiveMinuteSound_g[MAX_QPATH];
@@ -2268,6 +2270,7 @@ extern	vmCvar_t		cg_drawKeys;
 extern	vmCvar_t		cg_keysSize;
 extern	vmCvar_t		cg_keysX;
 extern	vmCvar_t		cg_keysY;
+extern	vmCvar_t		cg_keysColor;
 extern	vmCvar_t		cg_loadviewangles;
 
 // forty - speedometer

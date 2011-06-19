@@ -305,8 +305,10 @@ vmCvar_t	cg_drawOB;
 vmCvar_t	cg_drawspeedX;
 vmCvar_t	cg_drawspeedY;
 vmCvar_t	cg_drawKeys;
+vmCvar_t	cg_keysColor;
 vmCvar_t	cg_keysX;
 vmCvar_t	cg_keysY;
+vmCvar_t	cg_keysAlpha;
 vmCvar_t	cg_keysSize;
 vmCvar_t	cg_drawspeedColor;
 vmCvar_t	cg_loadviewangles;
@@ -332,7 +334,6 @@ vmCvar_t	cg_speedSizeX;
 vmCvar_t	cg_speedSizeY;
 vmCvar_t	cg_speedColor;
 vmCvar_t	cg_speedAlpha;
-vmCvar_t	cg_drawSpeedColor;
 
 typedef struct {
 	vmCvar_t	*vmCvar;
@@ -496,7 +497,6 @@ cvarTable_t		cvarTable[] = {
 	{ &cg_crosshairAlpha, "cg_crosshairAlpha", "1.0", CVAR_ARCHIVE },
 	{ &cg_crosshairAlphaAlt, "cg_crosshairAlphaAlt", "1.0", CVAR_ARCHIVE },
 	{ &cg_crosshairColor, "cg_crosshairColor", "White", CVAR_ARCHIVE },
-	{ &cg_drawspeedColor, "cg_drawspeedcolor", "Red", CVAR_ARCHIVE },
 	{ &cg_crosshairColorAlt, "cg_crosshairColorAlt", "White", CVAR_ARCHIVE },
 	{ &cg_crosshairPulse, "cg_crosshairPulse", "1", CVAR_ARCHIVE },
 	{ &cg_drawReinforcementTime, "cg_drawReinforcementTime", "1", CVAR_ARCHIVE },
@@ -577,6 +577,7 @@ cvarTable_t		cvarTable[] = {
 	{ &cg_drawspeedX,			"cg_drawspeedX", "-10", CVAR_ARCHIVE },
 	{ &cg_drawspeedY,			"cg_drawspeedY", "-20", CVAR_ARCHIVE },
 	{ &cg_drawKeys,				"cg_drawKeys", "1", CVAR_ARCHIVE },
+	{ &cg_keysColor,			"cg_keysColor", "Green", CVAR_ARCHIVE },
 	{ &cg_keysSize,				"cg_keysSize", "48", CVAR_ARCHIVE },
 	{ &cg_keysX,				"cg_keysX", "585", CVAR_ARCHIVE },
 	{ &cg_keysY,				"cg_keysY", "200", CVAR_ARCHIVE },
@@ -594,8 +595,8 @@ cvarTable_t		cvarTable[] = {
 	{ &cg_speedY, "cg_speedY", "400", CVAR_ARCHIVE },
 	{ &cg_speedSizeX, "cg_speedSizeX", "3", CVAR_ARCHIVE },
 	{ &cg_speedSizeY, "cg_speedSizeY", "3", CVAR_ARCHIVE },
-	{ &cg_speedColor, "cg_speedColor", "white", CVAR_ARCHIVE },
-	{ &cg_speedAlpha, "cg_speedAlpha", "1", CVAR_ARCHIVE }
+	{ &cg_speedColor, "cg_speedColor", "White", CVAR_ARCHIVE },
+	{ &cg_speedAlpha, "cg_speedAlpha", "1.0", CVAR_ARCHIVE }
 
 };
 
@@ -637,6 +638,8 @@ void CG_RegisterCvars( void ) {
 	CG_setClientFlags();
 	BG_setCrosshair(cg_crosshairColor.string, cg.xhairColor, cg_crosshairAlpha.value, "cg_crosshairColor");
 	BG_setCrosshair(cg_crosshairColorAlt.string, cg.xhairColorAlt, cg_crosshairAlphaAlt.value, "cg_crosshairColorAlt");
+	BG_setColor(cg_speedColor.string, cg.speedColor, cg_speedAlpha.value, "cg_speedColor");
+	BG_setColor(cg_keysColor.string, cg.keysColor, 1, "cg_keysColor");
 
 	cvarsLoaded = qtrue;
 }
@@ -680,9 +683,13 @@ void CG_UpdateCvars( void ) {
 					BG_setCrosshair(cg_crosshairColorAlt.string, cg.xhairColorAlt, cg_crosshairAlphaAlt.value, "cg_crosshairColorAlt");
 				}
 
-				else if (cv->vmCvar == &cg_speedColor || cv->vmCvar == &cg_speedColor)
+				else if (cv->vmCvar == &cg_speedColor || cv->vmCvar == &cg_speedAlpha)
 				{
-					BG_setColor(cg_speedColor.string, cg.speedColor, 1, "cg_speedColor");
+					BG_setColor(cg_speedColor.string, cg.speedColor, cg_speedAlpha.value, "cg_speedColor");
+				}
+
+				else if (cv->vmCvar == &cg_keysColor) {
+					BG_setColor(cg_keysColor.string, cg.keysColor, 1, "cg_keysColor");
 				}
 
 				else if(cv->vmCvar == &cg_rconPassword && *cg_rconPassword.string) {

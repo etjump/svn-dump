@@ -835,6 +835,11 @@ void SetWolfSpawnWeapons( gclient_t *client )
 	// Engineer gets dynamite
 	if (g_weapons.integer)
 	{
+		if(pc != PC_FIELDOPS) {
+			if( AddWeaponToPlayer( client, WP_BINOCULARS, 1, 0, qfalse ) ) {
+				client->ps.stats[STAT_KEYS] |= ( 1 << INV_BINOCS );
+			}
+		}
 		// Engineer gets dynamite
 		if (pc == PC_ENGINEER)
 		{
@@ -1847,7 +1852,7 @@ void ClientBegin( int clientNum )
 	// count current clients and rank for scoreboard
 	CalculateRanks();
 
-	// No surface determined yet.
+	// No surface determined yet.	
 	ent->surfaceFlags = 0;
 
 	// OSP

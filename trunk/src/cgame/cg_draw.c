@@ -3086,6 +3086,7 @@ static void CG_DrawKeys(void)
 	// sprint (upper left)
 	x = cg_keysX.value + 2 * skew;
 	y = cg_keysY.value;
+	trap_R_SetColor(cg.keysColor);
 	if (ps->stats[STAT_USERCMD_BUTTONS] & (BUTTON_SPRINT << 8))
 		CG_DrawPic(x, y, size, size, cgs.media.keys.SprintPressedShader);
 	else
