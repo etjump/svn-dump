@@ -550,6 +550,7 @@ void limbo( gentity_t *ent, qboolean makeCorpse )
 			level.blueNumWaiting++;
 		}
 
+		/*
 		for(i=0; i<level.numConnectedClients; i++) {
 			gclient_t *cl = &level.clients[level.sortedClients[i]];
 			if(((cl->ps.pm_flags & PMF_LIMBO) ||
@@ -558,6 +559,7 @@ void limbo( gentity_t *ent, qboolean makeCorpse )
 				Cmd_FollowCycle_f( &g_entities[level.sortedClients[i]], 1 );
 			}
 		}
+		*/
 	}
 }
 
