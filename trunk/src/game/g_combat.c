@@ -1281,9 +1281,12 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker,  vec3
 	if( client && (client->ps.weapon == WP_MORTAR_SET || client->ps.weapon == WP_MOBILE_MG42_SET) )
 		knockback *= 0.5;
 
-	if(targ->client != attacker->client && attacker->client && targ->client->sess.noNading == qtrue) {
+	if(targ->client != attacker->client && attacker->client) {
 		knockback = 0;
 	}
+
+	if(targ->client && targ->client->sess.noNading == qtrue)
+		knockback = 0;
 
 	// figure momentum add, even if the damage won't be taken
 	if ( knockback && targ->client ) {		

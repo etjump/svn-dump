@@ -138,14 +138,15 @@ static void CG_Obituary( entityState_t *ent ) {
 			break;
 		}
 	}
-	/*
+	
 	//Zero: I don't think we need to see all this crap here
+	/*
 	if (message) {
 		message = CG_TranslateString( message );
 		CG_AddPMItem( PM_DEATH, va( "%s %s.", targetName, message ), deathShader );
 		return;
 	}
-	*/
+	
 
 	// check for kill messages from the current clientNum
 	if( attacker == cg.snap->ps.clientNum ) {
@@ -383,6 +384,7 @@ static void CG_Obituary( entityState_t *ent ) {
 			CG_AddPMItem( PM_DEATH, va( "%s died.", targetName ), deathShader );
 			break;
 	}
+	*/
 }
 
 //==========================================================================

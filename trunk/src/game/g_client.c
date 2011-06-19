@@ -889,9 +889,6 @@ void SetWolfSpawnWeapons( gclient_t *client )
 
 		if (g_knifeonly.integer != 1)
 		{
-			if (pc != PC_FIELDOPS) {
-				AddWeaponToPlayer(client, WP_BINOCULARS, 0, 0, qfalse);
-			}
 			// Field ops gets binoculars, ammo pack, artillery, and a grenade
 			if (pc == PC_FIELDOPS)
 			{
@@ -1402,6 +1399,7 @@ void ClientUserinfoChanged( int clientNum ) {
 	client->pers.nofatigue = client->pers.clientFlags & CGF_NOFATIGUE;
 	client->pers.pmoveFixed = client->pers.clientFlags & CGF_PMOVEFIXED;
 	client->pers.cgaz = client->pers.clientFlags & CGF_CGAZ;
+	client->pers.loadViewAngles = client->pers.clientFlags & CGF_LOADVIEWANGLES;
 
 	// set name
 	Q_strncpyz( oldname, client->pers.netname, sizeof( oldname ) );

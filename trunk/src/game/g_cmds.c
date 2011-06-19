@@ -3377,7 +3377,7 @@ void Cmd_Load_f(gentity_t *ent)
 	{
 		VectorCopy(pos->origin, ent->client->ps.origin);
 		VectorClear(ent->client->ps.velocity);
-		if(ent->client->pers.clientFlags & CGF_LOADVIEWANGLES)
+		if(ent->client->pers.loadViewAngles)
 			SetClientViewAngle(ent, pos->vangles);
 	}
 	else

@@ -511,47 +511,84 @@ static float CG_DrawSpeed(float y)
 					break;
 			}
 			break;
-		case 3:
-			switch (cg_speedunit.integer)
-			{
-				default:
-				case 0:
-					// Units per second
-					s = va("%.0f", speed);
-					break;
-				case 1:
-					// Miles per hour
-					s = va("%.0f", (speed / SPEED_US_TO_MPH));
-					break;
-				case 2:
-					// Kilometers per hour
-					s = va("%.0f", (speed / SPEED_US_TO_KPH));
-					break;
-			}
-			break;
 
 
 	}
 
-	if(cg_drawspeed.integer == 3) {
-		int x, y;
-		x = cg_drawspeedX.integer;
-		y = cg_drawspeedY.integer;
-		w = CG_Text_Width_Ext(s, 0.19f, 0, &cgs.media.limboFont1);
-		CG_Text_Paint_Ext(x + 0.5 * (cg.refdef_current->width), y + 0.5 * (cg.refdef_current->height), 
-			0.19f, 0.19f, cg.drawspeedColor, s, 0, 0, 0, &cgs.media.limboFont1);
+	w = CG_Text_Width_Ext(s, 0.19f, 0, &cgs.media.limboFont1);
 
+	CG_FillRect(UPPERRIGHT_X - w - 2, y, w + 5, 12 + 2, timerBackground);
+	CG_DrawRect_FixedBorder(UPPERRIGHT_X - w - 2, y, w + 5, 12 + 2, 1, timerBorder);
 
-	} else {
-		w = CG_Text_Width_Ext(s, 0.19f, 0, &cgs.media.limboFont1);
-
-		CG_FillRect(UPPERRIGHT_X - w - 2, y, w + 5, 12 + 2, timerBackground);
-		CG_DrawRect_FixedBorder(UPPERRIGHT_X - w - 2, y, w + 5, 12 + 2, 1, timerBorder);
-
-		CG_Text_Paint_Ext(UPPERRIGHT_X - w, y + 11, 0.19f, 0.19f, tclr, s, 0, 0, 0, &cgs.media.limboFont1);
+	CG_Text_Paint_Ext(UPPERRIGHT_X - w, y + 11, 0.19f, 0.19f, tclr, s, 0, 0, 0, &cgs.media.limboFont1);
 	return y + 12 + 4;
-	}
 }
+
+static void CG_DrawSpeed2(void)
+{
+	char status[128];
+	float sizex, sizey;
+	int x, y, w;
+	static vec_t speed;
+	static vec_t topSpeed;
+
+	if (cg.resetmaxspeed)
+	{
+		topSpeed = 0;
+		cg.resetmaxspeed = qfalse;
+	}
+
+	if (!cg_drawSpeed2.integer)
+		return;
+
+	speed = sqrt(cg.predictedPlayerState.velocity[0] * cg.predictedPlayerState.velocity[0] + cg.predictedPlayerState.velocity[1] * cg.predictedPlayerState.velocity[1]);
+
+	if (speed > topSpeed)
+		topSpeed = speed;
+
+	sizex = sizey = 0.1f;
+	sizex *= cg_speedSizeX.integer;
+	sizey *= cg_speedSizeY.integer;
+
+	x = cg_speedX.integer;
+	y = cg_speedY.integer;
+
+
+	switch (cg_drawSpeed2.integer)
+	{
+		case 1:
+			Com_sprintf(status, sizeof(status), va("%.0f", speed));
+			break;
+		case 2:
+			Com_sprintf(status, sizeof(status), va("%.0f %.0f", speed, topSpeed));
+			break;
+		case 3:
+			Com_sprintf(status, sizeof(status), va("%.0f ^z%.0f", speed, topSpeed));
+			break;
+		case 4:
+			Com_sprintf(status, sizeof(status), va("%.0f (%.0f)", speed, topSpeed));
+			break;
+		case 5:
+			Com_sprintf(status, sizeof(status), va("%.0f ^z(%.0f)", speed, topSpeed));
+			break;
+		case 6:
+			Com_sprintf(status, sizeof(status), va("%.0f ^z[%.0f]", speed, topSpeed));
+			break;
+		case 7:
+			Com_sprintf(status, sizeof(status), va("%.0f | %.0f", speed, topSpeed));
+			break;
+		case 8:
+			Com_sprintf(status, sizeof(status), va("Speed: %.0f", speed));
+			break;
+	}
+
+	w = CG_Text_Width_Ext(status, sizex, 0, &cgs.media.limboFont2) / 2;
+	if (cg_drawSpeed2.integer == 8)
+		w = 0;
+
+	CG_Text_Paint_Ext(x - w, y, sizex, sizey, cg.speedColor, status, 0, 0, 0, &cgs.media.limboFont1);
+}
+
 
 float CG_DrawTime(float y)
 {
@@ -3127,7 +3164,7 @@ static qboolean CG_DrawFollow(void)
 	{
 		// Show in colors
 		CG_DrawStringExt(INFOTEXT_STARTX, 118,
-				CG_TranslateString(va("Following %s", cgs.clientinfo[cg.snap->ps.clientNum].name)),
+			CG_TranslateString(va("Following %s", cgs.clientinfo[cg.snap->ps.clientNum].cleanname)),
 				colorWhite, qtrue, qtrue, BIGCHAR_WIDTH / 2, BIGCHAR_HEIGHT, 0);
 	}
 
@@ -4817,6 +4854,8 @@ static void CG_Draw2D( void ) {
 		CG_DrawCGazHUD();
 
 		CG_DrawOB();
+
+		CG_DrawSpeed2();
 
 		CG_DrawKeys();
 	} else {

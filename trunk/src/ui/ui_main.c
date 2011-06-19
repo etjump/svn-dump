@@ -8420,7 +8420,7 @@ cvarTable_t		cvarTable[] = {
 	{ NULL, "g_ipcomplaintlimit", "3", CVAR_ARCHIVE },
 	{ NULL, "g_complaintlimit", "6", CVAR_ARCHIVE },
 	{ NULL, "g_doWarmup", "0", CVAR_ARCHIVE },
-	{ NULL, "g_inactivity", "0", CVAR_ARCHIVE },
+	{ NULL, "g_inactivity", "180", CVAR_ARCHIVE },
 	{ NULL, "g_maxLives", "0", CVAR_ARCHIVE },
 	{ NULL,	"refereePassword", "none", CVAR_ARCHIVE },
 	{ NULL, "g_teamForceBalance", "0", CVAR_ARCHIVE  },

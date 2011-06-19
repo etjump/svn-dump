@@ -670,6 +670,7 @@ typedef struct {
 	qboolean	pmoveFixed;			//
 	qboolean	nofatigue;
 	qboolean	cgaz;
+	qboolean	loadViewAngles;
 
 	unsigned	int maxFPS;
 	char		netname[MAX_NETNAME];

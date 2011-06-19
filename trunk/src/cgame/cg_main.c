@@ -325,6 +325,15 @@ vmCvar_t	cg_drawCGazUsers;
 vmCvar_t	cg_viewlog;
 vmCvar_t	cg_drawClock;
 
+vmCvar_t	cg_drawSpeed2;
+vmCvar_t	cg_speedX;
+vmCvar_t	cg_speedY;
+vmCvar_t	cg_speedSizeX;
+vmCvar_t	cg_speedSizeY;
+vmCvar_t	cg_speedColor;
+vmCvar_t	cg_speedAlpha;
+vmCvar_t	cg_drawSpeedColor;
+
 typedef struct {
 	vmCvar_t	*vmCvar;
 	char		*cvarName;
@@ -580,7 +589,16 @@ cvarTable_t		cvarTable[] = {
 	{ &cg_speedunit, "cg_speedunit", "0", CVAR_ARCHIVE },
 	{ &cg_viewlog, "cg_viewlog", "1", CVAR_ARCHIVE },
 	{ &cg_drawClock, "cg_drawClock", "1", CVAR_ARCHIVE },
+	{ &cg_drawSpeed2, "cg_drawSpeed2", "1", CVAR_ARCHIVE },
+	{ &cg_speedX, "cg_speedX", "320", CVAR_ARCHIVE },
+	{ &cg_speedY, "cg_speedY", "400", CVAR_ARCHIVE },
+	{ &cg_speedSizeX, "cg_speedSizeX", "3", CVAR_ARCHIVE },
+	{ &cg_speedSizeY, "cg_speedSizeY", "3", CVAR_ARCHIVE },
+	{ &cg_speedColor, "cg_speedColor", "white", CVAR_ARCHIVE },
+	{ &cg_speedAlpha, "cg_speedAlpha", "1", CVAR_ARCHIVE }
+
 };
+
 
 int		cvarTableSize = sizeof( cvarTable ) / sizeof( cvarTable[0] );
 qboolean	cvarsLoaded = qfalse;
@@ -662,9 +680,9 @@ void CG_UpdateCvars( void ) {
 					BG_setCrosshair(cg_crosshairColorAlt.string, cg.xhairColorAlt, cg_crosshairAlphaAlt.value, "cg_crosshairColorAlt");
 				}
 
-				else if (cv->vmCvar == &cg_drawspeedColor || cv->vmCvar == &cg_drawspeedColor)
+				else if (cv->vmCvar == &cg_speedColor || cv->vmCvar == &cg_speedColor)
 				{
-					BG_setColor(cg_drawspeedColor.string, cg.drawspeedColor, 1, "cg_drawspeedColor");
+					BG_setColor(cg_speedColor.string, cg.speedColor, 1, "cg_speedColor");
 				}
 
 				else if(cv->vmCvar == &cg_rconPassword && *cg_rconPassword.string) {
