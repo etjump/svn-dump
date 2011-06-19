@@ -4180,6 +4180,11 @@ static bind_t g_bindings[] = {
 	{ "selectbuddy 4",	K_KP_5,			-1,	K_KP_5,			-1,	-1,	-1 },
 	{ "selectbuddy 5",	K_KP_RIGHTARROW,-1,	K_KP_RIGHTARROW,-1,	-1,	-1 },
 	{ "selectbuddy -2",	K_KP_INS,		-1,	K_KP_MINUS,		-1,	-1,	-1 },
+	{ "save",				-1, -1, -1, -1 },
+	{ "load",				-1,	-1, -1, -1 },
+	{ "nocall",				-1, -1, -1, -1 },
+	{ "nogoto",				-1, -1, -1, -1 },
+	{ "nonading",			-1, -1, -1, -1 },
 
 /*	{"+scores", 		-1,				-1, -1, -1},
 	{"+speed",			K_SHIFT,		-1, -1, -1},

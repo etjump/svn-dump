@@ -1151,6 +1151,18 @@ static void Svcmd_KickNum_f( void ) {
 	}
 }
 
+void Svcmd_Cancelvote_f() {
+	level.voteInfo.voteYes = 0;
+	level.voteInfo.voteNo = level.numConnectedClients;
+	trap_SendServerCommand(-1, "Vote has been canceled!\n\"");
+}
+
+void Svcmd_Passvote_f() {
+	level.voteInfo.voteNo = 0;
+	level.voteInfo.voteYes = level.numConnectedClients;
+	trap_SendServerCommand(-1, "Vote has been passed by an admin!\n\"");
+}
+
 // -fretn
 
 
@@ -1334,6 +1346,16 @@ qboolean	ConsoleCommand( void ) {
 	if (!Q_stricmp(cmd, "m")) {
 		Cmd_PrivateMessage_f(NULL);
 		return qtrue;
+	}
+
+	if (!Q_stricmp(cmd, "passvote")) {
+		Svcmd_Passvote_f();
+		return qtrue;
+	}
+
+	if (!Q_stricmp(cmd, "cancelvote")) {
+		Svcmd_Cancelvote_f();
+		return qfalse;
 	}
 	// -fretn
 

@@ -666,7 +666,7 @@ void CG_UpdateCvars( void ) {
 				   cv->vmCvar == &pmove_fixed || cv->vmCvar == &com_maxfps || 
 				   cv->vmCvar == &cg_nofatigue || cv->vmCvar == &cg_drawCGaz ||
 				   cv->vmCvar == &cl_yawspeed || cv->vmCvar == &cl_freelook ||
-				   cv->vmCvar == &int_m_pitch 
+				   cv->vmCvar == &int_m_pitch  || cv->vmCvar == &cg_loadviewangles 
 				   )
 				{
 					fSetFlags = qtrue;

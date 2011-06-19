@@ -623,6 +623,9 @@ typedef struct {
 
 	// Kill cmd spam prot
 	int			lastKillTime;
+	// Name change spam prot
+	int			nameChangeCount;
+	int			lastNameChangeTime;
 
 	qboolean	specLocked;
 	int			specInvitedClients[MAX_CLIENTS / (sizeof(int) * 8)];
