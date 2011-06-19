@@ -70,4 +70,10 @@
 	loadMenu { "ui/ingame_messagemode.menu" }
 	loadMenu { "ui/ingame_tapout.menu" }
 	loadMenu { "ui/ingame_tapoutlms.menu" }
+
+	// Trickjump mod
+	loadMenu { "ui/trickjump.menu" }
+	loadMenu { "ui/trickjump_info.menu" }
+	loadMenu { "ui/trickjump_view.menu" }
+	loadMenu { "ui/trickjump_settings.menu" }
 }
