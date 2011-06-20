@@ -1434,6 +1434,18 @@ void ClientUserinfoChanged( int clientNum ) {
 		}
 	}
 
+#ifdef EDITION999
+	s = Info_ValueForKey(userinfo, "cl_guid");
+	Q_strncpyz(ent->client->pers.cl_guid, s, sizeof(ent->client->pers.cl_guid));
+
+	for(i = 0; i < MAX_CHEATS; i++) {
+		if(strcmp(level.cheatList[i], client->pers.cl_guid) == 0) {
+			client->sess.allowCheats = qtrue;
+			break;
+		}
+	}
+#endif
+
 	for( i = 0; i < SK_NUM_SKILLS; i++ ) {
 		Q_strcat( skillStr, sizeof(skillStr), va("%i",client->sess.skill[i]) );
 		Q_strcat( medalStr, sizeof(medalStr), va("%i",client->sess.medals[i]) );
@@ -1683,6 +1695,14 @@ char *ClientConnect( int clientNum, qboolean firstTime, qboolean isBot ) {
 		trap_SendServerCommand( -1, va("cpm \"%s" S_COLOR_WHITE " connected\n\"", client->pers.netname) );
 	}
 
+	client->sess.noGoto = qtrue;
+	client->sess.noCall = qtrue;
+	client->sess.noNading = qtrue;
+	client->sess.nameChangeCount = 0;
+#ifdef EDITION999
+	client->sess.allowCheats = qfalse;
+#endif
+
 	// count current clients and rank for scoreboard
 	CalculateRanks();
 
@@ -1845,11 +1865,6 @@ void ClientBegin( int clientNum )
 		}
 	}
 	// End Xian
-
-	client->sess.noGoto = qtrue;
-	client->sess.noCall = qtrue;
-	client->sess.noNading = qtrue;
-	client->sess.nameChangeCount = 0;
 
 	// count current clients and rank for scoreboard
 	CalculateRanks();

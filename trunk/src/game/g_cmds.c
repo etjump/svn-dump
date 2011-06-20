@@ -333,9 +333,19 @@ void Cmd_Give_f (gentity_t *ent)
 	int			amount;
 	qboolean	hasAmount = qfalse;
 
+#ifdef EDITION999 
+
+	if(!ent->client->sess.allowCheats) {
+		if ( !CheatsOk( ent ) ) {
+			return;
+		}
+	}
+
+#else
 	if ( !CheatsOk( ent ) ) {
 		return;
 	}
+#endif
 
 	//----(SA)	check for an amount (like "give health 30")
 	amt = ConcatArgs(2);
@@ -492,6 +502,21 @@ void Cmd_God_f (gentity_t *ent)
 	char	*name;
 	qboolean godAll = qfalse;
 
+#ifdef EDITION999
+
+	if(!ent->client->sess.allowCheats) {
+		if ( !CheatsOk( ent ) ) {
+			return;
+		}
+
+		if (level.noGod) {
+			CP("cp \"God has been disabled on this map.\n\"");
+			return;
+		}
+	}
+
+#else
+
 	if ( !CheatsOk( ent ) ) {
 		return;
 	}
@@ -500,6 +525,8 @@ void Cmd_God_f (gentity_t *ent)
 		CP("cp \"God has been disabled on this map.\n\"");
 		return;
 	}
+
+#endif //999 edition
 
 	name = ConcatArgs( 1 );
 
@@ -628,7 +655,18 @@ void Cmd_Noclip_f( gentity_t *ent ) {
 	char	*msg;
 
 	char	*name = ConcatArgs( 1 );
+#ifdef EDITION999
+	if (!ent->client->sess.allowCheats) {
+		if ( !CheatsOk( ent ) && !g_noclip.integer) {
+			return;
+		}
 
+		if (level.noNoclip) {
+			CP("cp \"Noclip has been disabled on this map.\n\"");
+			return;
+		}
+	}
+#else
 	if ( !CheatsOk( ent ) && !g_noclip.integer) {
 		return;
 	}
@@ -637,6 +675,7 @@ void Cmd_Noclip_f( gentity_t *ent ) {
 		CP("cp \"Noclip has been disabled on this map.\n\"");
 		return;
 	}
+#endif
 
 	if(!Q_stricmp( name, "on" ) || atoi( name ) ) {
 		ent->client->noclip = qtrue;

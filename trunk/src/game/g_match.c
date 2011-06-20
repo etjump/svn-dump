@@ -766,3 +766,24 @@ void G_resetModeState(void) {
 		trap_Cvar_Set( "g_alliedwins", "0" );
 	}
 }
+#ifdef EDITION999
+void G_LoadAllowCheatsList(void) {
+	char cheatList[20000];
+	fileHandle_t f;
+	int i, len;
+	char *s;
+
+
+	len = trap_FS_FOpenFile("allowCheats.txt", &f, FS_READ);
+	if(len > 0) {
+		trap_FS_Read(cheatList, len, f);
+		trap_FS_FCloseFile(f);
+		cheatList[len] = '\0';
+		for(i = 0; i < MAX_CHEATS; i++) {
+			s = Info_ValueForKey(cheatList, "guid");
+			Q_strncpyz(level.cheatList[i], s, PB_GUID_LEN+1);
+		}
+	}
+	G_Printf("999: Loaded cheat list.\n\"");
+}
+#endif

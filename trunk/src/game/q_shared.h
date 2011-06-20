@@ -275,6 +275,7 @@ typedef int		clipHandle_t;
 
 // RF, this is just here so different elements of the engine can be aware of this setting as it changes
 #define	MAX_SP_CLIENTS		64		// increasing this will increase memory usage significantly
+#define PB_GUID_LEN			32
 
 // the game guarantees that no string from the network will ever
 // exceed MAX_STRING_CHARS

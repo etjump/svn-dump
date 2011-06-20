@@ -577,7 +577,7 @@ cvarTable_t		cvarTable[] = {
 	{ &cg_drawspeedX,			"cg_drawspeedX", "-10", CVAR_ARCHIVE },
 	{ &cg_drawspeedY,			"cg_drawspeedY", "-20", CVAR_ARCHIVE },
 	{ &cg_drawKeys,				"cg_drawKeys", "1", CVAR_ARCHIVE },
-	{ &cg_keysColor,			"cg_keysColor", "Green", CVAR_ARCHIVE },
+	{ &cg_keysColor,			"cg_keysColor", "White", CVAR_ARCHIVE },
 	{ &cg_keysSize,				"cg_keysSize", "48", CVAR_ARCHIVE },
 	{ &cg_keysX,				"cg_keysX", "585", CVAR_ARCHIVE },
 	{ &cg_keysY,				"cg_keysY", "200", CVAR_ARCHIVE },

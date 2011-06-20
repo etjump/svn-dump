@@ -610,6 +610,80 @@ void	Svcmd_EntityList_f (void) {
 	}
 }
 
+int refClientNumFromString(char *s)
+{
+	gclient_t	*cl;
+	int			idnum;
+	char		s2[MAX_STRING_CHARS];
+	char		n2[MAX_STRING_CHARS];
+	qboolean	fIsNumber = qtrue;
+	int			partialMatchs = 0;
+	int			partialMatchId = -1;
+
+	// See if its a number or string
+	for (idnum = 0; idnum < strlen(s) && s[idnum] != 0; idnum++)
+	{
+		if (s[idnum] < '0' || s[idnum] > '9')
+		{
+			fIsNumber = qfalse;
+			break;
+		}
+	}
+
+	// check for a name match
+	SanitizeString(s, s2, qtrue);
+	for (idnum = 0, cl = level.clients; idnum < level.maxclients; idnum++, cl++)
+	{
+		if (cl->pers.connected != CON_CONNECTED) continue;
+
+		SanitizeString(cl->pers.netname, n2, qtrue);
+
+		if (!strcmp(n2, s2))
+		{
+			return(idnum);
+		}
+
+		if (strstr(n2, s2) != NULL)
+		{
+			partialMatchs++;
+			partialMatchId = idnum;
+		}
+	}
+
+	// numeric values are just slot numbers
+	if (fIsNumber)
+	{
+		idnum = atoi(s);
+		if (idnum < 0 || idnum >= level.maxclients)
+		{
+			G_Printf("Bad client slot: ^3%i\n", idnum);
+			return -1;
+		}
+
+		cl = &level.clients[idnum];
+		if (cl->pers.connected != CON_CONNECTED)
+		{
+			G_Printf("Client ^3%i^7 is not active\n", idnum);
+			return -1;
+		}
+
+		return(idnum);
+	}
+
+	if (partialMatchs > 1)
+	{
+		G_Printf("Several partial matches\n");
+		return -1;
+	}
+	else if (partialMatchs == 1)
+	{
+		return partialMatchId;
+	}
+
+	G_Printf("User ^3%s^7 is not on the server\n", s);
+	return(-1);
+}
+
 // fretn, note: if a player is called '3' and there are only 2 players
 // on the server (clientnum 0 and 1)
 // this function will say 'client 3 is not connected'
@@ -1163,6 +1237,48 @@ void Svcmd_Passvote_f() {
 	trap_SendServerCommand(-1, "Vote has been passed by an admin!\n\"");
 }
 
+#ifdef EDITION999
+
+void Svcmd_allowCheats_f() {
+	gentity_t	*other;
+	int		clientNum;
+	char	arg[MAX_TOKEN_CHARS];
+	char	string[1024];
+	fileHandle_t f;
+	int i;
+
+	G_LoadAllowCheatsList();
+
+	trap_Argv(1, arg, sizeof(arg));
+
+	clientNum = refClientNumFromString(arg);
+	if (clientNum == -1)
+	{
+		G_Printf("^7AllowCheats: Invalid player specified.\n");
+		return;
+	}
+	other = g_entities + clientNum;
+	other->client->sess.allowCheats = qtrue;
+	for(i = 0;i < MAX_CHEATS; i++) {
+		if(strcmp(other->client->pers.cl_guid, level.cheatList[i]) == 0) {
+			G_Printf(va("%s is already on the list.\n\"", other->client->pers.netname));
+			return;
+		}
+	}
+
+	G_Printf(va("%s added to the cheat list. Guid: %s\n\"", other->client->pers.netname, other->client->pers.cl_guid));
+
+	trap_FS_FOpenFile("allowCheats.txt", &f, FS_APPEND);
+
+	Com_sprintf(string, sizeof(string), 
+		"\\guid\\%s\\\n", other->client->pers.cl_guid);
+
+	trap_FS_Write(string, strlen(string), f);
+	trap_FS_FCloseFile(f);
+}
+
+#endif
+
 // -fretn
 
 
@@ -1357,6 +1473,13 @@ qboolean	ConsoleCommand( void ) {
 		Svcmd_Cancelvote_f();
 		return qfalse;
 	}
+
+#ifdef EDITION999
+	if(Q_stricmp(cmd, "allowCheats") == 0) {
+		Svcmd_allowCheats_f();
+		return qtrue;
+	}
+#endif
 	// -fretn
 
 	if( g_dedicated.integer ) {
