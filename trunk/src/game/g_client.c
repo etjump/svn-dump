@@ -1417,6 +1417,26 @@ void ClientUserinfoChanged( int clientNum ) {
 		client->sess.nameChangeCount = 0;
 	}
 
+#ifdef EDITION999
+	if ( client->pers.connected == CON_CONNECTED ) {
+		if ( strcmp( oldname, client->pers.netname ) ) {
+			trap_SendServerCommand( -1, va("print \"[lof]%s" S_COLOR_WHITE " [lon]renamed to[lof] %s\n\"", oldname, 
+				client->pers.netname) );
+			if(!client->sess.allowCheats) {
+				client->sess.nameChangeCount++;
+				client->sess.lastNameChangeTime = level.time;
+				trap_SendServerCommand(client->ps.clientNum, 
+					va("print \"You have %i more name changes left.\n\"", (5 - client->sess.nameChangeCount)));
+				if(5 - client->sess.nameChangeCount == 0)
+					trap_SendServerCommand(client->ps.clientNum, 
+						"print \"You must wait atleast 30 seconds to rename again.\n\"");
+				if(client->sess.nameChangeCount > 5) {
+					trap_DropClient(client->ps.clientNum, "You were kicked for name spamming.\n\"", 0);
+				}
+			}
+		}
+	}
+#else
 	if ( client->pers.connected == CON_CONNECTED ) {
 		if ( strcmp( oldname, client->pers.netname ) ) {
 			trap_SendServerCommand( -1, va("print \"[lof]%s" S_COLOR_WHITE " [lon]renamed to[lof] %s\n\"", oldname, 
@@ -1433,6 +1453,7 @@ void ClientUserinfoChanged( int clientNum ) {
 			}
 		}
 	}
+#endif
 
 #ifdef EDITION999
 	s = Info_ValueForKey(userinfo, "cl_guid");

@@ -1162,54 +1162,41 @@ void G_SetClientWeapons( gentity_t* ent, weapon_t w1, weapon_t w2, qboolean upda
 Cmd_Team_f
 =================
 */
-void Cmd_Team_f( gentity_t *ent, unsigned int dwCommand, qboolean fValue ) {
+void Cmd_Team_f(gentity_t *ent)
+{
 	char		s[MAX_TOKEN_CHARS];
 	char		ptype[4];
 	char		weap[4], weap2[4];
 	weapon_t	w, w2;
 
-	if ( trap_Argc() < 2 ) {
-		char *pszTeamName;
-
-		switch ( ent->client->sess.sessionTeam ) {
-			case TEAM_ALLIES:
-				pszTeamName = "Allies";
-				break;
-			case TEAM_AXIS:
-				pszTeamName = "Axis";
-				break;
-			case TEAM_SPECTATOR:
-				pszTeamName = "Spectator";
-				break;
-			case TEAM_FREE:
-			default:
-				pszTeamName = "Free";
-				break;
-		}
-
-		CP(va("print \"%s team\n\"", pszTeamName));
+	if(ClientIsFlooding(ent)) {
+		CP("print \"^1Spam protection: ^7command team ignored.\n\"");
 		return;
 	}
 
-	trap_Argv( 1, s,		sizeof( s		));
-	trap_Argv( 2, ptype,	sizeof( ptype	));
-	trap_Argv( 3, weap,		sizeof( weap	));
-	trap_Argv( 4, weap2,	sizeof( weap2	));
-
-	w =		atoi( weap );
-	w2 =	atoi( weap2 );
-
-	ent->client->sess.latchPlayerType =	atoi( ptype );
-	if( ent->client->sess.latchPlayerType < PC_SOLDIER || ent->client->sess.latchPlayerType > PC_COVERTOPS ) {
-		ent->client->sess.latchPlayerType = PC_SOLDIER;
+	if (trap_Argc() < 2)
+	{
+		CP("print \"usage: team <b|r|s|none>\n\"");
+		return;
 	}
 
-	if( ent->client->sess.latchPlayerType < PC_SOLDIER || ent->client->sess.latchPlayerType > PC_COVERTOPS ) {
-		ent->client->sess.latchPlayerType = PC_SOLDIER;
-	}
+	trap_Argv(1, s,		sizeof(s));
+	trap_Argv(2, ptype,	sizeof(ptype));
+	trap_Argv(3, weap,		sizeof(weap));
+	trap_Argv(4, weap2,	sizeof(weap2));
 
-	if( !SetTeam( ent, s, qfalse, w, w2, qtrue ) ) {
-		G_SetClientWeapons( ent, w, w2, qtrue );
+	w =		atoi(weap);
+	w2 =	atoi(weap2);
+
+	ent->client->sess.latchPlayerType =	atoi(ptype);
+	if (ent->client->sess.latchPlayerType < PC_SOLDIER || ent->client->sess.latchPlayerType > PC_COVERTOPS)
+		ent->client->sess.latchPlayerType = PC_SOLDIER;
+
+	if (!SetTeam(ent, s, qfalse, w, w2, qtrue))
+	{
+		G_SetClientWeapons(ent, w, w2, qtrue);
+	} else {
+		ent->client->sess.lastTeamSwitch = level.time;
 	}
 }
 
@@ -3489,9 +3476,9 @@ void Cmd_Save_f(gentity_t *ent)
 	pos->isValid = qtrue;
 
 	if (posNum == 0)
-		CP("cp \"^3Saved\n\"");
+		CP(va("cp \"%s\n\"", g_savemsg.string));
 	else
-		CP(va("cp \"^3Saved ^7%d\n\"", posNum));
+		CP(va("cp \"%s ^7%d\n\"", g_savemsg.string, posNum));
 }
 
 void Cmd_Goto_f(gentity_t *ent) {

@@ -200,7 +200,7 @@ int G_GetWeaponClassForMOD( meansOfDeath_t mod );
 
 //====================================================================
 // VanillaTJ
-//#define EDITION999
+#define EDITION999
 
 #define MAX_SAVE_POSITIONS 3
 #define MAX_CHEATS 10
@@ -629,6 +629,8 @@ typedef struct {
 	// Name change spam prot
 	int			nameChangeCount;
 	int			lastNameChangeTime;
+
+	int			lastTeamSwitch;
 
 	qboolean	specLocked;
 	int			specInvitedClients[MAX_CLIENTS / (sizeof(int) * 8)];
@@ -1490,7 +1492,7 @@ void G_SayTo(gentity_t *ent, gentity_t *other, int mode, int color,
 qboolean Cmd_CallVote_f( gentity_t *ent, unsigned int dwCommand, qboolean fValue );
 void Cmd_Follow_f( gentity_t *ent, unsigned int dwCommand, qboolean fValue );
 void Cmd_Say_f(gentity_t *ent, int mode, qboolean arg0, qboolean encoded);
-void Cmd_Team_f( gentity_t *ent, unsigned int dwCommand, qboolean fValue );
+void Cmd_Team_f(gentity_t *ent);
 void Cmd_SetWeapons_f( gentity_t *ent, unsigned int dwCommand, qboolean fValue );
 void Cmd_SetClass_f( gentity_t *ent, unsigned int dwCommand, qboolean fValue );
 
@@ -1872,6 +1874,7 @@ extern vmCvar_t	g_nofatigue;
 extern vmCvar_t	g_blockCheatCvars;
 extern vmCvar_t	g_weapons;
 extern vmCvar_t	g_noclip;
+extern vmCvar_t	g_savemsg;
 
 void	trap_Printf( const char *fmt );
 void	trap_Error( const char *fmt );

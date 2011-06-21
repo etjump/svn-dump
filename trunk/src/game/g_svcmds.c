@@ -1228,13 +1228,13 @@ static void Svcmd_KickNum_f( void ) {
 void Svcmd_Cancelvote_f() {
 	level.voteInfo.voteYes = 0;
 	level.voteInfo.voteNo = level.numConnectedClients;
-	trap_SendServerCommand(-1, "Vote has been canceled!\n\"");
+	trap_SendServerCommand(-1, "print \"Vote has been canceled!\n\"");
 }
 
 void Svcmd_Passvote_f() {
 	level.voteInfo.voteNo = 0;
 	level.voteInfo.voteYes = level.numConnectedClients;
-	trap_SendServerCommand(-1, "Vote has been passed by an admin!\n\"");
+	trap_SendServerCommand(-1, "print \"Vote has been passed by an admin!\n\"");
 }
 
 #ifdef EDITION999
@@ -1488,7 +1488,7 @@ qboolean	ConsoleCommand( void ) {
 			return qtrue;
 		}
 		else if( !Q_stricmp (cmd, "qsay")) {
-			trap_SendServerCommand( -1, va("cpm \"%s\n\"", ConcatArgs(1) ) );
+			trap_SendServerCommand( -1, va("chat \"%s\n\"", ConcatArgs(1) ) );
 			return qtrue;
 		}
 		else if( !Q_stricmp (cmd, "cp")) {

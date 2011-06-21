@@ -826,28 +826,36 @@ static void CG_DrawUpperRight( void ) {
 CG_DrawTeamInfo
 =================
 */
-static void CG_DrawTeamInfo( void ) {
+static void CG_DrawTeamInfo(void)
+{
 	int w, h;
 	int i, len;
 	vec4_t		hcolor;
 	int		chatHeight;
 	float	alphapercent;
 	float	lineHeight = 9.f;
+	qhandle_t	flag;
 
 	int chatWidth = 640 - CHATLOC_X - 100;
- 
-	if( cg_teamChatHeight.integer < TEAMCHAT_HEIGHT ) {
+
+	if (cg_teamChatHeight.integer < TEAMCHAT_HEIGHT)
+	{
 		chatHeight = cg_teamChatHeight.integer;
-	} else {
+	}
+	else
+	{
 		chatHeight = TEAMCHAT_HEIGHT;
 	}
 
-	if( chatHeight <= 0 ) {
+	if (chatHeight <= 0)
+	{
 		return; // disabled
 	}
 
-	if( cgs.teamLastChatPos != cgs.teamChatPos ) {
-		if( cg.time - cgs.teamChatMsgTimes[cgs.teamLastChatPos % chatHeight] > cg_teamChatTime.integer ) {
+	if (cgs.teamLastChatPos != cgs.teamChatPos)
+	{
+		if (cg.time - cgs.teamChatMsgTimes[cgs.teamLastChatPos % chatHeight] > cg_teamChatTime.integer)
+		{
 			cgs.teamLastChatPos++;
 		}
 
@@ -855,32 +863,43 @@ static void CG_DrawTeamInfo( void ) {
 
 		w = 0;
 
-		for( i = cgs.teamLastChatPos; i < cgs.teamChatPos; i++ ) {
-			len = CG_Text_Width_Ext( cgs.teamChatMsgs[i % chatHeight], 0.2f, 0, &cgs.media.limboFont2 );
-			if( len > w ) {
+		for (i = cgs.teamLastChatPos; i < cgs.teamChatPos; i++)
+		{
+			len = CG_Text_Width_Ext(cgs.teamChatMsgs[i % chatHeight], 0.2f, 0, &cgs.media.limboFont2);
+			if (len > w)
+			{
 				w = len;
 			}
 		}
 		w *= TINYCHAR_WIDTH;
 		w += TINYCHAR_WIDTH * 2;
 
-		for( i = cgs.teamChatPos - 1; i >= cgs.teamLastChatPos; i-- ) {
+		for (i = cgs.teamChatPos - 1; i >= cgs.teamLastChatPos; i--)
+		{
 			alphapercent = 1.0f - (cg.time - cgs.teamChatMsgTimes[i % chatHeight]) / (float)(cg_teamChatTime.integer);
-			if( alphapercent > 1.0f ) {
+			if (alphapercent > 1.0f)
+			{
 				alphapercent = 1.0f;
-			} else if( alphapercent < 0.f ) {
+			}
+			else if (alphapercent < 0.f)
+			{
 				alphapercent = 0.f;
 			}
 
-			if ( cg.snap->ps.persistant[PERS_TEAM] == TEAM_AXIS ) {
+			if (cg.snap->ps.persistant[PERS_TEAM] == TEAM_AXIS)
+			{
 				hcolor[0] = 1;
 				hcolor[1] = 0;
 				hcolor[2] = 0;
-			} else if ( cg.snap->ps.persistant[PERS_TEAM] == TEAM_ALLIES ) {
+			}
+			else if (cg.snap->ps.persistant[PERS_TEAM] == TEAM_ALLIES)
+			{
 				hcolor[0] = 0;
 				hcolor[1] = 0;
 				hcolor[2] = 1;
-			} else {
+			}
+			else
+			{
 				hcolor[0] = 0;
 				hcolor[1] = 1;
 				hcolor[2] = 0;
@@ -888,14 +907,24 @@ static void CG_DrawTeamInfo( void ) {
 
 			hcolor[3] = 0.33f * alphapercent;
 
-			trap_R_SetColor( hcolor );
-			CG_DrawPic( CHATLOC_X, CHATLOC_Y - (cgs.teamChatPos - i)*lineHeight, chatWidth, lineHeight, cgs.media.teamStatusBar );
+			trap_R_SetColor(hcolor);
+			CG_DrawPic(CHATLOC_X, CHATLOC_Y - (cgs.teamChatPos - i)*lineHeight, chatWidth, lineHeight, cgs.media.teamStatusBar);
 
 			hcolor[0] = hcolor[1] = hcolor[2] = 1.0;
 			hcolor[3] = alphapercent;
-			trap_R_SetColor( hcolor );
+			trap_R_SetColor(hcolor);
 
-			CG_Text_Paint_Ext( CHATLOC_TEXT_X, CHATLOC_Y - (cgs.teamChatPos - i - 1) * lineHeight - 1, 0.2f, 0.2f, hcolor, cgs.teamChatMsgs[i % chatHeight], 0, 0, 0, &cgs.media.limboFont2 );
+			if (cgs.teamChatMsgTeams[i % chatHeight] == TEAM_AXIS)
+				flag = cgs.media.axisFlag;
+			else if (cgs.teamChatMsgTeams[i % chatHeight] == TEAM_ALLIES)
+				flag = cgs.media.alliedFlag;
+			else
+				flag = 0;
+			if (flag)
+				CG_DrawPic(CHATLOC_TEXT_X - 14, CHATLOC_Y - (cgs.teamChatPos - i - 1) * lineHeight - 8,
+						   12, 8, flag);
+
+			CG_Text_Paint_Ext(CHATLOC_TEXT_X, CHATLOC_Y - (cgs.teamChatPos - i - 1) * lineHeight - 1, 0.2f, 0.2f, hcolor, cgs.teamChatMsgs[i % chatHeight], 0, 0, 0, &cgs.media.limboFont2);
 		}
 	}
 }
@@ -2151,14 +2180,14 @@ void CG_CheckForCursorHints( void ) {
 CG_DrawCrosshairNames
 =====================
 */
-static void CG_DrawCrosshairNames( void ) {
+static void CG_DrawCrosshairNames(void)
+{
 	float		*color;
 	char		*name;
 	float		w;
-	const char	*s, *playerClass;
+	const char	*s;
 	int			playerHealth = 0;
 	qboolean	drawStuff = qfalse;
-	const char *playerRank;
 	qboolean	isTank = qfalse;
 	int			maxHealth = 1;
 
@@ -2168,116 +2197,77 @@ static void CG_DrawCrosshairNames( void ) {
 
 	qboolean hitClient = qfalse;
 
-	if ( cg_drawCrosshair.integer < 0 ) {
+	if (cg_drawCrosshair.integer < 0)
+	{
 		return;
 	}
 
 	// scan the known entities to see if the crosshair is sighted on one
-	dist = CG_ScanForCrosshairEntity(&zChange, &hitClient );
+	dist = CG_ScanForCrosshairEntity(&zChange, &hitClient);
 
-	if ( cg.renderingThirdPerson ) {
+	if (cg.renderingThirdPerson)
+	{
 		return;
 	}
 
 	// draw the name of the player being looked at
-	color = CG_FadeColor( cg.crosshairClientTime, 1000 );
+	color = CG_FadeColor(cg.crosshairClientTime, 1000);
 
-	if ( !color ) {
-		trap_R_SetColor( NULL );
+	if (!color)
+	{
+		trap_R_SetColor(NULL);
 		return;
 	}
 
 	// NERVE - SMF
-	if ( cg.crosshairClientNum > MAX_CLIENTS ) {
-		if ( !cg_drawCrosshairNames.integer ) {
+	if (cg.crosshairClientNum > MAX_CLIENTS)
+	{
+		if (!cg_drawCrosshairNames.integer)
+		{
 			return;
 		}
 
-		if( cgs.clientinfo[cg.snap->ps.clientNum].team != TEAM_SPECTATOR ) {
-			if( cg_entities[cg.crosshairClientNum].currentState.eType == ET_MOVER && cg_entities[cg.crosshairClientNum].currentState.effect1Time ) {
-				isTank = qtrue;
+		if (cg_entities[cg.crosshairClientNum].currentState.eType == ET_MOVER && cg_entities[cg.crosshairClientNum].currentState.effect1Time)
+		{
+			isTank = qtrue;
 
-				playerHealth = cg_entities[cg.crosshairClientNum].currentState.dl_intensity;
-				maxHealth = 255;
+			playerHealth = cg_entities[cg.crosshairClientNum].currentState.dl_intensity;
+			maxHealth = 255;
 
-				s = Info_ValueForKey( CG_ConfigString( CS_SCRIPT_MOVER_NAMES ), va( "%i", cg.crosshairClientNum ) );
-				if( !*s ) {
-					return;
-				}
-
-				w = CG_DrawStrlen( s ) * SMALLCHAR_WIDTH;
-				CG_DrawSmallStringColor( 320 - w / 2, 170, s, color );
-			} else if( cg_entities[cg.crosshairClientNum].currentState.eType == ET_CONSTRUCTIBLE_MARKER ) {
-				s = Info_ValueForKey( CG_ConfigString( CS_CONSTRUCTION_NAMES ), va( "%i", cg.crosshairClientNum ) );
-				if( *s ) {
-					w = CG_DrawStrlen( s ) * SMALLCHAR_WIDTH;
-					CG_DrawSmallStringColor( 320 - w / 2, 170, s, color );
-				}
+			s = Info_ValueForKey(CG_ConfigString(CS_SCRIPT_MOVER_NAMES), va("%i", cg.crosshairClientNum));
+			if (!*s)
+			{
 				return;
 			}
-		}
 
-		if( !isTank ) {
+			w = CG_DrawStrlen(s) * SMALLCHAR_WIDTH;
+			CG_DrawSmallStringColor(320 - w / 2, 170, s, color);
+		}
+		else if (cg_entities[cg.crosshairClientNum].currentState.eType == ET_CONSTRUCTIBLE_MARKER)
+		{
+			s = Info_ValueForKey(CG_ConfigString(CS_CONSTRUCTION_NAMES), va("%i", cg.crosshairClientNum));
+			if (*s)
+			{
+				w = CG_DrawStrlen(s) * SMALLCHAR_WIDTH;
+				CG_DrawSmallStringColor(320 - w / 2, 170, s, color);
+			}
 			return;
 		}
-	} else if( cgs.clientinfo[cg.crosshairClientNum].team != cgs.clientinfo[cg.snap->ps.clientNum].team ) {
-		if( (cg_entities[cg.crosshairClientNum].currentState.powerups & (1 << PW_OPS_DISGUISED)) && cgs.clientinfo[cg.snap->ps.clientNum].team != TEAM_SPECTATOR) {
-			if( cgs.clientinfo[cg.snap->ps.clientNum].team != TEAM_SPECTATOR &&
-				cgs.clientinfo[cg.snap->ps.clientNum].skill[SK_SIGNALS] >= 4 && cgs.clientinfo[cg.snap->ps.clientNum].cls == PC_FIELDOPS ) {
-				s = CG_TranslateString( "Disguised Enemy!" );
-				w = CG_DrawStrlen( s ) * SMALLCHAR_WIDTH;
-				CG_DrawSmallStringColor( 320 - w / 2, 170, s, color );
-				return;
-			} else if( dist > 512 ) {
-				if ( !cg_drawCrosshairNames.integer ) {
-					return;
-				}
 
-				drawStuff = qtrue;
-
-				// determine player class
-				playerClass = BG_ClassLetterForNumber( (cg_entities[ cg.crosshairClientNum ].currentState.powerups >> PW_OPS_CLASS_1) & 6 );
-
-				name = cgs.clientinfo[ cg.crosshairClientNum ].disguiseName;
-
-				playerRank = cgs.clientinfo[ cg.crosshairClientNum ].team != TEAM_AXIS ? rankNames_Axis[cgs.clientinfo[cg.crosshairClientNum].disguiseRank] : rankNames_Allies[cgs.clientinfo[cg.crosshairClientNum].disguiseRank];
-				s = va( "[%s] %s %s", CG_TranslateString( playerClass ), playerRank, name );
-				w = CG_DrawStrlen( s ) * SMALLCHAR_WIDTH;
-
-				// draw the name and class
-				CG_DrawSmallStringColor( 320 - w / 2, 170, s, color );
-
-				// set the health
-				// rain - #480 - make sure it's the health for the right entity;
-				// if it's not, use the clientinfo health (which is updated
-				// by tinfo)
-				if( cg.crosshairClientNum == cg.snap->ps.identifyClient ) {
-					playerHealth = cg.snap->ps.identifyClientHealth;
-				} else {
-					playerHealth = cgs.clientinfo[ cg.crosshairClientNum ].health;
-				}
-
-				maxHealth = 100;
-			} else {
-				// rain - #480 - don't show the name after you look away, should this be
-				// a disguised covert
-				cg.crosshairClientTime = 0;
-				return;
-			}
-		} else {
+		if (!isTank)
+		{
 			return;
 		}
 	}
 
-	if ( !cg_drawCrosshairNames.integer ) {
+	if (!cg_drawCrosshairNames.integer)
+	{
 		return;
 	}
 
-	// Mad Doc - TDF
-	// changed this from early-exiting if true, to only executing most stuff if false. We want to
-	// show debug info regardless
+	if (!isTank && ((cg_hide.integer == 1 && dist < cg_hideDistance.integer) || cg_hide.integer == 2))
+		return;
 
-	// we only want to see players on our team
 	if (!isTank)
 	{
 		drawStuff = qtrue;
@@ -2294,13 +2284,12 @@ static void CG_DrawCrosshairNames( void ) {
 	}
 
 	// -NERVE - SMF
-	if( isTank )
+	if (isTank)
 		return;
 
 	if (drawStuff)
-		trap_R_SetColor( NULL );
+		trap_R_SetColor(NULL);
 }
-
 
 
 //==============================================================================
@@ -2998,6 +2987,9 @@ static void CG_DrawOB(void)
 	vec3_t start, end;
 	float n1, n2;
 	int n;
+
+	if(!cg_drawOB.integer)
+		return;
 
 	if (cg_thirdPerson.integer)
 		return;

@@ -390,10 +390,10 @@ cvarTable_t		cvarTable[] = {
 	{ &cg_centertime, "cg_centertime", "5", CVAR_CHEAT },		// DHM - Nerve :: changed from 3 to 5
 	{ &cg_runpitch, "cg_runpitch", "0.002", CVAR_ARCHIVE},
 	{ &cg_runroll, "cg_runroll", "0.005", CVAR_ARCHIVE },
-	{ &cg_bobup , "cg_bobup", "0.005", CVAR_ARCHIVE },
-	{ &cg_bobpitch, "cg_bobpitch", "0.002", CVAR_ARCHIVE },
-	{ &cg_bobroll, "cg_bobroll", "0.002", CVAR_ARCHIVE },
-	{ &cg_bobyaw, "cg_bobyaw", "0.002", CVAR_ARCHIVE },
+	{ &cg_bobup , "cg_bobup", "0", CVAR_ARCHIVE },
+	{ &cg_bobpitch, "cg_bobpitch", "0", CVAR_ARCHIVE },
+	{ &cg_bobroll, "cg_bobroll", "0", CVAR_ARCHIVE },
+	{ &cg_bobyaw, "cg_bobyaw", "0", CVAR_ARCHIVE },
 
 	// JOSEPH 10-27-99
 	{ &cg_autoactivate, "cg_autoactivate", "1", CVAR_ARCHIVE },
@@ -745,7 +745,7 @@ void CG_setClientFlags(void)
 												((cg_drawCGaz.integer > 0) ? CGF_CGAZ : 0) |
 												((cl_yawspeed.integer > 0) ? CGF_YAWSPEED : 0) |
 												((cl_freelook.integer > 0) ? 0 : CGF_FREELOOK) |
-												((int_m_pitch.value > 0) ? 0 : CGF_MPITCHFIX) |
+												((int_m_pitch.value > 0.01 || int_m_pitch.value < -0.01) ? 0 : CGF_MPITCHFIX) |
 												((cg_loadviewangles.integer > 0) ? CGF_LOADVIEWANGLES : 0)
 												// Add more in here, as needed
 											),

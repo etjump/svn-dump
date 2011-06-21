@@ -215,6 +215,7 @@ vmCvar_t		g_nofatigue;
 vmCvar_t		g_blockCheatCvars;
 vmCvar_t		g_weapons;
 vmCvar_t		g_noclip;
+vmCvar_t		g_savemsg;
 
 
 cvarTable_t		gameCvarTable[] = {
@@ -440,7 +441,7 @@ cvarTable_t		gameCvarTable[] = {
 	{ &g_endround, "g_endround", "0", CVAR_ARCHIVE},
 
 	{ &g_floodprotection, "g_floodprotection", "1", CVAR_ARCHIVE },
-	{ &g_floodlimit, "g_floodlimit", "24", CVAR_ARCHIVE },
+	{ &g_floodlimit, "g_floodlimit", "5", CVAR_ARCHIVE },
 	{ &g_floodwait, "g_floodwait", "768", CVAR_ARCHIVE },
 
 	{ &g_ghostPlayers, "g_ghostPlayers", "1", CVAR_SERVERINFO | CVAR_LATCH },
@@ -448,6 +449,7 @@ cvarTable_t		gameCvarTable[] = {
 	{ &g_blockCheatCvars, "g_blockCheatCvars", "1", CVAR_ARCHIVE },
 	{ &g_weapons, "g_weapons", "1", CVAR_ARCHIVE },
 	{ &g_noclip, "g_noclip", "0", CVAR_ARCHIVE },
+	{ &g_savemsg, "g_savemsg", "^7Saved", CVAR_ARCHIVE },
 };
 
 // bk001129 - made static to avoid aliasing
