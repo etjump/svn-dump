@@ -1687,7 +1687,7 @@ char *ClientConnect( int clientNum, qboolean firstTime, qboolean isBot ) {
 	}
 
 	// get and distribute relevent paramters
-	G_LogPrintf( "ClientConnect: %i\n", clientNum );
+	G_LogPrintf( "ClientConnect: %i.\n", clientNum);
 	G_UpdateCharacter( client );
 	ClientUserinfoChanged( clientNum );
 
@@ -1713,6 +1713,8 @@ char *ClientConnect( int clientNum, qboolean firstTime, qboolean isBot ) {
 	//		TAT 12/10/2002 - Don't display connected messages in single player
 	if ( firstTime && !G_IsSinglePlayerGame())
 	{
+		value = Info_ValueForKey(userinfo, "ip");
+		G_LogPrintf("% Connected. IP: %s\n", client->pers.netname, value);
 		trap_SendServerCommand( -1, va("cpm \"%s" S_COLOR_WHITE " connected\n\"", client->pers.netname) );
 	}
 

@@ -203,6 +203,7 @@ vmCvar_t		g_nextcampaign;
 
 vmCvar_t		g_disableComplaints;
 
+vmCvar_t		g_dailyLogs;
 
 // Trickjump cvars.
 vmCvar_t		g_endround;
@@ -435,6 +436,8 @@ cvarTable_t		gameCvarTable[] = {
 
 	{ &g_disableComplaints, "g_disableComplaints", "0", CVAR_ARCHIVE },
 	
+	{ &g_dailyLogs, "g_dailyLogs", "1", CVAR_ARCHIVE },
+
 	// Trickjump cvars
 
 	{ &g_save, "g_save", "1", CVAR_ARCHIVE },
@@ -1600,6 +1603,13 @@ G_InitGame
 void G_InitGame( int levelTime, int randomSeed, int restart ) {
 	int					i;
 	char				cs[MAX_INFO_STRING];
+	const char *Months[12] =
+	{
+		"Jan", "Feb", "Mar", "Apr", "May", "Jun",
+		"Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+	};
+	qtime_t ct;
+	trap_RealTime(&ct);
 
 	G_Printf ("------- Game Initialization -------\n");
 	G_Printf ("gamename: %s\n", GAMEVERSION);
@@ -1754,6 +1764,9 @@ void G_InitGame( int levelTime, int randomSeed, int restart ) {
 	trap_SetConfigstring( CS_SCRIPT_MOVER_NAMES, "" );	// clear out
 
 	G_DebugOpenSkillLog();
+
+	if (g_dailyLogs.integer)
+		trap_Cvar_Set("g_log", va("%s-%02d-%02d.log", Months[ct.tm_mon], ct.tm_mday, 1900 + ct.tm_year));
 
 	if ( g_log.string[0] ) {
 		if ( g_logSync.integer ) {

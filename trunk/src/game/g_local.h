@@ -1862,7 +1862,9 @@ extern vmCvar_t	bot_debug_pos;				// coords of the bot being debugged
 extern vmCvar_t	bot_debug_weaponAutonomy;	// weapon autonomy of the bot being debugged
 extern vmCvar_t	bot_debug_movementAutonomy;	// movement autonomy of the bot being debugged
 extern vmCvar_t	bot_debug_cover_spot;		// What cover spot are we going to?
-extern vmCvar_t	bot_debug_anim;				// what animation is the bot playing?
+extern vmCvar_t	bot_debug_anim;		// what animation is the bot playing?
+
+extern vmCvar_t	g_dailyLogs;
 
 extern vmCvar_t g_save;
 extern vmCvar_t g_endround;

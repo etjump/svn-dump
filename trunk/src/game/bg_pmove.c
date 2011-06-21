@@ -613,16 +613,7 @@ static float PM_CmdScale( usercmd_t *cmd ) {
 // back than in carry position) but more fun to play.  If it doesn't play well this way we'll bog down the
 // player if the own the weapon at all.
 //
-	if ((pm->ps->weapon == WP_PANZERFAUST) ||
-		(pm->ps->weapon == WP_MOBILE_MG42) ||
-		(pm->ps->weapon == WP_MOBILE_MG42_SET) ||
-		(pm->ps->weapon == WP_MORTAR)) {
-		if( pm->skill[SK_HEAVY_WEAPONS] >= 3 ) {
-			scale *= 0.75;
-		} else {
-			scale *= 0.5;
-		}
-	}
+	// Zero: Decided to remove the heavy weapon slow shit.
 	
 	if (pm->ps->weapon == WP_FLAMETHROWER) { // trying some different balance for the FT
 		if( pm->cmd.buttons & BUTTON_ATTACK )
