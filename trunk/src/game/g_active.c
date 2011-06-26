@@ -1311,9 +1311,15 @@ void ClientThink_real( gentity_t *ent ) {
 
 	if (g_blockCheatCvars.integer)
 	{
-		if(client->pers.clientFlags & CGF_YAWSPEED || client->pers.clientFlags & CGF_FREELOOK 
-			|| (client->pers.maxFPS > 125 && !client->pers.pmoveFixed || client->pers.clientFlags & CGF_MPITCHFIX) ) {
+		if(client->pers.clientFlags & CGF_CHEATCVARSON || (client->pers.maxFPS > 125 && !client->pers.pmoveFixed)	
+			|| ( client->pers.maxFPS < 25 )) {
 			CP("cpm \"Using cheat cvars is not allowed on this server.\n\"");
+			CP("cpm \"Check console for more info.\n\"");
+			CP("print \"Following cvars are not allowed:\n\"");
+			CP("print \"m_pitch values -0.01 <= x <= 0.01\n\"");
+			CP("print \"cl_freelook 0\n\"");
+			CP("print \"com_maxfps > 125 with pmove_Fixed on\n\"");
+			CP("print \"com_maxfps < 25\n\"");
 			trap_SendServerCommand(ent - g_entities, "cheatCvarsOff");
 			SetTeam(ent, "s", qtrue, -1, -1, qfalse);
 		}

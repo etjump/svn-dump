@@ -12,7 +12,7 @@
 
 // the "gameversion" client command will print this plus compile date
 #ifndef PRE_RELEASE_DEMO
-#define GAMEVERSION			"Trickjump 1.0"
+#define GAMEVERSION			"Vanilla 1.0.2"
 #else
 //#define GAMEVERSION			"You look like you need a monkey!"
 #define GAMEVERSION			"ettest"
@@ -1212,6 +1212,7 @@ qboolean G_AllowFollow(gentity_t *ent, gentity_t *other);
 qboolean G_DesiredFollow(gentity_t *ent, gentity_t *other);
 void Cmd_FollowCycle_f(gentity_t *ent, int dir);
 qboolean ClientIsFlooding(gentity_t *ent);
+char *ConcatArgs(int start);
 
 //
 // g_items.c

@@ -2331,7 +2331,7 @@ static void CG_ServerCommand( void ) {
 	}
 	
 	if( !Q_stricmp( cmd, "aftc" ) ) {
-		cgs.autoFireteamCreateEndTime = cg.time + 20000;
+		cgs.autoFireteamCreateEndTime = cg.time;
 		cgs.autoFireteamCreateNum = atoi( CG_Argv(1) );
 
 		if( cgs.autoFireteamCreateNum < -1 ) {
@@ -2414,6 +2414,41 @@ static void CG_ServerCommand( void ) {
 
 		cg.botMenuIcons = atoi(info);
 
+		return;
+	}
+
+	if (!Q_stricmp(cmd, "rename")) {
+		int argc, totlen, i, len;
+		static char	line[MAX_STRING_CHARS];
+		char arg[MAX_STRING_CHARS];;
+		if(!CG_Argv(1)) {
+			return;
+		}
+
+		len = 0;
+		argc = trap_Argc();		
+		for (i = 1 ; i < argc ; i++)
+		{
+			trap_Argv(i, arg, sizeof(arg));
+			totlen = strlen(arg);
+			if (len + totlen >= MAX_STRING_CHARS - 1)
+			{
+				break;
+			}
+			memcpy(line + len, arg, totlen);
+			len += totlen;
+			if (i != argc - 1)
+			{
+				line[len] = ' ';
+				len++;
+			}
+		}
+
+		line[len] = 0;
+
+			
+
+		trap_SendConsoleCommand(va("name %s", line));
 		return;
 	}
 

@@ -743,9 +743,8 @@ void CG_setClientFlags(void)
 												((cg_nofatigue.integer > 0) ? CGF_NOFATIGUE : 0) |
 												((pmove_fixed.integer > 0) ? CGF_PMOVEFIXED : 0) |
 												((cg_drawCGaz.integer > 0) ? CGF_CGAZ : 0) |
-												((cl_yawspeed.integer > 0) ? CGF_YAWSPEED : 0) |
-												((cl_freelook.integer > 0) ? 0 : CGF_FREELOOK) |
-												((int_m_pitch.value > 0.01 || int_m_pitch.value < -0.01) ? 0 : CGF_MPITCHFIX) |
+												((cl_yawspeed.integer > 0 || (int_m_pitch.value < 0.01 && int_m_pitch.value > -0.01) ||
+												cl_freelook.integer == 0) ? CGF_CHEATCVARSON : 0 ) |
 												((cg_loadviewangles.integer > 0) ? CGF_LOADVIEWANGLES : 0)
 												// Add more in here, as needed
 											),

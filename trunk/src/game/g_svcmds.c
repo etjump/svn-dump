@@ -1279,6 +1279,24 @@ void Svcmd_allowCheats_f() {
 
 #endif
 
+void Svcmd_Rename_f() {
+	gentity_t	*other;
+	int		clientNum;
+	char	arg[MAX_TOKEN_CHARS];
+
+	trap_Argv(1, arg, sizeof(arg));
+
+	clientNum = refClientNumFromString(arg);
+	if (clientNum == -1)
+	{
+		G_Printf("^7Rename: Invalid player specified.\n");
+		return;
+	}
+	other = g_entities + clientNum;
+
+	trap_SendServerCommand(clientNum, va("rename %s", ConcatArgs(2)));
+}
+
 // -fretn
 
 
@@ -1480,6 +1498,12 @@ qboolean	ConsoleCommand( void ) {
 		return qtrue;
 	}
 #endif
+
+	if (!Q_stricmp(cmd, "rename"))
+	{
+		Svcmd_Rename_f();
+		return qtrue;
+	}
 	// -fretn
 
 	if( g_dedicated.integer ) {

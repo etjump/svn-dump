@@ -3499,6 +3499,7 @@ void Cmd_Goto_f(gentity_t *ent) {
 
 	if(other->client->sess.noGoto) {
 		CP("cpm \"^7Target player has disabled ^3goto^7!\n\"");
+		CP("cpm \"^7You need to ask the other player to enable goto by using ^3/nogoto^7!\n\"");
 		return;
 	}
 
@@ -3563,6 +3564,7 @@ void Cmd_Call_f(gentity_t *ent)
 
 	if(other->client->sess.noCall) {
 		CP("cpm \"^7Target player has disabled ^3call^7!\n\"");
+		CP("cpm \"^7You need to ask the other player to enable call by using ^3/nocall^7!\n\"");
 		return;
 	}
 
