@@ -391,8 +391,12 @@ int G_Mute_v(gentity_t *ent, unsigned int dwVoteIndex, char *arg, char *arg2, qb
 		if(!vote_allow_muting.integer && ent && !ent->client->sess.referee) {
 			G_voteDisableMessage(ent, arg);
 			return(G_INVALID);
-		} else if(G_voteDescription(ent, fRefereeCmd, dwVoteIndex)) return(G_INVALID);
-		else if((pid = ClientNumberFromString(ent, arg2)) == -1) return(G_INVALID);
+		} 
+		else if(G_voteDescription(ent, fRefereeCmd, dwVoteIndex)) 
+			return(G_INVALID);
+
+		else if((pid = ClientNumberFromString(ent, arg2)) == -1) 
+			return(G_INVALID);
 
 		if(level.clients[pid].sess.referee) {
 			G_refPrintf(ent, "Can't vote to mute referees!");

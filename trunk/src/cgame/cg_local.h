@@ -15,7 +15,7 @@
 #include "cg_public.h"
 #include "../ui/ui_shared.h"
 
-#define TRICKJUMP_VER "Trickjump 1.0"
+#define TRICKJUMP_VER "VanillaTJ 1.0.0"
 
 #define MAX_LOCATIONS		256
 #define	POWERUP_BLINKS		5
@@ -1090,6 +1090,7 @@ typedef struct {
 	vec4_t				xhairColorAlt;
 	vec4_t				speedColor;
 	vec4_t				keysColor;
+	vec4_t				personalTimerColor;
 
 	// Arnout: allow overriding of countdown sounds
 	char		fiveMinuteSound_g[MAX_QPATH];
@@ -1169,6 +1170,10 @@ typedef struct {
 	char			objDescription_Allied[MAX_OBJECTIVES][256];
 
 	int				waterundertime;
+	// Personal timer.
+	int				startTime;
+	int				stopTime;
+	qboolean		activeTimer;
 	qboolean		resetmaxspeed;
 } cg_t;
 
@@ -2295,6 +2300,12 @@ extern vmCvar_t			cg_speedSizeX;
 extern vmCvar_t			cg_speedSizeY;
 extern vmCvar_t			cg_speedColor;
 extern vmCvar_t			cg_speedAlpha;
+
+extern vmCvar_t			cg_drawPersonalTimer;
+extern vmCvar_t			cg_personalTimerColor;
+extern vmCvar_t			cg_personalTimerAlpha;
+extern vmCvar_t			cg_personalTimerX;
+extern vmCvar_t			cg_personalTimerY;
 
 
 //

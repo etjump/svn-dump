@@ -1879,6 +1879,8 @@ extern vmCvar_t	g_weapons;
 extern vmCvar_t	g_noclip;
 extern vmCvar_t	g_savemsg;
 
+extern vmCvar_t	g_mapScriptDir;
+
 void	trap_Printf( const char *fmt );
 void	trap_Error( const char *fmt );
 int		trap_Milliseconds( void );

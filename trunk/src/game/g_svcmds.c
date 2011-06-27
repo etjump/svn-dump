@@ -1512,7 +1512,7 @@ qboolean	ConsoleCommand( void ) {
 			return qtrue;
 		}
 		else if( !Q_stricmp (cmd, "qsay")) {
-			trap_SendServerCommand( -1, va("chat \"%s\n\"", ConcatArgs(1) ) );
+			trap_SendServerCommand( -1, va("chat \"%s\"", ConcatArgs(1) ) );
 			return qtrue;
 		}
 		else if( !Q_stricmp (cmd, "cp")) {

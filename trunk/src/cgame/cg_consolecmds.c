@@ -906,6 +906,18 @@ static void CG_CPM_f( void ) {
 	CG_AddPMItem( PM_MESSAGE, CG_Argv(1), cgs.media.voiceChatShader );
 }
 
+void CG_StartTimer( void ) {
+	CG_Printf("Timer started.\n");
+	cg.startTime = cg.time;
+	cg.activeTimer = qtrue;
+}
+
+void CG_StopTimer ( void ) {
+	CG_Printf("Timer stopped.\n");
+	cg.activeTimer = qfalse;
+	cg.stopTime = cg.time;
+}
+
 typedef struct {
 	char	*cmd;
 	void	(*function)(void);
@@ -1008,6 +1020,8 @@ static consoleCommand_t	commands[] =
 	{ "cpm", CG_CPM_f },
 	{ "forcetapout", CG_ForceTapOut_f },
 	{ "resetmaxspeed", CG_ResetMaxSpeed_f },
+	{ "startTimer",	CG_StartTimer },
+	{ "stopTimer", CG_StopTimer },
 };
 
 
@@ -1152,5 +1166,10 @@ void CG_InitConsoleCommands( void ) {
 	trap_AddCommand ("resetmaxspeed");
 	trap_AddCommand ("nonading");
 	trap_AddCommand ("class");
+	trap_AddCommand ("startTimer");
+	trap_AddCommand ("stopTimer");
+	trap_AddCommand ("vsay");
+	trap_AddCommand ("vsay_team");
+	trap_AddCommand ("vsay_buddy");
 
 }

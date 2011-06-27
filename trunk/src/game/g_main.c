@@ -217,6 +217,7 @@ vmCvar_t		g_blockCheatCvars;
 vmCvar_t		g_weapons;
 vmCvar_t		g_noclip;
 vmCvar_t		g_savemsg;
+vmCvar_t		g_mapScriptDir;
 
 
 cvarTable_t		gameCvarTable[] = {
@@ -453,6 +454,8 @@ cvarTable_t		gameCvarTable[] = {
 	{ &g_weapons, "g_weapons", "1", CVAR_ARCHIVE },
 	{ &g_noclip, "g_noclip", "0", CVAR_ARCHIVE },
 	{ &g_savemsg, "g_savemsg", "^7Saved", CVAR_ARCHIVE },
+
+	{ &g_mapScriptDir, "g_mapScriptDir", "scripts", CVAR_ARCHIVE },
 };
 
 // bk001129 - made static to avoid aliasing

@@ -348,6 +348,7 @@ void G_Script_ScriptLoad( void ) {
 	vmCvar_t		mapname;
 	fileHandle_t	f;
 	int				len;
+	qboolean		found = qfalse;
 
 	trap_Cvar_Register( &g_scriptDebug, "g_scriptDebug", "0", 0 );
 
@@ -359,16 +360,28 @@ void G_Script_ScriptLoad( void ) {
 	} else {
 		trap_Cvar_Register( &mapname, "mapname", "", CVAR_SERVERINFO | CVAR_ROM );
 	}
-	Q_strncpyz( filename, "maps/", sizeof(filename) );
-	Q_strcat( filename, sizeof(filename), mapname.string );
-
-	if ( g_gametype.integer == GT_WOLF_LMS ) {
-		Q_strcat( filename, sizeof(filename), "_lms" );
+	if(g_mapScriptDir.string[0]) {
+		G_Printf("^7Loading custom mapscript.\n");
+		Q_strncpyz(filename,
+			g_mapScriptDir.string,
+			sizeof(filename));
+		Q_strcat(filename, sizeof(filename), "/");
+		Q_strcat( filename, sizeof(filename), mapname.string );
+		Q_strcat( filename, sizeof(filename), ".script" );
+		len = trap_FS_FOpenFile( filename, &f, FS_READ );
+		if(len > 0) {
+			found = qtrue; 
+			G_Printf("Custom mapscript loaded.\n");
+		}
 	}
+	if(!found) {
+		Q_strncpyz( filename, "maps/", sizeof(filename) );
+		Q_strcat( filename, sizeof(filename), mapname.string );
 
-	Q_strcat( filename, sizeof(filename), ".script" );
-
-	len = trap_FS_FOpenFile( filename, &f, FS_READ );
+		Q_strcat( filename, sizeof(filename), ".script" );
+		len = trap_FS_FOpenFile( filename, &f, FS_READ );
+		G_Printf("No custom mapscript was found, using default.\n");
+	}
 
 	// make sure we clear out the temporary scriptname
 	trap_Cvar_Set( "g_scriptName", "" );

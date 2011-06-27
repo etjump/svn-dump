@@ -335,6 +335,12 @@ vmCvar_t	cg_speedSizeY;
 vmCvar_t	cg_speedColor;
 vmCvar_t	cg_speedAlpha;
 
+vmCvar_t	cg_drawPersonalTimer;
+vmCvar_t	cg_personalTimerColor;
+vmCvar_t	cg_personalTimerAlpha;
+vmCvar_t	cg_personalTimerX;
+vmCvar_t	cg_personalTimerY;
+
 typedef struct {
 	vmCvar_t	*vmCvar;
 	char		*cvarName;
@@ -581,7 +587,7 @@ cvarTable_t		cvarTable[] = {
 	{ &cg_keysSize,				"cg_keysSize", "48", CVAR_ARCHIVE },
 	{ &cg_keysX,				"cg_keysX", "585", CVAR_ARCHIVE },
 	{ &cg_keysY,				"cg_keysY", "200", CVAR_ARCHIVE },
-	{ &cg_loadviewangles,		"cg_loadviewangles", "0", CVAR_ARCHIVE },
+	{ &cg_loadviewangles,		"cg_loadviewangles", "1", CVAR_ARCHIVE },
 
 	// forty - speedometer
 	{ &cg_drawspeed, "cg_drawspeed", "1", CVAR_ARCHIVE },
@@ -590,13 +596,21 @@ cvarTable_t		cvarTable[] = {
 	{ &cg_speedunit, "cg_speedunit", "0", CVAR_ARCHIVE },
 	{ &cg_viewlog, "cg_viewlog", "1", CVAR_ARCHIVE },
 	{ &cg_drawClock, "cg_drawClock", "1", CVAR_ARCHIVE },
+	// Speedometer ala tjmod
 	{ &cg_drawSpeed2, "cg_drawSpeed2", "1", CVAR_ARCHIVE },
 	{ &cg_speedX, "cg_speedX", "320", CVAR_ARCHIVE },
 	{ &cg_speedY, "cg_speedY", "400", CVAR_ARCHIVE },
 	{ &cg_speedSizeX, "cg_speedSizeX", "3", CVAR_ARCHIVE },
 	{ &cg_speedSizeY, "cg_speedSizeY", "3", CVAR_ARCHIVE },
 	{ &cg_speedColor, "cg_speedColor", "White", CVAR_ARCHIVE },
-	{ &cg_speedAlpha, "cg_speedAlpha", "1.0", CVAR_ARCHIVE }
+	{ &cg_speedAlpha, "cg_speedAlpha", "1.0", CVAR_ARCHIVE },
+	// Personal timer
+	{ &cg_drawPersonalTimer, "cg_drawPersonalTimer", "0", CVAR_ARCHIVE },
+	{ &cg_personalTimerColor, "cg_personalTimerColor", "White", CVAR_ARCHIVE },
+	{ &cg_personalTimerAlpha, "cg_personalTimerAlpha", "1", CVAR_ARCHIVE },
+	{ &cg_personalTimerX, "cg_personalTimerX", "320", CVAR_ARCHIVE },
+	{ &cg_personalTimerY, "cg_personalTimerY", "440", CVAR_ARCHIVE }
+
 
 };
 
@@ -640,6 +654,7 @@ void CG_RegisterCvars( void ) {
 	BG_setCrosshair(cg_crosshairColorAlt.string, cg.xhairColorAlt, cg_crosshairAlphaAlt.value, "cg_crosshairColorAlt");
 	BG_setColor(cg_speedColor.string, cg.speedColor, cg_speedAlpha.value, "cg_speedColor");
 	BG_setColor(cg_keysColor.string, cg.keysColor, 1, "cg_keysColor");
+	BG_setColor(cg_personalTimerColor.string, cg.personalTimerColor, cg_personalTimerAlpha.value, "cg_personalTimerColor");
 
 	cvarsLoaded = qtrue;
 }
@@ -690,6 +705,10 @@ void CG_UpdateCvars( void ) {
 
 				else if (cv->vmCvar == &cg_keysColor) {
 					BG_setColor(cg_keysColor.string, cg.keysColor, 1, "cg_keysColor");
+				}
+
+				else if (cv->vmCvar == &cg_personalTimerColor) {
+					BG_setColor(cg_personalTimerColor.string, cg.personalTimerColor, cg_personalTimerAlpha.value, "cg_personalTimerColor");
 				}
 
 				else if(cv->vmCvar == &cg_rconPassword && *cg_rconPassword.string) {
