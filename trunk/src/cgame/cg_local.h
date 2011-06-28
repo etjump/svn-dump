@@ -15,7 +15,7 @@
 #include "cg_public.h"
 #include "../ui/ui_shared.h"
 
-#define TRICKJUMP_VER "VanillaTJ 1.0.0"
+#define TRICKJUMP_VER "Vanilla Trickjump 1.0.0"
 
 #define MAX_LOCATIONS		256
 #define	POWERUP_BLINKS		5

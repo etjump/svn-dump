@@ -23,6 +23,7 @@ menuDef {
 	
 	onESC {
 		close trickjump ;
+		open ingame_main ;
 	}
 
 // Window //

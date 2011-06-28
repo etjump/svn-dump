@@ -5,7 +5,7 @@
 #define WINDOW_X		16
 #define WINDOW_Y		16
 #define WINDOW_WIDTH	400
-#define WINDOW_HEIGHT	195
+#define WINDOW_HEIGHT 231
 #define GROUP_NAME		"grpView"
 
 // Macros //
@@ -23,15 +23,16 @@ menuDef {
 	
 	onESC {
 		close trickjump_view ;
+		open trickjump ;
 	}
 
 // Window //
 
 #define SUBWINDOW_WIDTH WINDOW_WIDTH-12
 
-WINDOW( "VIEW", 94 )
+WINDOW( "VIEW", 106 )
 
-	SUBWINDOW( 6, 32, (SUBWINDOW_WIDTH), 132, "HUD DISPLAY" )
+	SUBWINDOW( 6, 32, (SUBWINDOW_WIDTH), 168, "HUD DISPLAY" )
 MULTI( 8, 48, (SUBWINDOW_WIDTH)-4, 10, "Trickjump HUD:", 	.2, 8, "cg_drawTJHud", cvarFloatList { "Off" 0 "1" 1 "2" 2 }, "" )
 
 MULTI( 8, 60, (SUBWINDOW_WIDTH)-4, 10, "Draw speed:", 	.2, 8, "cg_drawSpeed", cvarFloatList { "Off" 0 "1" 1 "2" 2 }, "" )
@@ -45,11 +46,17 @@ MULTI( 8, 108, (SUBWINDOW_WIDTH)-4, 10, "Draw CGaz:", 	.2, 8, "cg_drawCgaz", cva
 
 YESNO( 8, 120, (SUBWINDOW_WIDTH)-4, 10, "Draw keys:", .2, 8, "cg_drawKeys", "Draws the keys user is pressing." )
 
-YESNO( 8, 132, (SUBWINDOW_WIDTH)-4, 10, "Draw clock:", .2, 8, "cg_drawClock", "Draws the clock." )
+MULTI( 8, 132, (SUBWINDOW_WIDTH)-4, 10, "Draw keys color:", .2, 8, "cg_keysColor", cvarStrList { "White"; "white"; "Yellow"; "yellow"; "Red"; "red"; "Green"; "green"; "Blue"; "blue"; "Magenta"; "magenta"; "Cyan"; "cyan"; "Orange"; "orange"; "Light Blue"; "0xa0c0ff"; "Medium Blue"; "mdblue"; "Light Red"; "0xffc0a0"; "Medium Red"; "mdred"; "Light Green"; "0xa0ffc0"; "Medium Green"; "mdgreen"; "Dark Green"; "dkgreen"; "Medium Cyan"; "mdcyan"; "Medium Yellow"; "mdyellow"; "Medium Orange"; "mdorange"; "Light Grey"; "ltgrey"; "Medium Grey"; "mdgrey"; "Dark Grey"; "dkgrey"; "Black"; "black" }, "Set the color for your keypresses." )
 
-YESNO( 8, 144, (SUBWINDOW_WIDTH)-4, 10, "Draw cgaz users:", .2, 8, "cg_drawCGazUsers", "Draws the cgaz users on scoreboard." )
+YESNO( 8, 144, (SUBWINDOW_WIDTH)-4, 10, "Draw clock:", .2, 8, "cg_drawClock", "Draws the clock." )
 
-BUTTON ( 6, 170, WINDOW_WIDTH-12, 18, "BACK", .3, 14, close trickjump_view ; open trickjump )
+YESNO( 8, 156, (SUBWINDOW_WIDTH)-4, 10, "Draw cgaz users:", .2, 8, "cg_drawCGazUsers", "Draws the cgaz users on scoreboard." )
+
+YESNO( 8, 168, (SUBWINDOW_WIDTH)-4, 10, "Draw personal timer:", .2, 8, "cg_drawPersonalTimer", "Draws the personal timer (/startTimer /stopTimer.) \nUse cg_personalTimerX & cg_personalTimerY to set the position." )
+
+MULTI( 8, 180, (SUBWINDOW_WIDTH)-4, 10, "Personal timer color:", .2, 8, "cg_personalTimerColor", cvarStrList { "White"; "white"; "Yellow"; "yellow"; "Red"; "red"; "Green"; "green"; "Blue"; "blue"; "Magenta"; "magenta"; "Cyan"; "cyan"; "Orange"; "orange"; "Light Blue"; "0xa0c0ff"; "Medium Blue"; "mdblue"; "Light Red"; "0xffc0a0"; "Medium Red"; "mdred"; "Light Green"; "0xa0ffc0"; "Medium Green"; "mdgreen"; "Dark Green"; "dkgreen"; "Medium Cyan"; "mdcyan"; "Medium Yellow"; "mdyellow"; "Medium Orange"; "mdorange"; "Light Grey"; "ltgrey"; "Medium Grey"; "mdgrey"; "Dark Grey"; "dkgrey"; "Black"; "black" }, "Set the color for your personal timer.)")
+
+BUTTON ( 6, 206, WINDOW_WIDTH-12, 18, "BACK", .3, 14, close trickjump_view ; open trickjump )
 
 }
 

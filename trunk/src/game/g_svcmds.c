@@ -1292,6 +1292,7 @@ void Svcmd_Rename_f() {
 		G_Printf("^7Rename: Invalid player specified.\n");
 		return;
 	}
+	
 	other = g_entities + clientNum;
 
 	trap_SendServerCommand(clientNum, va("rename %s", ConcatArgs(2)));

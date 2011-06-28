@@ -12,7 +12,7 @@
 
 // the "gameversion" client command will print this plus compile date
 #ifndef PRE_RELEASE_DEMO
-#define GAMEVERSION			"Vanilla 1.0.0"
+#define GAMEVERSION			"Vanilla Trickjump 1.0.0"
 #else
 //#define GAMEVERSION			"You look like you need a monkey!"
 #define GAMEVERSION			"ettest"
