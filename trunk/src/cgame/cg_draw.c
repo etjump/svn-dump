@@ -2782,6 +2782,10 @@ static void CG_DrawPersonalTimer( void ) {
 	int msec, min, sec;
 	float x, y, w;
 	char time[128];
+
+	if(!cg_drawPersonalTimer.integer)
+		return;
+
 	if(cg.activeTimer)
 		msec = cg.time - cg.startTime;
 	else
@@ -2791,15 +2795,9 @@ static void CG_DrawPersonalTimer( void ) {
 	msec -= min * 60000;
 	sec = msec / 1000;
 	msec -= sec * 1000;
-
-	if(!cg_drawPersonalTimer.integer)
-		return;
-
+	
 	x = cg_personalTimerX.value;
 	y = cg_personalTimerY.value;
-
-	x = cg_crosshairX.integer;
-	y = cg_crosshairY.integer;
 
 	Com_sprintf(time, sizeof(time), va("%02d:%02d.%03d", min, sec, msec));
 

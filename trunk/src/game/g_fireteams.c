@@ -99,7 +99,7 @@ void G_UpdateFireteamConfigString( fireteamData_t* ft ) {
 		}
 
 //		Com_sprintf(buffer, 128, "\\n\\%s\\l\\%i\\c\\%.8x%.8x", ft->name, ft->joinOrder[0], clnts[1], clnts[0]);
-		Com_sprintf(buffer, 128, "\\id\\%i\\l\\%i\\c\\%.8x%.8x", ft->ident - 1, ft->joinOrder[0], clnts[1], clnts[0]);
+		Com_sprintf(buffer, 128, "\\id\\%i\\l\\%i\\c\\%.8x%.8x\\savelimit\\%i", ft->ident - 1, ft->joinOrder[0], clnts[1], clnts[0], ft->savelimit);
 //		G_Printf(va("%s\n", buffer));
 	}
 
@@ -236,6 +236,7 @@ void G_RegisterFireteam(/*const char* name,*/ int entityNum) {
 	memset(ft->joinOrder, -1, sizeof(level.fireTeams[0].joinOrder));
 	ft->joinOrder[0] = leader - g_entities;
 	ft->ident = ident;
+	ft->savelimit = 0;
 
 	if( g_autoFireteams.integer ) {
 		ft->priv = qfalse;
@@ -284,10 +285,13 @@ void G_AddClientToFireteam( int entityNum, int leaderNum ) {
 		}
 
 		if(ft->joinOrder[i] == -1) {
+			gentity_t *otherEnt = g_entities + entityNum;
 			// found a free position
 			ft->joinOrder[i] = entityNum;
 
 			G_UpdateFireteamConfigString(ft);
+
+			otherEnt->client->sess.savelimit = ft->savelimit;
 
 			return;
 		}
@@ -338,7 +342,7 @@ void G_RemoveClientFromFireteams( int entityNum, qboolean update, qboolean print
 				break;
 			}
 
-			trap_SendServerCommand( ft->joinOrder[i], va( "cpm \"%s has left the Fireteam\"\n", level.clients[entityNum].pers.netname ) );
+			trap_SendServerCommand( ft->joinOrder[i], va( "cpm \"%s ^7has left the Fireteam\"\n", level.clients[entityNum].pers.netname ) );
 		}
 	}
 
@@ -597,6 +601,63 @@ fireteamData_t* G_FindFreePublicFireteam( team_t team ) {
 	return NULL;
 }
 
+void G_SetFireTeamRules( int clientNum ) {
+	int i;
+	char arg1[MAX_TOKEN_CHARS];
+	char val[MAX_TOKEN_CHARS];
+	fireteamData_t* ft;
+
+	if(!G_IsOnFireteam( clientNum, &ft )) {
+		G_ClientPrintAndReturn( clientNum, "You are not on a fireteam" );
+	}
+
+	if(!G_IsFireteamLeader( clientNum, &ft )) {
+		G_ClientPrintAndReturn( clientNum, "You are not the leader." );
+	}
+
+	if(trap_Argc() < 4) {
+		G_ClientPrintAndReturn( clientNum, "usage: fireteam rules <rule> <value>");
+	}
+
+	trap_Argv(2, arg1, sizeof(arg1));
+
+	if(!Q_stricmp(arg1, "savelimit")) {
+		gentity_t *ent;
+		trap_Argv(3, val, sizeof(val));
+
+		if(!Q_stricmp(val, "reset")) {
+			for(i = 0; i < level.numConnectedClients; i++) {
+				if(ft->joinOrder[i] == -1) {
+					continue;
+				} else {
+					ent = g_entities + ft->joinOrder[i];
+					ent->client->sess.savelimit = ft->savelimit;
+				}
+			}
+			return;
+		}
+
+		if( atoi(val) > 100) 
+			ft->savelimit = 100;
+		else
+			ft->savelimit = atoi(val);
+
+		ft->savelimit = atoi(val);
+		trap_SendServerCommand(clientNum, va("print \"fireteam: savelimit was set to %i\n\"", atoi(val)));
+		for(i = 0; i < level.numConnectedClients; i++) {
+			if(ft->joinOrder[i] == -1) {
+				continue;
+			} else {
+				ent = g_entities + ft->joinOrder[i];
+				ent->client->sess.savelimit = ft->savelimit;
+			}
+		}
+		return;
+	}
+
+	G_ClientPrintAndReturn( clientNum, "fireteam: failed to set rules.");
+}
+
 
 // Command handler
 void Cmd_FireTeam_MP_f( gentity_t* ent ) {
@@ -604,7 +665,7 @@ void Cmd_FireTeam_MP_f( gentity_t* ent ) {
 	int i;
 
 	if ( trap_Argc() < 2 ) {
-		G_ClientPrintAndReturn( ent-g_entities, "usage: fireteam <create|leave|apply|invite>");
+		G_ClientPrintAndReturn( ent-g_entities, "usage: fireteam <create|leave|apply|invite|rules>");
 	}
 
 	trap_Argv(1, command, 32);
@@ -759,5 +820,10 @@ void Cmd_FireTeam_MP_f( gentity_t* ent ) {
 		}
 
 		G_ProposeFireTeamPlayer( ent-g_entities, clientnum-1 );		
+	} 
+	// Challenge group. 
+	// Only leader 
+	else if (!Q_stricmp(command, "rules")) {
+		G_SetFireTeamRules( ent - g_entities );
 	}
 }

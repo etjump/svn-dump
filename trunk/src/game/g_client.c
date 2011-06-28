@@ -1291,7 +1291,14 @@ static void ClientCleanName( const char *in, char *out, int outSize )
 			}
 
 			*out++ = ch;
-			*out++ = *in++;
+			// No ^= color code.
+			if(*in == '=') {
+				*out++ = '7';
+				*in++;	
+			} else {
+				*out++ = *in++;
+			}
+
 			len += 2;
 			continue;
 		}

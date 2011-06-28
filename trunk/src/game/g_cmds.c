@@ -3419,11 +3419,23 @@ void Cmd_Save_f(gentity_t *ent)
 	int posNum;
 	save_position_t *pos;
 	trace_t trace;
+	fireteamData_t *ft;
 
 	if (!g_save.integer)
 	{
 		CP("print \"^3Save ^7is not enabled.\n\"");
 		return;
+	}
+
+	if (G_IsOnFireteam(ent-g_entities, &ft)) {
+		if(ft->savelimit) {
+			if(ent->client->sess.savelimit) {
+				ent->client->sess.savelimit--;
+			} else {
+				CP("cp \"fireteam: you are out of saves.\n\"");
+				return;
+			}
+		}
 	}
 
 	// get save slot (do this first so players can get usage message even if
@@ -3476,10 +3488,15 @@ void Cmd_Save_f(gentity_t *ent)
 	VectorCopy(ent->client->ps.viewangles, pos->vangles);
 	pos->isValid = qtrue;
 
-	if (posNum == 0)
+	if (posNum == 0) 
 		CP(va("cp \"%s\n\"", g_savemsg.string));
 	else
 		CP(va("cp \"%s ^7%d\n\"", g_savemsg.string, posNum));
+
+	if (G_IsOnFireteam(ent-g_entities, &ft)) {
+		if(ft->savelimit)
+			CP(va("cp \"You have %i saves left\n\"", ent->client->sess.savelimit));
+	}
 }
 
 void Cmd_Goto_f(gentity_t *ent) {

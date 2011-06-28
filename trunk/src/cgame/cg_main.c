@@ -608,8 +608,8 @@ cvarTable_t		cvarTable[] = {
 	{ &cg_drawPersonalTimer, "cg_drawPersonalTimer", "0", CVAR_ARCHIVE },
 	{ &cg_personalTimerColor, "cg_personalTimerColor", "White", CVAR_ARCHIVE },
 	{ &cg_personalTimerAlpha, "cg_personalTimerAlpha", "1", CVAR_ARCHIVE },
-	{ &cg_personalTimerX, "cg_personalTimerX", "320", CVAR_ARCHIVE },
-	{ &cg_personalTimerY, "cg_personalTimerY", "440", CVAR_ARCHIVE }
+	{ &cg_personalTimerX, "cg_personalTimerX", "687", CVAR_ARCHIVE },
+	{ &cg_personalTimerY, "cg_personalTimerY", "400", CVAR_ARCHIVE }
 
 
 };

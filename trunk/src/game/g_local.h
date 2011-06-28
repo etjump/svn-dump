@@ -635,6 +635,10 @@ typedef struct {
 	qboolean	specLocked;
 	int			specInvitedClients[MAX_CLIENTS / (sizeof(int) * 8)];
 
+	// Challenge group
+
+	int			savelimit;
+
 	qboolean	versionOK;
 } clientSession_t;
 
