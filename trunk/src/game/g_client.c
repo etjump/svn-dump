@@ -1295,6 +1295,16 @@ static void ClientCleanName( const char *in, char *out, int outSize )
 			if(*in == '=') {
 				*out++ = '7';
 				*in++;	
+			} 
+
+			/*
+			 * This will fix the color code bug that caused players to lag
+			 * when people reconnected with extended ascii chars. 
+			*/
+
+			if(*in == (char)46 || (int)*in < 0) {
+				*out++ = '.';
+				*in++;
 			} else {
 				*out++ = *in++;
 			}
