@@ -12,7 +12,7 @@
 
 // the "gameversion" client command will print this plus compile date
 #ifndef PRE_RELEASE_DEMO
-#define GAMEVERSION			"Vanilla Trickjump 1.0.0"
+#define GAMEVERSION			"ETJump 1.0.0"
 #else
 //#define GAMEVERSION			"You look like you need a monkey!"
 #define GAMEVERSION			"ettest"
@@ -2479,6 +2479,7 @@ void G_MakeReferee(void);
 void G_RemoveReferee(void);
 void G_MuteClient(void);
 void G_UnMuteClient(void);
+void G_ref_con(void);
 
 
 

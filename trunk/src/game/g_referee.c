@@ -4,7 +4,7 @@
 // rhea@OrangeSmoothie.org
 //
 #include "g_local.h"
-#include "../../trickjump/ui/menudef.h"
+#include "../../etjump/ui/menudef.h"
 
 
 //
@@ -17,17 +17,15 @@
 qboolean G_refCommandCheck(gentity_t *ent, char *cmd)
 {
 		 if(!Q_stricmp(cmd, "allready"))	G_refAllReady_cmd(ent);
-	else if(!Q_stricmp(cmd, "lock"))		G_refLockTeams_cmd(ent, qtrue);
+	else if(!Q_stricmp(cmd, "lock"))		trap_SendServerCommand(ent-g_entities, "Disabled ref command.");
 	else if(!Q_stricmp(cmd, "help"))		G_refHelp_cmd(ent);
-	else if(!Q_stricmp(cmd, "pause"))		G_refPause_cmd(ent, qtrue);
+	else if(!Q_stricmp(cmd, "pause"))		trap_SendServerCommand(ent-g_entities, "Disabled ref command.");
 	else if(!Q_stricmp(cmd, "putallies"))	G_refPlayerPut_cmd(ent, TEAM_ALLIES);
 	else if(!Q_stricmp(cmd, "putaxis"))		G_refPlayerPut_cmd(ent, TEAM_AXIS);
 	else if(!Q_stricmp(cmd, "remove"))		G_refRemove_cmd(ent);
-	else if(!Q_stricmp(cmd, "speclock"))	G_refSpeclockTeams_cmd(ent, qtrue);
-	else if(!Q_stricmp(cmd, "specunlock"))	G_refSpeclockTeams_cmd(ent, qfalse);
-	else if(!Q_stricmp(cmd, "unlock"))		G_refLockTeams_cmd(ent, qfalse);
-	else if(!Q_stricmp(cmd, "unpause"))		G_refPause_cmd(ent, qfalse);
-	else if(!Q_stricmp(cmd, "warmup"))		G_refWarmup_cmd(ent);
+	else if(!Q_stricmp(cmd, "unlock"))		trap_SendServerCommand(ent-g_entities, "Disabled ref command.");
+	else if(!Q_stricmp(cmd, "unpause"))		trap_SendServerCommand(ent-g_entities, "Disabled ref command.");
+	else if(!Q_stricmp(cmd, "warmup"))		trap_SendServerCommand(ent-g_entities, "Disabled ref command.");
 	else if(!Q_stricmp(cmd, "warn"))		G_refWarning_cmd(ent);
 	else if(!Q_stricmp(cmd, "mute"))		G_refMute_cmd(ent, qtrue);
 	else if(!Q_stricmp(cmd, "unmute"))		G_refMute_cmd(ent, qfalse);
@@ -35,7 +33,6 @@ qboolean G_refCommandCheck(gentity_t *ent, char *cmd)
 
 	return(qtrue);
 }
-
 
 // Lists ref commands.
 void G_refHelp_cmd(gentity_t *ent)
@@ -66,10 +63,45 @@ void G_refHelp_cmd(gentity_t *ent)
 		G_Printf(  "allready    putallies <pid>     unlock\n");
 		G_Printf(  "lock        putaxis <pid>       unpause\n");
 		G_Printf(  "help        restart             warmup [value]\n");
-		G_Printf(  "pause       speclock            warn <pid>\n");
-		G_Printf(  "remove      specunlock\n\n");
+		G_Printf(  "pause       warn <pid>\n");
+		G_Printf(  "remove      \n\n");
 
 		G_Printf(  "Usage: <cmd> [params]\n\n");
+	}
+}
+// Console ref kick
+void G_refKick(char *name) {
+	int clientNum, timeout = 300;
+
+	if(!*name) {
+		G_Printf("usage: ref kick <name>\n");
+		return;
+	}
+
+	if((clientNum = ClientNumberFromString(NULL, name)) == -1) {
+		G_Printf("Client not found!\n");
+		return;
+	}
+
+	trap_DropClient(clientNum, "Player kicked!", timeout);
+	return;
+}
+// Console cmd check
+void G_ref_con() {
+	char arg[MAX_TOKEN_CHARS];
+
+	trap_Argv(1, arg, sizeof(arg));
+	
+	if (!Q_stricmp(arg, "kick")) {
+		trap_Argv(2, arg, sizeof(arg));
+		G_refKick(arg);
+		return;
+	}
+
+	if(G_refCommandCheck(NULL, arg)) {
+		return;
+	} else {
+		G_Printf("Invalid ref command.\n");
 	}
 }
 
@@ -286,31 +318,6 @@ void G_refRemove_cmd(gentity_t *ent)
 	if(g_gamestate.integer == GS_WARMUP || g_gamestate.integer == GS_WARMUP_COUNTDOWN) {
 		G_readyMatchState();
 	}
-}
-
-
-// Changes team spectator lock status
-void G_refSpeclockTeams_cmd(gentity_t *ent, qboolean fLock)
-{
-	char *status;
-
-	// Ensure proper locking
-	G_updateSpecLock(TEAM_AXIS, (TeamCount(-1, TEAM_AXIS)) ? fLock : qfalse);
-	G_updateSpecLock(TEAM_ALLIES, (TeamCount(-1, TEAM_ALLIES)) ? fLock : qfalse);
-
-	status = va("Referee has ^3SPECTATOR %sLOCKED^7 teams", ((fLock) ? "" : "UN"));
-
-	G_printFull(status, ent);
-
-	// Update viewers as necessary
-//	G_pollMultiPlayers();
-
-	if( fLock ) {
-		level.server_settings |= CV_SVS_LOCKSPECS;
-	} else {
-		level.server_settings &= ~CV_SVS_LOCKSPECS;
-	}
-	trap_SetConfigstring(CS_SERVERTOGGLES, va("%d", level.server_settings));
 }
 
 void G_refWarmup_cmd(gentity_t* ent)

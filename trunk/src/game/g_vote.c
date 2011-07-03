@@ -2,7 +2,7 @@
 // -------------------------------
 //
 #include "g_local.h"
-#include "../../trickjump/ui/menudef.h"	// For vote options
+#include "../../etjump/ui/menudef.h"	// For vote options
 
 
 

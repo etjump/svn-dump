@@ -630,7 +630,7 @@ int refClientNumFromString(char *s)
 		}
 	}
 
-	// check for a name match
+	// check for a name match	
 	SanitizeString(s, s2, qtrue);
 	for (idnum = 0, cl = level.clients; idnum < level.maxclients; idnum++, cl++)
 	{
@@ -1490,6 +1490,11 @@ qboolean	ConsoleCommand( void ) {
 
 	if (!Q_stricmp(cmd, "cancelvote")) {
 		Svcmd_Cancelvote_f();
+		return qfalse;
+	}
+
+	if (!Q_stricmp(cmd, "ref")) {
+		G_ref_con();
 		return qfalse;
 	}
 

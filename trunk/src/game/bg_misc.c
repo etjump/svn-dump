@@ -8,7 +8,7 @@
 
 #include "q_shared.h"
 #include "bg_public.h"
-#include "../../trickjump/ui/menudef.h"
+#include "../../etjump/ui/menudef.h"
 
 #ifdef CGAMEDLL
 	extern	vmCvar_t cg_gameType;

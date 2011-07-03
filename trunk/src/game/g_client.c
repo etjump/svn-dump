@@ -1,5 +1,5 @@
 #include "g_local.h"
-#include "../../trickjump/ui/menudef.h"
+#include "../../etjump/ui/menudef.h"
 
 // g_client.c -- client functions that don't happen every frame
 

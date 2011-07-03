@@ -1318,7 +1318,7 @@ void ClientThink_real( gentity_t *ent ) {
 			CP("print \"Following cvars are not allowed:\n\"");
 			CP("print \"m_pitch values -0.01 <= x <= 0.01\n\"");
 			CP("print \"cl_freelook 0\n\"");
-			CP("print \"com_maxfps > 125 with pmove_Fixed on\n\"");
+			CP("print \"com_maxfps > 125 without pmove_Fixed\n\"");
 			CP("print \"com_maxfps < 25\n\"");
 			trap_SendServerCommand(ent - g_entities, "cheatCvarsOff");
 			SetTeam(ent, "s", qtrue, -1, -1, qfalse);

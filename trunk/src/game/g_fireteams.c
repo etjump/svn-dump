@@ -615,8 +615,12 @@ void G_SetFireTeamRules( int clientNum ) {
 		G_ClientPrintAndReturn( clientNum, "You are not the leader." );
 	}
 
-	if(trap_Argc() < 4) {
+	if(trap_Argc() < 3) {
 		G_ClientPrintAndReturn( clientNum, "usage: fireteam rules <rule> <value>");
+	}
+
+	if(trap_Argc() == 3 ) {
+		G_ClientPrintAndReturn( clientNum, "rules: savelimit.");
 	}
 
 	trap_Argv(2, arg1, sizeof(arg1));
@@ -639,6 +643,8 @@ void G_SetFireTeamRules( int clientNum ) {
 
 		if( atoi(val) > 100) 
 			ft->savelimit = 100;
+		else if ( atoi(val) < 0 )
+			ft->savelimit = -1;
 		else
 			ft->savelimit = atoi(val);
 

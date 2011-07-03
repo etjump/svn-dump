@@ -4115,12 +4115,13 @@ qboolean G_ScriptAction_Cvar( gentity_t *ent, char *params )
 		if (!token[0]) {
 			G_Error( "G_Scripting: cvar %s requires a parameter\n", lastToken );
 		}
-		cvarValue = atoi(token);
+		trap_Cvar_Set( cvarName, va( "%i", atoi( token ) ) );
 	} else if (!Q_stricmp(lastToken, "random")) {
 		if (!token[0]) {
 			G_Error( "G_Scripting: cvar %s requires a parameter\n", lastToken );
 		}
 		cvarValue = rand() % atoi(token);
+		trap_Cvar_Set( cvarName, va( "%i", cvarValue ) );
 	} else if (!Q_stricmp(lastToken, "trigger_if_equal")) {
 		if (!token[0]) {
 			G_Error( "G_Scripting: cvar %s requires a parameter\n", lastToken );

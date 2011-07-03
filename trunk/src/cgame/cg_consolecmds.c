@@ -1168,6 +1168,7 @@ void CG_InitConsoleCommands( void ) {
 	trap_AddCommand ("class");
 	trap_AddCommand ("startTimer");
 	trap_AddCommand ("stopTimer");
+	trap_AddCommand ("cvarHelp");
 	trap_AddCommand ("vsay");
 	trap_AddCommand ("vsay_team");
 	trap_AddCommand ("vsay_buddy");

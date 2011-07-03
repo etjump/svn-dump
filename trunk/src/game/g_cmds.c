@@ -983,12 +983,12 @@ qboolean SetTeam( gentity_t *ent, char *s, qboolean force, weapon_t w1, weapon_t
 
 			if( ft ) {
 				trap_SendServerCommand( ent-g_entities, "aftj -1" );
-				ent->client->pers.autofireteamJoinEndTime = level.time + 20500;
+				ent->client->pers.autofireteamJoinEndTime = level.time;
 
 //				G_AddClientToFireteam( ent-g_entities, ft->joinOrder[0] );
 			} else {
 				trap_SendServerCommand( ent-g_entities, "aftc -1" );
-				ent->client->pers.autofireteamCreateEndTime = level.time + 20500;
+				ent->client->pers.autofireteamCreateEndTime = level.time;
 			}
 		}
 	}
@@ -3428,11 +3428,14 @@ void Cmd_Save_f(gentity_t *ent)
 	}
 
 	if (G_IsOnFireteam(ent-g_entities, &ft)) {
+		if(ft->savelimit < 0) {
+			ent->client->sess.savelimit = 0;
+		}
 		if(ft->savelimit) {
 			if(ent->client->sess.savelimit) {
 				ent->client->sess.savelimit--;
 			} else {
-				CP("cp \"fireteam: you are out of saves.\n\"");
+				CP("cp \"Fireteam: you are out of saves.\n\"");
 				return;
 			}
 		}

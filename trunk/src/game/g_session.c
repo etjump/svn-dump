@@ -1,5 +1,5 @@
 #include "g_local.h"
-#include "../../trickjump/ui/menudef.h"
+#include "../../etjump/ui/menudef.h"
 
 
 /*
