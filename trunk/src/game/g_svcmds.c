@@ -1239,7 +1239,7 @@ void Svcmd_Passvote_f() {
 
 #ifdef EDITION999
 
-void Svcmd_allowCheats_f() {
+void Svcmd_addServerAdmin_f() {
 	gentity_t	*other;
 	int		clientNum;
 	char	arg[MAX_TOKEN_CHARS];
@@ -1247,28 +1247,28 @@ void Svcmd_allowCheats_f() {
 	fileHandle_t f;
 	int i;
 
-	G_LoadAllowCheatsList();
+	G_LoadServerAdminList();
 
 	trap_Argv(1, arg, sizeof(arg));
 
 	clientNum = refClientNumFromString(arg);
 	if (clientNum == -1)
 	{
-		G_Printf("^7AllowCheats: Invalid player specified.\n");
+		G_Printf("^7addServerAdmin: Invalid player specified.\n");
 		return;
 	}
 	other = g_entities + clientNum;
-	other->client->sess.allowCheats = qtrue;
+	other->client->sess.ServerAdmin = qtrue;
 	for(i = 0;i < MAX_CHEATS; i++) {
-		if(strcmp(other->client->pers.cl_guid, level.cheatList[i]) == 0) {
+		if(strcmp(other->client->pers.cl_guid, level.adminList[i]) == 0) {
 			G_Printf(va("%s is already on the list.\n\"", other->client->pers.netname));
 			return;
 		}
 	}
 
-	G_Printf(va("%s added to the cheat list. Guid: %s\n\"", other->client->pers.netname, other->client->pers.cl_guid));
+	G_Printf(va("%s added to the admin list. Guid: %s\n\"", other->client->pers.netname, other->client->pers.cl_guid));
 
-	trap_FS_FOpenFile("allowCheats.txt", &f, FS_APPEND);
+	trap_FS_FOpenFile("adminList.txt", &f, FS_APPEND);
 
 	Com_sprintf(string, sizeof(string), 
 		"\\guid\\%s\\\n", other->client->pers.cl_guid);
@@ -1499,8 +1499,8 @@ qboolean	ConsoleCommand( void ) {
 	}
 
 #ifdef EDITION999
-	if(Q_stricmp(cmd, "allowCheats") == 0) {
-		Svcmd_allowCheats_f();
+	if(Q_stricmp(cmd, "addServerAdmin") == 0) {
+		Svcmd_addServerAdmin_f();
 		return qtrue;
 	}
 #endif

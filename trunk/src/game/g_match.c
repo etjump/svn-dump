@@ -767,21 +767,21 @@ void G_resetModeState(void) {
 	}
 }
 #ifdef EDITION999
-void G_LoadAllowCheatsList(void) {
-	char cheatList[20000];
+void G_LoadServerAdminList(void) {
+	char adminList[20000];
 	fileHandle_t f;
 	int i, len;
 	char *s;
 
 
-	len = trap_FS_FOpenFile("allowCheats.txt", &f, FS_READ);
+	len = trap_FS_FOpenFile("adminList.txt", &f, FS_READ);
 	if(len > 0) {
-		trap_FS_Read(cheatList, len, f);
+		trap_FS_Read(adminList, len, f);
 		trap_FS_FCloseFile(f);
-		cheatList[len] = '\0';
+		adminList[len] = '\0';
 		for(i = 0; i < MAX_CHEATS; i++) {
-			s = Info_ValueForKey(cheatList, "guid");
-			Q_strncpyz(level.cheatList[i], s, PB_GUID_LEN+1);
+			s = Info_ValueForKey(adminList, "guid");
+			Q_strncpyz(level.adminList[i], s, PB_GUID_LEN+1);
 		}
 	}
 	G_Printf("999: Loaded cheat list.\n\"");

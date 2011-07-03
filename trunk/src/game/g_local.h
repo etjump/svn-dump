@@ -498,6 +498,11 @@ struct gentity_s {
 
 	//bani
 	int	etpro_misc_1;
+	//etjump
+	float	addvelx;
+	float	addvely;
+	float	addvelz;
+	vec3_t	addvel;
 };
 
 // Ridah
@@ -616,7 +621,7 @@ typedef struct {
 	qboolean	noGoto;
 	qboolean	noCall;
 	qboolean	noNading;
-	qboolean	allowCheats;
+	qboolean	ServerAdmin;
 
 	// SpamProtection
 
@@ -1154,7 +1159,7 @@ typedef struct {
 
 #ifdef EDITION999
 	// 32 == PB_GUID_LEN
-	char		cheatList[MAX_CHEATS][32+1];
+	char		adminList[MAX_CHEATS][32+1];
 #endif
 
 } level_locals_t;
@@ -2433,7 +2438,7 @@ void G_statsPrint(gentity_t *ent, int nType);
 unsigned int G_weapStatIndex_MOD(unsigned int iWeaponMOD);
 
 #ifdef EDITION999
-void G_LoadAllowCheatsList(void);
+void G_LoadServerAdminList(void);
 #endif
 
 ///////////////////////

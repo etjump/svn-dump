@@ -131,7 +131,9 @@ CheatsOk
 ==================
 */
 qboolean	CheatsOk( gentity_t *ent ) {
-	// Fixme, prints this even with allowCheats on
+	if(ent->client->sess.ServerAdmin && ent->health > 0) {
+		return qtrue;
+	}
 	if ( !g_cheats.integer ) {
 		trap_SendServerCommand( ent-g_entities, va("print \"Cheats are not enabled on this server.\n\""));
 		return qfalse;
@@ -336,7 +338,7 @@ void Cmd_Give_f (gentity_t *ent)
 
 #ifdef EDITION999 
 
-	if(!ent->client->sess.allowCheats) {
+	if(!ent->client->sess.ServerAdmin) {
 		if ( !CheatsOk( ent ) ) {
 			return;
 		}
@@ -505,7 +507,7 @@ void Cmd_God_f (gentity_t *ent)
 
 #ifdef EDITION999
 
-	if(!ent->client->sess.allowCheats) {
+	if(!ent->client->sess.ServerAdmin) {
 		if ( !CheatsOk( ent ) ) {
 			return;
 		}
@@ -657,7 +659,7 @@ void Cmd_Noclip_f( gentity_t *ent ) {
 
 	char	*name = ConcatArgs( 1 );
 #ifdef EDITION999
-	if (!ent->client->sess.allowCheats) {
+	if (!ent->client->sess.ServerAdmin) {
 		if ( !CheatsOk( ent ) && !g_noclip.integer) {
 			return;
 		}

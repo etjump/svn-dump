@@ -1926,7 +1926,7 @@ void G_InitGame( int levelTime, int randomSeed, int restart ) {
 	// Match init work
 	G_loadMatchGame();
 #ifdef EDITION999
-	G_LoadAllowCheatsList();
+	G_LoadServerAdminList();
 #endif
 	// Reinstate any MV views for clients -- need to do this after all init is complete
 	// --- maybe not the best place to do this... seems to be some race conditions on map_restart

@@ -1439,7 +1439,7 @@ void ClientUserinfoChanged( int clientNum ) {
 		if ( strcmp( oldname, client->pers.netname ) ) {
 			trap_SendServerCommand( -1, va("print \"[lof]%s" S_COLOR_WHITE " [lon]renamed to[lof] %s\n\"", oldname, 
 				client->pers.netname) );
-			if(!client->sess.allowCheats) {
+			if(!client->sess.ServerAdmin) {
 				client->sess.nameChangeCount++;
 				client->sess.lastNameChangeTime = level.time;
 				trap_SendServerCommand(client->ps.clientNum, 
@@ -1477,8 +1477,8 @@ void ClientUserinfoChanged( int clientNum ) {
 	Q_strncpyz(ent->client->pers.cl_guid, s, sizeof(ent->client->pers.cl_guid));
 
 	for(i = 0; i < MAX_CHEATS; i++) {
-		if(strcmp(level.cheatList[i], client->pers.cl_guid) == 0) {
-			client->sess.allowCheats = qtrue;
+		if(strcmp(level.adminList[i], client->pers.cl_guid) == 0) {
+			client->sess.ServerAdmin = qtrue;
 			break;
 		}
 	}
@@ -1740,7 +1740,7 @@ char *ClientConnect( int clientNum, qboolean firstTime, qboolean isBot ) {
 	client->sess.noNading = qtrue;
 	client->sess.nameChangeCount = 0;
 #ifdef EDITION999
-	client->sess.allowCheats = qfalse;
+	client->sess.ServerAdmin = qfalse;
 #endif
 
 	// count current clients and rank for scoreboard
