@@ -1419,8 +1419,11 @@ void ClientUserinfoChanged( int clientNum ) {
 
 	if (client->pers.nofatigue && !(client->pers.clientFlags & CGF_NOFATIGUE))
 		client->ps.powerups[PW_ADRENALINE] = 0;
+	//ft rule nofatigue
+	if (!client->sess.nofatigue)
+		client->ps.powerups[PW_ADRENALINE] = 0;
 
-	client->pers.nofatigue = client->pers.clientFlags & CGF_NOFATIGUE;
+	client->pers.nofatigue = (client->pers.clientFlags & CGF_NOFATIGUE && client->sess.nofatigue);
 	client->pers.pmoveFixed = client->pers.clientFlags & CGF_PMOVEFIXED;
 	client->pers.cgaz = client->pers.clientFlags & CGF_CGAZ;
 	client->pers.loadViewAngles = client->pers.clientFlags & CGF_LOADVIEWANGLES;
@@ -1739,6 +1742,7 @@ char *ClientConnect( int clientNum, qboolean firstTime, qboolean isBot ) {
 	client->sess.noCall = qtrue;
 	client->sess.noNading = qtrue;
 	client->sess.nameChangeCount = 0;
+	client->sess.nofatigue = qtrue;
 #ifdef EDITION999
 	client->sess.ServerAdmin = qfalse;
 #endif

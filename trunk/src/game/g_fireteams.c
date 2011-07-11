@@ -248,7 +248,7 @@ void G_RegisterFireteam(/*const char* name,*/ int entityNum) {
 	}
 
 //	Q_strncpyz(ft->name, name, 32);
-
+	ft->nofatigue = qtrue;
 	G_UpdateFireteamConfigString(ft);
 }
 
@@ -292,6 +292,7 @@ void G_AddClientToFireteam( int entityNum, int leaderNum ) {
 			G_UpdateFireteamConfigString(ft);
 
 			otherEnt->client->sess.savelimit = ft->savelimit;
+			otherEnt->client->sess.nofatigue = ft->nofatigue;
 
 			return;
 		}
@@ -348,6 +349,20 @@ void G_RemoveClientFromFireteams( int entityNum, qboolean update, qboolean print
 
 	if( update ) {
 		G_UpdateFireteamConfigString(ft);
+	}
+
+	// if the leader leaves it seems the savelimit will be set to
+	// 2^32-1 / -2^32-1 so this should fix it.
+	if(!ft->savelimit) {
+		gentity_t *ent;
+		for(i = 0; i < level.numConnectedClients; i++) {
+			if(ft->joinOrder[i] == -1) {
+				continue;
+			} else {
+				ent = g_entities + ft->joinOrder[i];
+				ent->client->sess.savelimit = ft->savelimit;
+			}
+		}
 	}
 }
 
@@ -620,7 +635,7 @@ void G_SetFireTeamRules( int clientNum ) {
 	}
 
 	if(trap_Argc() == 3 ) {
-		G_ClientPrintAndReturn( clientNum, "rules: savelimit.");
+		G_ClientPrintAndReturn( clientNum, "rules: savelimit, nofatigue on/off.");
 	}
 
 	trap_Argv(2, arg1, sizeof(arg1));
@@ -649,7 +664,7 @@ void G_SetFireTeamRules( int clientNum ) {
 			ft->savelimit = atoi(val);
 
 		ft->savelimit = atoi(val);
-		trap_SendServerCommand(clientNum, va("print \"fireteam: savelimit was set to %i\n\"", atoi(val)));
+		trap_SendServerCommand(clientNum, va("print \"Fireteam: savelimit was set to %i\n\"", atoi(val)));
 		for(i = 0; i < level.numConnectedClients; i++) {
 			if(ft->joinOrder[i] == -1) {
 				continue;
@@ -658,6 +673,32 @@ void G_SetFireTeamRules( int clientNum ) {
 				ent->client->sess.savelimit = ft->savelimit;
 			}
 		}
+		return;
+	} else if (!Q_stricmp(arg1, "nofatigue")) {
+		gentity_t *ent;
+		char *msg;
+		trap_Argv(3, arg1, sizeof(arg1));
+		SanitizeString(arg1, arg1, qtrue);
+		if(!Q_stricmp(arg1, "on")) {
+			ft->nofatigue = qtrue;
+			msg = "on";
+		} else if (!Q_stricmp(arg1, "off")) {
+			ft->nofatigue = qfalse;
+			msg = "off";
+		} else {
+			ft->nofatigue = qtrue;
+			msg = "on";
+		}
+
+		for(i = 0; i < level.numConnectedClients; i++) {
+			if(ft->joinOrder[i] == -1) {
+				continue;
+			} else {
+				ent = g_entities + ft->joinOrder[i];
+				ent->client->sess.nofatigue = ft->nofatigue;
+			}
+		}
+		trap_SendServerCommand(clientNum, va("print \"Fireteam: nofatigue is now %s\n\"", msg));
 		return;
 	}
 

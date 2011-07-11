@@ -1253,8 +1253,12 @@ void ClientThink_real( gentity_t *ent ) {
 		Cmd_Activate_f( ent );
 	}
 
-	if (client->pers.nofatigue && g_nofatigue.integer)
-		ent->client->ps.powerups[PW_ADRENALINE] = level.time + 10000;
+	if (client->sess.nofatigue) {
+		if (client->pers.nofatigue && g_nofatigue.integer)
+			ent->client->ps.powerups[PW_ADRENALINE] = level.time + 10000;
+	} else {
+		ent->client->ps.powerups[PW_ADRENALINE] = level.time - 10000;
+	}
 
 	if (ent->flags & FL_NOFATIGUE)
 		ent->client->pmext.sprintTime = SPRINTTIME;
