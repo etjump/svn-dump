@@ -1595,6 +1595,10 @@ void G_Say(gentity_t *ent, gentity_t *target, int mode, qboolean encoded, const 
 			G_SayTo(ent, other, mode, color, name, text, localize, encoded);
 		}
 	}
+
+	if(text[0] == '!') {
+		G_admin_command_check(ent);
+	}
 }
 
 
@@ -2685,7 +2689,7 @@ qboolean Do_Activate_f(gentity_t *ent, gentity_t *traceEnt) {
 			ent->client->ps.weaponTime = traceEnt->backupWeaponTime;
 			ent->client->ps.weapHeat[WP_DUMMY_MG42] = traceEnt->mg42weapHeat;
 
-			G_UseTargets( traceEnt, ent);	//----(SA)	added for Mike so mounting an MG42 can be a trigger event (let me know if there's any issues with this)
+			G_UseTargets( traceEnt, ent, qfalse);	//----(SA)	added for Mike so mounting an MG42 can be a trigger event (let me know if there's any issues with this)
 			found = qtrue;
 		} else if ( ( (Q_stricmp (traceEnt->classname, "func_door") == 0) || (Q_stricmp (traceEnt->classname, "func_door_rotating") == 0) ) ) {
 			if( walking ) {

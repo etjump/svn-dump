@@ -433,6 +433,9 @@ void SP_ai_marker( gentity_t *ent );
 // Gordon: debris test
 void SP_func_debris( gentity_t* ent );
 // ===================
+void SP_target_set_ident ( gentity_t *ent );
+void SP_target_activate (gentity_t *ent);
+void SP_target_printname (gentity_t *ent);
 
 spawn_t	spawns[] = {
 	// info entities don't do anything at all, but provide positional
@@ -658,6 +661,9 @@ spawn_t	spawns[] = {
 	{"misc_constructiblemarker", SP_misc_constructiblemarker},
 	{"target_explosion",	SP_target_explosion },
 	{"misc_landmine",		SP_misc_landmine },
+	{"target_setident",		SP_target_set_ident },
+	{"target_activate",		SP_target_activate },
+	{"target_printname",	SP_target_printname },
 
 	{0, 0}
 };

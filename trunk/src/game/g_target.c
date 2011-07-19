@@ -94,7 +94,6 @@ void SP_target_delay( gentity_t *ent ) {
 	ent->use = Use_Target_Delay;
 }
 
-
 //==========================================================
 
 /*QUAKED target_score (1 0 0) (-8 -8 -8) (8 8 8)
@@ -1256,3 +1255,92 @@ void SP_target_rumble (gentity_t *self)
 
 	trap_LinkEntity (self);
 }
+
+
+//==========================================================
+
+/*QUAKED target_setident (1 0 0) (-8 -8 -8) (8 8 8)
+Sets activator's identity value to ident <val>.
+"ident" 
+*/
+
+void target_set_ident_use( gentity_t *ent, gentity_t *other, gentity_t *activator ) {
+	if(!activator->client)
+		return;
+	
+	activator->client->sess.clientident = ent->ident;
+}
+
+void SP_target_set_ident( gentity_t *ent ) {
+	
+	G_SpawnInt("ident", "0", &ent->ident);
+
+	ent->use = target_set_ident_use;
+}
+
+//=============================================================
+/*QUAKED target_activate (0 1 0) (-8 -8 -8) (8 8 8)
+Target target_activate to another entity.
+"reqident" Every client has an identity number and if their identity isn't the right one
+<reqidentval> the entity will not activate.
+*/
+
+void target_activate_use ( gentity_t *self, gentity_t *other, gentity_t *activator ) {
+	if(self->reqident == activator->client->sess.clientident) {
+		gentity_t	*ent;
+
+		ent = G_PickTarget( self->target );
+		if ( ent && ent->use ) {
+			G_UseEntity( ent, self, activator );
+		}
+		return;
+	}
+}
+
+void SP_target_activate( gentity_t *ent ) {
+
+	G_SpawnInt("reqident", "0", &ent->reqident);
+
+	ent->use = target_activate_use;
+}	
+
+//=============================================================
+/*QUAKED target_messagename (0 0 1) (-8 -8 -8) (8 8 8)
+<NAME> <MSG>
+*/
+
+void target_printname_use ( gentity_t *ent, gentity_t *other, gentity_t *activator ) {
+	if ( ( ent->spawnflags & 4 ) ) {
+		if(!activator) {
+			G_Error( "G_scripting: call to client only target_printname with no activator\n" );
+		}
+
+		if(activator->client) {
+			trap_SendServerCommand( activator-g_entities, va("cpm \"%s ^7%s\"", activator->client->pers.netname, ent->message ));
+			return;
+		}
+	}
+
+	if ( ent->spawnflags & 3 ) {
+		if ( ent->spawnflags & 1 ) {
+			G_TeamCommand( TEAM_AXIS, va("cpm \"%s ^7%s\"", activator->client->pers.netname, ent->message )) ;
+		}
+		if ( ent->spawnflags & 2 ) {
+			G_TeamCommand( TEAM_ALLIES, va("cpm \"%s ^7%s\"", activator->client->pers.netname, ent->message )) ;
+		}
+		return;
+	}
+
+	trap_SendServerCommand( -1, va("cpm \"%s ^7%s\"", activator->client->pers.netname, ent->message ));
+}
+
+void SP_target_printname (gentity_t *ent) {
+	G_SpawnString("message", "", &ent->message);
+
+	ent->use = target_printname_use;
+}
+
+//=============================================================
+/*QUAKED target_fireonce (0 0 1) (-16 -16 -16) (16 16 16)
+Fired once at GameInit. Targets another entity.
+*/

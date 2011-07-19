@@ -99,7 +99,7 @@ void G_UpdateFireteamConfigString( fireteamData_t* ft ) {
 		}
 
 //		Com_sprintf(buffer, 128, "\\n\\%s\\l\\%i\\c\\%.8x%.8x", ft->name, ft->joinOrder[0], clnts[1], clnts[0]);
-		Com_sprintf(buffer, 128, "\\id\\%i\\l\\%i\\c\\%.8x%.8x\\savelimit\\%i", ft->ident - 1, ft->joinOrder[0], clnts[1], clnts[0], ft->savelimit);
+		Com_sprintf(buffer, 128, "\\id\\%i\\l\\%i\\c\\%.8x%.8x", ft->ident - 1, ft->joinOrder[0], clnts[1], clnts[0]);
 //		G_Printf(va("%s\n", buffer));
 	}
 
@@ -712,7 +712,7 @@ void Cmd_FireTeam_MP_f( gentity_t* ent ) {
 	int i;
 
 	if ( trap_Argc() < 2 ) {
-		G_ClientPrintAndReturn( ent-g_entities, "usage: fireteam <create|leave|apply|invite|rules>");
+		G_ClientPrintAndReturn( ent-g_entities, "usage: fireteam <create|leave|apply|invite|rules|race>");
 	}
 
 	trap_Argv(1, command, 32);

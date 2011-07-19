@@ -1743,6 +1743,8 @@ char *ClientConnect( int clientNum, qboolean firstTime, qboolean isBot ) {
 	client->sess.noNading = qtrue;
 	client->sess.nameChangeCount = 0;
 	client->sess.nofatigue = qtrue;
+	// Zero: target_set_ident id.
+	client->sess.clientident = 0;
 #ifdef EDITION999
 	client->sess.ServerAdmin = qfalse;
 #endif
@@ -2209,16 +2211,9 @@ void ClientSpawn( gentity_t *ent, qboolean revived )
 			ClientUserinfoChanged( index );
 		}
 	}
-
-	// TTimo keep it isolated from spectator to be safe still
-	if( client->sess.sessionTeam != TEAM_SPECTATOR ) {
-		// Xian - Moved the invul. stuff out of SetWolfSpawnWeapons and put it here for clarity
-		if ( g_fastres.integer == 1 && revived )
-			client->ps.powerups[PW_INVULNERABLE] = level.time + 1000; 
-		else
-			client->ps.powerups[PW_INVULNERABLE] = level.time + 3000; 
-	}
-	// End Xian
+	
+	// Zero: Don't need spawn protection.
+	// -- removed
 
 	G_UpdateCharacter( client );
 

@@ -1195,7 +1195,11 @@ static void Svcmd_KickNum_f( void ) {
 	}
 
 	trap_Argv(1, name, sizeof(name));
-	clientNum = atoi(name);
+
+	if((clientNum = ClientNumberFromString(NULL, name)) == -1) {
+		G_Printf("Client not found!\n");
+		return;
+	}
 
 	cl = G_GetPlayerByNum( clientNum );
 	if ( !cl ) {

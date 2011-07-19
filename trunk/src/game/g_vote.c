@@ -370,7 +370,7 @@ int G_Kick_v( gentity_t *ent, unsigned int dwVoteIndex, char *arg, char *arg2, q
 	// Vote action (vote has passed)
 	} else {
 		// Kick a player
-		trap_SendConsoleCommand( EXEC_APPEND, va( "clientkick %d\n", atoi( level.voteInfo.vote_value ) ) );
+		trap_SendConsoleCommand( EXEC_APPEND, va( "ref kick %d\n", atoi( level.voteInfo.vote_value ) ) );
 		AP( va( "cp \"%s\n^3has been kicked!\n\"", level.clients[ atoi( level.voteInfo.vote_value ) ].pers.netname ) );
 	}
 

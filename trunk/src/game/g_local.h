@@ -12,7 +12,7 @@
 
 // the "gameversion" client command will print this plus compile date
 #ifndef PRE_RELEASE_DEMO
-#define GAMEVERSION			"ETJump 1.0.0"
+#define GAMEVERSION			"ETJump 1.1.0 Beta"
 #else
 //#define GAMEVERSION			"You look like you need a monkey!"
 #define GAMEVERSION			"ettest"
@@ -499,10 +499,8 @@ struct gentity_s {
 	//bani
 	int	etpro_misc_1;
 	//etjump
-	float	addvelx;
-	float	addvely;
-	float	addvelz;
-	vec3_t	addvel;
+	int ident;
+	int reqident;
 };
 
 // Ridah
@@ -644,6 +642,8 @@ typedef struct {
 
 	int			savelimit;
 	qboolean	nofatigue;
+
+	int			clientident;
 
 	qboolean	versionOK;
 } clientSession_t;
@@ -2605,3 +2605,7 @@ void G_TempTraceIgnorePlayersAndBodies( void );
 qboolean G_CanPickupWeapon( weapon_t weapon, gentity_t* ent );
 
 qboolean G_LandmineSnapshotCallback( int entityNum, int clientNum );
+
+// g_admin
+
+void G_admin_command_check(gentity_t *ent);

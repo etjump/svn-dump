@@ -198,6 +198,9 @@
     <ClCompile Include="q_shared.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="g_admin.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="game.def">
@@ -308,6 +311,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\botai\syn.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="g_admin.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
