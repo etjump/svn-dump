@@ -111,6 +111,9 @@ void CG_ShowHelp_Off(int *status)
 // Demo playback key catcher support
 void CG_DemoClick(int key, qboolean down)
 {
+
+	char buf[MAX_TOKEN_CHARS];
+
 	int milli = trap_Milliseconds();
 
 	// Avoid active console keypress issues
@@ -288,6 +291,12 @@ void CG_DemoClick(int key, qboolean down)
 			if(down) cgs.aviDemoRate = demo_avifpsF5.integer;
 			else trap_Cvar_Set("cl_avidemo", demo_avifpsF5.string);
 			return;
+		default: 
+			if (down)
+			{
+				trap_Key_GetBindingBuf(key, buf, sizeof(buf));
+				trap_SendConsoleCommand(va("%s\n", buf));
+			}
 	}
 }
 

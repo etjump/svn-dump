@@ -436,6 +436,7 @@ void SP_func_debris( gentity_t* ent );
 void SP_target_set_ident ( gentity_t *ent );
 void SP_target_activate (gentity_t *ent);
 void SP_target_printname (gentity_t *ent);
+void SP_target_fireonce (gentity_t *self);
 
 spawn_t	spawns[] = {
 	// info entities don't do anything at all, but provide positional
@@ -664,6 +665,7 @@ spawn_t	spawns[] = {
 	{"target_setident",		SP_target_set_ident },
 	{"target_activate",		SP_target_activate },
 	{"target_printname",	SP_target_printname },
+	{"target_fireonce",		SP_target_fireonce },
 
 	{0, 0}
 };

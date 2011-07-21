@@ -2689,7 +2689,7 @@ qboolean Do_Activate_f(gentity_t *ent, gentity_t *traceEnt) {
 			ent->client->ps.weaponTime = traceEnt->backupWeaponTime;
 			ent->client->ps.weapHeat[WP_DUMMY_MG42] = traceEnt->mg42weapHeat;
 
-			G_UseTargets( traceEnt, ent, qfalse);	//----(SA)	added for Mike so mounting an MG42 can be a trigger event (let me know if there's any issues with this)
+			G_UseTargets( traceEnt, ent );	//----(SA)	added for Mike so mounting an MG42 can be a trigger event (let me know if there's any issues with this)
 			found = qtrue;
 		} else if ( ( (Q_stricmp (traceEnt->classname, "func_door") == 0) || (Q_stricmp (traceEnt->classname, "func_door_rotating") == 0) ) ) {
 			if( walking ) {
@@ -3368,7 +3368,6 @@ void Cmd_Load_f(gentity_t *ent)
 	int argc;
 	int posNum;
 	save_position_t *pos;
-	trace_t trace;
 
 	if (!g_save.integer)
 	{
@@ -3630,7 +3629,8 @@ void Cmd_PrivateMessage_f(gentity_t *ent)
 	{
 		msg = ConcatArgs(2);
 		CPx(other - g_entities, va("chat \"^7Private message from %s^7: ^3%s\"", ent->client->pers.netname, msg));
-		CP(va("chat \"^7Private message to %s^7: ^3%s\"", other->client->pers.netname, msg));
+		if(ent)
+			CP(va("chat \"^7Private message to %s^7: ^3%s\"", other->client->pers.netname, msg));
 	}
 	else
 		CP(va("print \"Private message to %s was ignored by the player.\n\"", other->client->pers.netname));

@@ -1286,6 +1286,20 @@ Target target_activate to another entity.
 */
 
 void target_activate_use ( gentity_t *self, gentity_t *other, gentity_t *activator ) {
+
+	// spawnflags 1 -> will check if ident>reqident
+	if(self->spawnflags & 1) {
+		if(activator->client->sess.clientident > self->reqident) {
+			gentity_t	*ent;
+
+			ent = G_PickTarget( self->target );
+			if ( ent && ent->use ) {
+				G_UseEntity( ent, self, activator );
+			}
+			return;
+		}
+	}
+
 	if(self->reqident == activator->client->sess.clientident) {
 		gentity_t	*ent;
 
@@ -1305,33 +1319,57 @@ void SP_target_activate( gentity_t *ent ) {
 }	
 
 //=============================================================
-/*QUAKED target_messagename (0 0 1) (-8 -8 -8) (8 8 8)
+/*QUAKED target_printname (0 0 1) (-8 -8 -8) (8 8 8)
 <NAME> <MSG>
 */
 
 void target_printname_use ( gentity_t *ent, gentity_t *other, gentity_t *activator ) {
+
+	char msg[MAX_TOKEN_CHARS];
+	char text[MAX_TOKEN_CHARS];
+	int i = 0;
+
+	Com_sprintf(msg, sizeof(msg), "cpm \"%s", ent->message);
+
+	while(msg[i]) {
+		if(msg[i] == '%') {
+			if(msg[i+1] != 's') {
+				msg[i+1] = 's';
+			}
+		}
+		i++;
+	}
+
+	if(activator->client) {
+		Com_sprintf(text, sizeof(text), msg , activator->client->pers.netname);
+	}
+	else {
+		return;
+	}
+
 	if ( ( ent->spawnflags & 4 ) ) {
 		if(!activator) {
 			G_Error( "G_scripting: call to client only target_printname with no activator\n" );
 		}
 
 		if(activator->client) {
-			trap_SendServerCommand( activator-g_entities, va("cpm \"%s ^7%s\"", activator->client->pers.netname, ent->message ));
+			trap_SendServerCommand( activator - g_entities, text );
 			return;
 		}
 	}
 
 	if ( ent->spawnflags & 3 ) {
+		
 		if ( ent->spawnflags & 1 ) {
-			G_TeamCommand( TEAM_AXIS, va("cpm \"%s ^7%s\"", activator->client->pers.netname, ent->message )) ;
+			G_TeamCommand( TEAM_AXIS, text ) ;
 		}
 		if ( ent->spawnflags & 2 ) {
-			G_TeamCommand( TEAM_ALLIES, va("cpm \"%s ^7%s\"", activator->client->pers.netname, ent->message )) ;
+			G_TeamCommand( TEAM_ALLIES, text ) ;
 		}
 		return;
 	}
 
-	trap_SendServerCommand( -1, va("cpm \"%s ^7%s\"", activator->client->pers.netname, ent->message ));
+	trap_SendServerCommand( -1, text );
 }
 
 void SP_target_printname (gentity_t *ent) {
@@ -1341,6 +1379,24 @@ void SP_target_printname (gentity_t *ent) {
 }
 
 //=============================================================
-/*QUAKED target_fireonce (0 0 1) (-16 -16 -16) (16 16 16)
-Fired once at GameInit. Targets another entity.
+/*QUAKED target_fireonce (0 0 1) (-8 -8 -8) (8 8 8)
+Fires once
 */
+
+void target_fireonce_use ( gentity_t *self, gentity_t *other, gentity_t *activator ) {
+	// Mostly to give backwards compability to maps
+	// Activate this at the beginning to show new stuff, if it does not work the old stuff
+	// works like in any other mod.
+	gentity_t	*ent;
+
+	ent = G_PickTarget( self->target );
+	if ( ent && ent->use ) {
+		G_UseEntity( ent, self, activator );
+	}
+	self->think = G_FreeEntity;
+	self->nextthink = level.time + FRAMETIME;
+}
+
+void SP_target_fireonce ( gentity_t *self ) {
+	self->use = target_fireonce_use;
+}
