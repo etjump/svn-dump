@@ -1036,8 +1036,8 @@ void SetWolfSpawnWeapons( gclient_t *client )
 						AddWeaponToPlayer(client, WP_STEN, 2 * (GetAmmoTableData(WP_STEN)->defaultStartingAmmo), GetAmmoTableData(WP_STEN)->defaultStartingClip, qtrue);
 						break;
 				}
-
-				AddWeaponToPlayer(client, WP_SMOKE_BOMB, GetAmmoTableData(WP_SMOKE_BOMB)->defaultStartingAmmo,  GetAmmoTableData(WP_SMOKE_BOMB)->defaultStartingClip, qfalse);
+				// Smoke is useless.
+				//AddWeaponToPlayer(client, WP_SMOKE_BOMB, GetAmmoTableData(WP_SMOKE_BOMB)->defaultStartingAmmo,  GetAmmoTableData(WP_SMOKE_BOMB)->defaultStartingClip, qfalse);
 
 				// See if we already have a satchel charge placed - NOTE: maybe we want to change this so the thing voids on death
 				if (!level.noExplosives)
@@ -1404,7 +1404,8 @@ void ClientUserinfoChanged( int clientNum ) {
 							&client->pers.clientTimeNudge,
 							&client->pers.clientMaxPackets,
 							&client->pers.maxFPS,
-							&client->pers.cgaz);
+							&client->pers.cgaz,
+							&client->pers.hideMe);
 
 	client->pers.autoActivate = (client->pers.clientFlags & CGF_AUTOACTIVATE) ? PICKUP_TOUCH : PICKUP_ACTIVATE;
 	client->pers.predictItemPickup = ((client->pers.clientFlags & CGF_PREDICTITEMS) != 0);
@@ -1423,7 +1424,7 @@ void ClientUserinfoChanged( int clientNum ) {
 	if (!client->sess.nofatigue)
 		client->ps.powerups[PW_ADRENALINE] = 0;
 
-	client->pers.nofatigue = (client->pers.clientFlags & CGF_NOFATIGUE && client->sess.nofatigue);
+	client->pers.nofatigue = ((client->pers.clientFlags & CGF_NOFATIGUE) && client->sess.nofatigue);
 	client->pers.pmoveFixed = client->pers.clientFlags & CGF_PMOVEFIXED;
 	client->pers.cgaz = client->pers.clientFlags & CGF_CGAZ;
 	client->pers.loadViewAngles = client->pers.clientFlags & CGF_LOADVIEWANGLES;
@@ -1510,7 +1511,7 @@ void ClientUserinfoChanged( int clientNum ) {
 	// send over a subset of the userinfo keys so other clients can
 	// print scoreboards, display models, and play custom sounds
 	
-	s = va( "n\\%s\\t\\%i\\c\\%i\\r\\%i\\m\\%s\\s\\%s\\dn\\%s\\dr\\%i\\w\\%i\\lw\\%i\\sw\\%i\\mu\\%i\\ref\\%i\\pm\\%i\\fps\\%i\\cgaz\\%i",
+	s = va( "n\\%s\\t\\%i\\c\\%i\\r\\%i\\m\\%s\\s\\%s\\dn\\%s\\dr\\%i\\w\\%i\\lw\\%i\\sw\\%i\\mu\\%i\\ref\\%i\\pm\\%i\\fps\\%i\\cgaz\\%i\\h\\%i",
 		client->pers.netname, 
 		client->sess.sessionTeam, 
 		client->sess.playerType, 
@@ -1526,7 +1527,8 @@ void ClientUserinfoChanged( int clientNum ) {
 		client->sess.referee,
 		client->pers.pmoveFixed ? 1 : 0,
 		client->pers.maxFPS < 999 && client->pers.maxFPS > 0 ? client->pers.maxFPS : 0,
-		client->pers.cgaz > 0 ? client->pers.cgaz : 0
+		client->pers.cgaz > 0 ? client->pers.cgaz : 0,
+		client->pers.hideMe > 0 ? client->pers.hideMe : 0
 		);
 
 	trap_GetConfigstring( CS_PLAYERS + clientNum, oldname, sizeof( oldname ) );

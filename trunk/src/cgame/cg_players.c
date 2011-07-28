@@ -247,6 +247,9 @@ void CG_NewClientInfo( int clientNum ) {
 	v = Info_ValueForKey(configstring, "cgaz");
 	newInfo.CGaz = atoi(v);
 
+	v = Info_ValueForKey(configstring, "h");
+	newInfo.hideMe = atoi(v);
+
 	// Gordon: detect rank/skill changes client side
 	if( clientNum == cg.clientNum ) {
 		int i;
@@ -1761,6 +1764,7 @@ void CG_Player( centity_t *cent )
 	centity_t		*cgsnap;
 	bg_character_t	*character;
 	float			hilightIntensity = 0.f;
+	qboolean		hidden = qfalse;
 
 	cgsnap = &cg_entities[cg.snap->ps.clientNum];
 
@@ -1790,6 +1794,9 @@ void CG_Player( centity_t *cent )
 	// Hide players at close range
 	if (cg_hide.integer && ci->clientNum != cg.clientNum && Distance(cgsnap->lerpOrigin, cent->lerpOrigin) < cg_hideDistance.integer)
 		return;
+
+	if (ci->hideMe)
+		hidden = qtrue;
 
 	character = CG_CharacterForClientinfo( ci, cent );
 
@@ -1931,7 +1938,8 @@ void CG_Player( centity_t *cent )
 	// (SA) only need to set this once...
 	VectorCopy( lightorigin, acc.lightingOrigin );
 
-	CG_AddRefEntityWithPowerups( &body,	cent->currentState.powerups, ci->team, &cent->currentState, cent->fireRiseDir );
+	if (!hidden)
+		CG_AddRefEntityWithPowerups( &body,	cent->currentState.powerups, ci->team, &cent->currentState, cent->fireRiseDir );
 
 	// ydnar debug
 	#if 0

@@ -1595,10 +1595,6 @@ void G_Say(gentity_t *ent, gentity_t *target, int mode, qboolean encoded, const 
 			G_SayTo(ent, other, mode, color, name, text, localize, encoded);
 		}
 	}
-
-	if(text[0] == '!') {
-		G_admin_command_check(ent);
-	}
 }
 
 
@@ -3368,6 +3364,7 @@ void Cmd_Load_f(gentity_t *ent)
 	int argc;
 	int posNum;
 	save_position_t *pos;
+	fireteamData_t *ft;
 
 	if (!g_save.integer)
 	{
@@ -3399,6 +3396,13 @@ void Cmd_Load_f(gentity_t *ent)
 	{
 		CP("cp \"^7You can not ^3load ^7as a spectator!\n\"");
 		return;
+	}
+
+	if (G_IsOnFireteam(ent-g_entities, &ft)) {
+		if(ft->savelimit < 0) {
+			CP("cp \"Fireteam: Loading has been disabled.\n\"");
+			return;
+		}
 	}
 
 	if (ent->client->sess.sessionTeam == TEAM_ALLIES)

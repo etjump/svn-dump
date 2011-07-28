@@ -14,7 +14,7 @@ panel_button_text_t fireteamFont = {
 	ITEM_TEXTSTYLE_SHADOWED, 0,
 	&cgs.media.limboFont2,
 };
-
+	
 panel_button_t fireteamTopBorder = {
 	NULL,
 	NULL,	

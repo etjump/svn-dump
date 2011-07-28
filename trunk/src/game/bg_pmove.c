@@ -3106,7 +3106,7 @@ void PM_AdjustAimSpreadScale( void ) {
 		wpnScale = 0.6f;
 		break;
 	case WP_STEN:
-		wpnScale = 0.6f;
+		wpnScale = 0.0f;
 		break;
 	case WP_KAR98:
 	case WP_CARBINE:

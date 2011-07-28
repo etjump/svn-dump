@@ -567,6 +567,7 @@ typedef struct clientInfo_s {
 	int				weapHeat;
 	int				weaponState;
 	int				weaponState_last;
+	int				hideMe;
 } clientInfo_t;
 
 typedef enum {
@@ -2258,6 +2259,7 @@ extern	vmCvar_t		cg_recording_statusline;
 extern	vmCvar_t		cg_ghostPlayers;
 extern	vmCvar_t		cg_hide;
 extern	vmCvar_t		cg_hideDistance;
+extern	vmCvar_t		cg_hideMe;
 extern	vmCvar_t		cg_nofatigue;
 extern	vmCvar_t		com_maxfps;
 extern	vmCvar_t		com_hunkmegs;

@@ -757,6 +757,8 @@ typedef struct {
 	bg_character_t	*character;
     int				characterIndex;
 
+	int				hideMe;
+
 #ifdef EDITION999
 	char			cl_guid[PB_GUID_LEN+1];
 #endif

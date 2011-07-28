@@ -2268,6 +2268,10 @@ static void CG_DrawCrosshairNames(void)
 	if (!isTank && ((cg_hide.integer == 1 && dist < cg_hideDistance.integer) || cg_hide.integer == 2))
 		return;
 
+	if (cgs.clientinfo[cg.crosshairClientNum ].hideMe) {
+		return;
+	}
+
 	if (!isTank)
 	{
 		drawStuff = qtrue;

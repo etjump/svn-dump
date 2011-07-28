@@ -292,6 +292,7 @@ vmCvar_t	cg_recording_statusline;
 vmCvar_t	cg_ghostPlayers;
 vmCvar_t	cg_hide;
 vmCvar_t	cg_hideDistance;
+vmCvar_t	cg_hideMe;
 vmCvar_t	cg_nofatigue;
 vmCvar_t	com_maxfps;
 vmCvar_t	com_hunkmegs;
@@ -567,6 +568,7 @@ cvarTable_t		cvarTable[] = {
 	{ &cg_ghostPlayers,			"", "0", 0 },
 	{ &cg_hide,					"cg_hide", "1", CVAR_ARCHIVE },
 	{ &cg_hideDistance,			"cg_hideDistance", "128", CVAR_ARCHIVE },
+	{ &cg_hideMe,				"cg_hideMe", "0", CVAR_ARCHIVE },
 	{ &cg_nofatigue,			"cg_nofatigue", "1", CVAR_ARCHIVE },
 	{ &com_maxfps,				"com_maxfps", "76", CVAR_ARCHIVE },
 	{ &com_hunkmegs,			"com_hunkmegs", "128", CVAR_ARCHIVE },
@@ -684,7 +686,8 @@ void CG_UpdateCvars( void ) {
 				   cv->vmCvar == &pmove_fixed || cv->vmCvar == &com_maxfps || 
 				   cv->vmCvar == &cg_nofatigue || cv->vmCvar == &cg_drawCGaz ||
 				   cv->vmCvar == &cl_yawspeed || cv->vmCvar == &cl_freelook ||
-				   cv->vmCvar == &int_m_pitch  || cv->vmCvar == &cg_loadviewangles 
+				   cv->vmCvar == &int_m_pitch  || cv->vmCvar == &cg_loadviewangles ||
+				   cv->vmCvar == &cg_hideMe 
 				   )
 				{
 					fSetFlags = qtrue;
@@ -752,7 +755,7 @@ void CG_setClientFlags(void)
 	if(cg.demoPlayback) return;
 
 	cg.pmext.bAutoReload = (cg_autoReload.integer > 0);
-	trap_Cvar_Set("cg_uinfo", va("%d %d %d %d",
+	trap_Cvar_Set("cg_uinfo", va("%d %d %d %d %d",
 											 // Client Flags
 											(
 												((cg_autoReload.integer > 0) ? CGF_AUTORELOAD : 0) |
@@ -772,7 +775,8 @@ void CG_setClientFlags(void)
 											int_cl_timenudge.integer,
 											// MaxPackets
 											int_cl_maxpackets.integer,
-											com_maxfps.integer
+											com_maxfps.integer,
+											cg_hideMe.integer
 									   ));
 }
 
