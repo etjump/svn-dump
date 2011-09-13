@@ -3416,6 +3416,8 @@ void Cmd_Load_f(gentity_t *ent)
 		if(ent->client->pers.loadViewAngles) {
 			SetClientViewAngle(ent, pos->vangles);
 		}
+		// Crashland + instant load bug fix.
+		ent->client->ps.pm_time = 1;
 	}
 	else
 		CP("cp \"^7Use ^3save ^7first!\n\"");

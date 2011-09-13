@@ -5,12 +5,12 @@ void InitTrigger( gentity_t *self) {
 	if (!VectorCompare (self->s.angles, vec3_origin))
 		G_SetMovedir (self->s.angles, self->movedir);
 
-	trap_SetBrushModel( self, self->model );
+	if (self->model)
+		trap_SetBrushModel( self, self->model );
 
 	self->r.contents = CONTENTS_TRIGGER;		// replaces the -1 from trap_SetBrushModel
 	self->r.svFlags = SVF_NOCLIENT;
 }
-
 
 // the wait time has passed, so set back up for another activation
 void multi_wait( gentity_t *ent ) {
