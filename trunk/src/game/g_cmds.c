@@ -1989,6 +1989,12 @@ qboolean Cmd_CallVote_f( gentity_t *ent, unsigned int dwCommand, qboolean fRefCo
 			CP(va("print \"^3Callvote: ^7The map is not on the server.\n\"", arg2));
 			return qfalse;
 		}
+
+		if (strstr(Q_strlwr(g_blockedMaps.string), Q_strlwr(arg2)) != NULL) {
+			CP(va("print \"Voting for %s is not allowed.\n\"", arg2));
+			return qfalse;
+		}
+
 	}
 
 
@@ -3892,6 +3898,7 @@ static command_t noIntermissionCommands[] =
 	{ "iwant",				qtrue,  Cmd_Call_f },
 	{ "load",				qfalse,	Cmd_Load_f },
 	{ "save",				qfalse,	Cmd_Save_f },
+
 };
 
 qboolean ClientIsFlooding(gentity_t *ent)

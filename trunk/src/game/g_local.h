@@ -1892,6 +1892,7 @@ extern vmCvar_t	g_noclip;
 extern vmCvar_t	g_savemsg;
 
 extern vmCvar_t	g_mapScriptDir;
+extern vmCvar_t	g_blockedMaps;
 
 void	trap_Printf( const char *fmt );
 void	trap_Error( const char *fmt );

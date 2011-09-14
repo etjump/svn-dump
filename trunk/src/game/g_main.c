@@ -218,6 +218,7 @@ vmCvar_t		g_weapons;
 vmCvar_t		g_noclip;
 vmCvar_t		g_savemsg;
 vmCvar_t		g_mapScriptDir;
+vmCvar_t		g_blockedMaps;
 
 
 cvarTable_t		gameCvarTable[] = {
@@ -236,13 +237,13 @@ cvarTable_t		gameCvarTable[] = {
 // JPW NERVE multiplayer stuffs
 	{ &g_redlimbotime, "g_redlimbotime", "30000", CVAR_SERVERINFO | CVAR_LATCH, 0, qfalse },
 	{ &g_bluelimbotime, "g_bluelimbotime", "30000", CVAR_SERVERINFO | CVAR_LATCH, 0, qfalse },
-	{ &g_medicChargeTime, "g_medicChargeTime", "45000", CVAR_SERVERINFO | CVAR_LATCH, 0, qfalse, qtrue },
-	{ &g_engineerChargeTime, "g_engineerChargeTime", "30000", CVAR_SERVERINFO | CVAR_LATCH, 0, qfalse, qtrue },
-	{ &g_LTChargeTime, "g_LTChargeTime", "40000", CVAR_SERVERINFO | CVAR_LATCH, 0, qfalse, qtrue },
-	{ &g_soldierChargeTime, "g_soldierChargeTime", "20000", CVAR_SERVERINFO | CVAR_LATCH, 0, qfalse, qtrue },
+	{ &g_medicChargeTime, "g_medicChargeTime", "1", CVAR_SERVERINFO | CVAR_LATCH, 0, qfalse, qtrue },
+	{ &g_engineerChargeTime, "g_engineerChargeTime", "1", CVAR_SERVERINFO | CVAR_LATCH, 0, qfalse, qtrue },
+	{ &g_LTChargeTime, "g_LTChargeTime", "1", CVAR_SERVERINFO | CVAR_LATCH, 0, qfalse, qtrue },
+	{ &g_soldierChargeTime, "g_soldierChargeTime", "1", CVAR_SERVERINFO | CVAR_LATCH, 0, qfalse, qtrue },
 // jpw
 
-	{ &g_covertopsChargeTime, "g_covertopsChargeTime", "30000", CVAR_SERVERINFO | CVAR_LATCH, 0, qfalse, qtrue },
+	{ &g_covertopsChargeTime, "g_covertopsChargeTime", "1", CVAR_SERVERINFO | CVAR_LATCH, 0, qfalse, qtrue },
 	{ &g_landminetimeout, "g_landminetimeout", "1", CVAR_ARCHIVE, 0, qfalse, qtrue },
 
 	{ &g_maxclients, "sv_maxclients", "20", CVAR_SERVERINFO | CVAR_LATCH | CVAR_ARCHIVE, 0, qfalse  },			// NERVE - SMF - made 20 from 8
@@ -456,6 +457,7 @@ cvarTable_t		gameCvarTable[] = {
 	{ &g_savemsg, "g_savemsg", "^7Saved", CVAR_ARCHIVE },
 
 	{ &g_mapScriptDir, "g_mapScriptDir", "scripts", CVAR_ARCHIVE },
+	{ &g_blockedMaps, "g_blockedMaps", "", CVAR_ARCHIVE },
 };
 
 // bk001129 - made static to avoid aliasing

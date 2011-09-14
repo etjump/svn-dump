@@ -1167,16 +1167,12 @@ Svcmd_KickNum_f
 Kick a user off of the server
 ==================
 */
-static void Svcmd_KickNum_f( void ) {
-	gclient_t	*cl;
-	int timeout = -1;
-	char	*ip;
-	char	userinfo[MAX_INFO_STRING];
-	char	sTimeout[MAX_TOKEN_CHARS];
-	char	name[MAX_TOKEN_CHARS];
-	int		clientNum;
 
-	// make sure server is running
+static void Svcmd_KickNum_f( void ) {
+	int timeout = 300;
+	int clientNum;
+	char name[MAX_TOKEN_CHARS], sTimeout[MAX_TOKEN_CHARS];
+
 	if ( !G_Is_SV_Running() ) {
 		G_Printf( "Server is not running.\n" );
 		return;
@@ -1201,32 +1197,7 @@ static void Svcmd_KickNum_f( void ) {
 		return;
 	}
 
-	cl = G_GetPlayerByNum( clientNum );
-	if ( !cl ) {
-		return;
-	}
-	if ( cl->pers.localClient ) {
-		G_Printf("Cannot kick host player\n");
-		return;
-	}
-		
-	trap_GetUserinfo( cl->ps.clientNum, userinfo, sizeof( userinfo ) );
-	ip = Info_ValueForKey (userinfo, "ip");
-	// use engine banning system, mods may choose to use their own banlist
-	if (USE_ENGINE_BANLIST) { 
-
-		// kick but dont ban bots, they arent that lame
-		if ( (g_entities[cl->ps.clientNum].r.svFlags & SVF_BOT) ) {
-			timeout = 0;
-		}
-		trap_DropClient(cl->ps.clientNum, "player kicked", timeout);
-	} else {
-		trap_DropClient(cl->ps.clientNum, "player kicked", 0);
-
-		// kick but dont ban bots, they arent that lame
-		if ( !(g_entities[cl->ps.clientNum].r.svFlags & SVF_BOT) )
-			AddIPBan( ip );
-	}
+	trap_DropClient(clientNum, "player kicked", timeout);
 }
 
 void Svcmd_Cancelvote_f() {
