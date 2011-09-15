@@ -1287,7 +1287,7 @@ Target target_activate to another entity.
 
 void target_activate_use ( gentity_t *self, gentity_t *other, gentity_t *activator ) {
 	// spawnflags 1 -> will check if ident>reqident
-	if(self->spawnflags & 1) {
+	if( (self->spawnflags & 1) ) {
 		if(activator->client->sess.clientident > self->reqident) {
 			gentity_t	*ent;
 
@@ -1298,8 +1298,7 @@ void target_activate_use ( gentity_t *self, gentity_t *other, gentity_t *activat
 			return;
 		}
 	}
-
-	if(self->spawnflags & 2) {
+	else if( (self->spawnflags & 2) ) {
 		if(activator->client->sess.clientident != self->reqident) {
 			gentity_t	*ent;
 
@@ -1339,7 +1338,7 @@ void target_printname_use ( gentity_t *ent, gentity_t *other, gentity_t *activat
 	char msg[MAX_TOKEN_CHARS];
 	char text[MAX_TOKEN_CHARS];
 	int i = 0;
-
+	
 	Com_sprintf(msg, sizeof(msg), "cpm \"%s", ent->message);
 
 	while(msg[i]) {
@@ -1369,7 +1368,7 @@ void target_printname_use ( gentity_t *ent, gentity_t *other, gentity_t *activat
 		}
 	}
 
-	if ( ent->spawnflags & 3 ) {
+	if ( ( ent->spawnflags & 3 ) ) {
 		
 		if ( ent->spawnflags & 1 ) {
 			G_TeamCommand( TEAM_AXIS, text ) ;
@@ -1384,8 +1383,6 @@ void target_printname_use ( gentity_t *ent, gentity_t *other, gentity_t *activat
 }
 
 void SP_target_printname (gentity_t *ent) {
-	G_SpawnString("message", "", &ent->message);
-
 	ent->use = target_printname_use;
 }
 
