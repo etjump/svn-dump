@@ -1159,6 +1159,7 @@ typedef struct {
 	qboolean	noSave;
 	qboolean	noNoclip;
 	qboolean	noGod;
+	qboolean	noGoto;
 
 #ifdef EDITION999
 	// 32 == PB_GUID_LEN

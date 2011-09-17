@@ -3524,6 +3524,11 @@ void Cmd_Goto_f(gentity_t *ent) {
 	char cmd[MAX_TOKEN_CHARS];
 	gentity_t *other;
 
+	if(level.noGoto) {
+		CP("print \"Goto is disabled on this map.\n\"");
+		return;
+	}
+
 	if(trap_Argc() != 2) {
 		CP("print \"^7Usage: ^3goto ^7<Player ID> | <Partname> | <Name>\n\"");
 		return;
@@ -3569,6 +3574,11 @@ void Cmd_Call_f(gentity_t *ent)
 	int clientNum;
 	char cmd[MAX_TOKEN_CHARS];
 	gentity_t *other;
+
+	if(level.noGoto) {
+		CP("print \"Call is disabled on this map.\n\"");
+		return;
+	}
 
 	if (trap_Argc() != 2)
 	{

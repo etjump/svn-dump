@@ -1014,6 +1014,10 @@ void SP_worldspawn( void ) {
 	if (atoi(s))
 		level.noGod = qtrue;
 
+	G_SpawnString("nogoto", "0", &s);
+	if (atoi(s))
+		level.noGoto = qtrue;
+
 	level.mapcoordsValid = qfalse;
 	if( G_SpawnVector2D( "mapcoordsmins", "-128 128", level.mapcoordsMins ) &&	// top left
 		G_SpawnVector2D( "mapcoordsmaxs", "128 -128", level.mapcoordsMaxs ) ) {	// bottom right
