@@ -145,6 +145,8 @@ int WM_DrawObjectives( int x, int y, int width, float fade ) {
 
 		s = va(CG_TranslateString(va("^<%s", cgs.rawmapname)));
 		CG_Text_Paint_Ext(640 / 2 - CG_Text_Width_Ext(s, 0.25f, 0, &cgs.media.limboFont2) / 2, y + 13, 0.25f, 0.25f, tclr, s, 0, 0, 0, &cgs.media.limboFont2);
+		s = CG_TranslateString("^<www.etjump.com");
+		CG_Text_Paint_Ext(640 - 80 - CG_Text_Width_Ext(s, 0.25f, 0, &cgs.media.limboFont2) / 2, y + 13, 0.25f, 0.25f, tclr, s, 0, 0, 0, &cgs.media.limboFont2);
 
 		if( cgs.gametype != GT_WOLF_LMS ) {
 			if(cgs.clientinfo[cg.snap->ps.clientNum].team == TEAM_AXIS || cgs.clientinfo[cg.snap->ps.clientNum].team == TEAM_ALLIES) {
@@ -208,7 +210,6 @@ static void WM_DrawClientScore(int x, int y, score_t *score, float *color, float
 
 	ci = &cgs.clientinfo[score->client];
 
-	// Dini, Note, highlights yourself
 	if (score->client == cg.snap->ps.clientNum)
 	{
 		tempx = x;

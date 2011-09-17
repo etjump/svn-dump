@@ -782,6 +782,7 @@ void G_LoadServerAdminList(void) {
 		for(i = 0; i < MAX_CHEATS; i++) {
 			s = Info_ValueForKey(adminList, "guid");
 			Q_strncpyz(level.adminList[i], s, PB_GUID_LEN+1);
+			Info_RemoveKey(adminList, "guid");
 		}
 	}
 	G_Printf("999: Loaded cheat list.\n\"");

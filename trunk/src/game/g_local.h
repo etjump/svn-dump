@@ -200,7 +200,7 @@ int G_GetWeaponClassForMOD( meansOfDeath_t mod );
 
 //====================================================================
 // VanillaTJ
-//#define EDITION999
+#define EDITION999
 
 #define MAX_SAVE_POSITIONS 3
 #define MAX_CHEATS 10

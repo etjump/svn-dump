@@ -361,13 +361,25 @@ void G_UseTargets( gentity_t *ent, gentity_t *activator ) {
 					// check door usage rules before allowing any entity to trigger a door open
 					G_TryDoor(t, ent, activator);		// (door,other,activator)
 				} else {
+
 					if(t->reqident && activator->client) {
-						if(t->reqident == activator->client->sess.clientident) {
-							G_UseEntity( t, ent, activator );
+						if(t->spawnflags & 1) {
+							if(t->reqident < activator->client->sess.clientident) {
+								G_UseEntity( t, ent, activator );
+							}
+						} else if(t->spawnflags & 2) {
+								if(t->reqident != activator->client->sess.clientident) {
+									G_UseEntity( t, ent, activator );
+								}
+						} else {
+							if(t->reqident == activator->client->sess.clientident) {
+								G_UseEntity( t, ent, activator );
+							}
 						}
 					} else {
 						G_UseEntity( t, ent, activator );
 					}
+
 				}
 			}
 		}

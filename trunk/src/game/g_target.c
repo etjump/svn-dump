@@ -1286,31 +1286,22 @@ Target target_activate to another entity.
 */
 
 void target_activate_use ( gentity_t *self, gentity_t *other, gentity_t *activator ) {
-	// spawnflags 1 -> will check if ident>reqident
-	if( (self->spawnflags & 1) ) {
-		if(activator->client->sess.clientident > self->reqident) {
-			gentity_t	*ent;
+	qboolean activate = qfalse;
 
-			ent = G_PickTarget( self->target );
-			if ( ent && ent->use ) {
-				G_UseEntity( ent, self, activator );
-			}
-			return;
+	if(self->spawnflags & 1) {
+		if(self->reqident < activator->client->sess.clientident) {
+			activate = qtrue;
+		}
+	} else if (self->spawnflags & 2) {
+		if(self->reqident != activator->client->sess.clientident) {
+			activate = qtrue;
+		}
+	} else {
+		if(self->reqident == activator->client->sess.clientident) {
+			activate = qtrue;
 		}
 	}
-	else if( (self->spawnflags & 2) ) {
-		if(activator->client->sess.clientident != self->reqident) {
-			gentity_t	*ent;
-
-			ent = G_PickTarget( self->target );
-			if ( ent && ent->use ) {
-				G_UseEntity( ent, self, activator );
-			}
-			return;
-		}
-	}
-
-	if(self->reqident == activator->client->sess.clientident) {
+	if(activate) {
 		gentity_t	*ent;
 
 		ent = G_PickTarget( self->target );

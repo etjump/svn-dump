@@ -1736,7 +1736,7 @@ char *ClientConnect( int clientNum, qboolean firstTime, qboolean isBot ) {
 	if ( firstTime && !G_IsSinglePlayerGame())
 	{
 		value = Info_ValueForKey(userinfo, "ip");
-		G_LogPrintf("% Connected. IP: %s\n", client->pers.netname, value);
+		G_LogPrintf("%s Connected. IP: %s\n", client->pers.netname, value);
 		trap_SendServerCommand( -1, va("cpm \"%s" S_COLOR_WHITE " connected\n\"", client->pers.netname) );
 	}
 

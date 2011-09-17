@@ -660,7 +660,7 @@ void Cmd_Noclip_f( gentity_t *ent ) {
 	char	*name = ConcatArgs( 1 );
 #ifdef EDITION999
 	if (!ent->client->sess.ServerAdmin) {
-		if ( !CheatsOk( ent ) && !g_noclip.integer) {
+		if ( !g_noclip.integer && !CheatsOk( ent ) ) {
 			return;
 		}
 

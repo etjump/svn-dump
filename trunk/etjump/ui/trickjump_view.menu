@@ -42,7 +42,7 @@ YESNO( 8, 72, (SUBWINDOW_WIDTH)-4, 10, "Drawspeed2:", .2, 8, "cg_drawSpeed2", "S
 MULTI( 8, 84, (SUBWINDOW_WIDTH)-4, 10, "Drawspeed color:", .2, 8, "cg_speedColor", cvarStrList { "White"; "white"; "Yellow"; "yellow"; "Red"; "red"; "Green"; "green"; "Blue"; "blue"; "Magenta"; "magenta"; "Cyan"; "cyan"; "Orange"; "orange"; "Light Blue"; "0xa0c0ff"; "Medium Blue"; "mdblue"; "Light Red"; "0xffc0a0"; "Medium Red"; "mdred"; "Light Green"; "0xa0ffc0"; "Medium Green"; "mdgreen"; "Dark Green"; "dkgreen"; "Medium Cyan"; "mdcyan"; "Medium Yellow"; "mdyellow"; "Medium Orange"; "mdorange"; "Light Grey"; "ltgrey"; "Medium Grey"; "mdgrey"; "Dark Grey"; "dkgrey"; "Black"; "black" }, "Set the color for your speedometer." )
 
 YESNO( 8, 96, (SUBWINDOW_WIDTH)-4, 10, "Draw overbounce detector:", .2, 8, "cg_drawOB", "Draws an overbounce detector." )
-MULTI( 8, 108, (SUBWINDOW_WIDTH)-4, 10, "Draw CGaz:", 	.2, 8, "cg_drawCgaz", cvarFloatList { "Off" 0 "1" 1 "2" 2 "3" 3 }, "" )
+MULTI( 8, 108, (SUBWINDOW_WIDTH)-4, 10, "Draw CGaz:", 	.2, 8, "cg_drawCgaz", cvarFloatList { "Off" 0 "1" 1 "2" 2 }, "" )
 
 YESNO( 8, 120, (SUBWINDOW_WIDTH)-4, 10, "Draw keys:", .2, 8, "cg_drawKeys", "Draws the keys user is pressing." )
 
