@@ -1341,6 +1341,11 @@ void Cmd_Follow_f( gentity_t *ent, unsigned int dwCommand, qboolean fValue ) {
 	// can't follow another spectator
 	if ( level.clients[ i ].sess.sessionTeam == TEAM_SPECTATOR ) return;
 	if ( level.clients[ i ].ps.pm_flags & PMF_LIMBO ) return;
+	
+	if(!G_AllowFollow(ent, g_entities + i)) {
+			CP(va("print \"Sorry, player %s ^7is locked from spectators.\n\"", level.clients[i].pers.netname));
+			return;
+	}
 
 	// OSP - can't follow a player on a speclocked team, unless allowed
 	if(!G_allowFollow(ent, level.clients[i].sess.sessionTeam)) {

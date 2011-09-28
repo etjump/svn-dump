@@ -1421,6 +1421,8 @@ void ClientUserinfoChanged( int clientNum ) {
 	if (client->pers.nofatigue && !(client->pers.clientFlags & CGF_NOFATIGUE))
 		client->ps.powerups[PW_ADRENALINE] = 0;
 	//ft rule nofatigue
+	// FIXME, BUGGED
+	// Sets off adre even if not in a ft.
 	if (!client->sess.nofatigue)
 		client->ps.powerups[PW_ADRENALINE] = 0;
 
