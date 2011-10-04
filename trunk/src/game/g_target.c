@@ -1296,6 +1296,10 @@ void target_activate_use ( gentity_t *self, gentity_t *other, gentity_t *activat
 		if(self->reqident != activator->client->sess.clientident) {
 			activate = qtrue;
 		}
+	} else if (self->spawnflags & 4) {
+		if(self->reqident > activator->client->sess.clientident) {
+			activate = qtrue;
+		}
 	} else {
 		if(self->reqident == activator->client->sess.clientident) {
 			activate = qtrue;
