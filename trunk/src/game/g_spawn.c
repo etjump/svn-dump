@@ -666,7 +666,7 @@ spawn_t	spawns[] = {
 	{"target_setident",		SP_target_set_ident },
 	{"target_activate",		SP_target_activate },
 	{"target_printname",	SP_target_printname },
-	{"target_fireonce",		SP_target_fireonce },
+	{"etjump_target_relay",	SP_target_fireonce },
 	{"func_fakebrush",		SP_func_fakebrush },
 
 	{0, 0}
