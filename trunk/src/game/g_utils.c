@@ -371,6 +371,10 @@ void G_UseTargets( gentity_t *ent, gentity_t *activator ) {
 								if(t->reqident != activator->client->sess.clientident) {
 									G_UseEntity( t, ent, activator );
 								}
+						} else if(t->spawnflags & 4) {
+								if(t->reqident > activator->client->sess.clientident) {
+									G_UseEntity( t, ent, activator );
+								}
 						} else {
 							if(t->reqident == activator->client->sess.clientident) {
 								G_UseEntity( t, ent, activator );
