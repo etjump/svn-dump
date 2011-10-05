@@ -1403,3 +1403,23 @@ void target_fireonce_use ( gentity_t *self, gentity_t *other, gentity_t *activat
 void SP_target_fireonce ( gentity_t *self ) {
 	self->use = target_fireonce_use;
 }
+
+//===============================================================
+/*QUAKED target_savereset (0 0 1) (-8 -8 -8) (8 8 8)
+Resets saved positions
+*/
+
+void target_savereset_use ( gentity_t *self, gentity_t *other, gentity_t *activator) {
+	int i;
+	if(activator && activator->client) {
+		for(i = 0; i < MAX_SAVE_POSITIONS; i++) {
+			activator->client->sess.allies_save_pos[i].isValid = qfalse;
+			activator->client->sess.axis_save_pos[i].isValid = qfalse;
+		}
+	}
+	CPx(activator - g_entities, "cp \"^7 Your saves were removed.\n\"");
+}
+
+void SP_target_savereset ( gentity_t *self ) {
+	self->use = target_savereset_use;
+}

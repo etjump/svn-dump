@@ -1897,6 +1897,8 @@ void ClientBegin( int clientNum )
 		trap_SendServerCommand( -1, va("print \"[lof]%s" S_COLOR_WHITE " [lon]entered the game\n\"", client->pers.netname) );
 	}
 
+	client->pers.nofatigue = client->pers.clientFlags & CGF_NOFATIGUE;
+
 	G_LogPrintf( "ClientBegin: %i\n", clientNum );
 
 	// Xian - Check for maxlives enforcement

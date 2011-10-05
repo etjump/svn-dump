@@ -438,6 +438,7 @@ void SP_target_activate (gentity_t *ent);
 void SP_target_printname (gentity_t *ent);
 void SP_target_fireonce (gentity_t *self);
 void SP_func_fakebrush (gentity_t *ent);
+void SP_target_savereset (gentity_t *self);
 
 spawn_t	spawns[] = {
 	// info entities don't do anything at all, but provide positional
@@ -668,6 +669,7 @@ spawn_t	spawns[] = {
 	{"target_printname",	SP_target_printname },
 	{"etjump_target_relay",	SP_target_fireonce },
 	{"func_fakebrush",		SP_func_fakebrush },
+	{"target_savereset",	SP_target_savereset },
 
 	{0, 0}
 };
