@@ -342,6 +342,10 @@ vmCvar_t	cg_personalTimerAlpha;
 vmCvar_t	cg_personalTimerX;
 vmCvar_t	cg_personalTimerY;
 
+#ifdef EDITION999
+vmCvar_t	cg_adminpassword;
+#endif
+
 typedef struct {
 	vmCvar_t	*vmCvar;
 	char		*cvarName;
@@ -532,7 +536,7 @@ cvarTable_t		cvarTable[] = {
 	{ &int_m_pitch, "m_pitch", "0.022", CVAR_ARCHIVE },
 	{ &int_sensitivity, "sensitivity", "5", CVAR_ARCHIVE },
 	{ &int_ui_blackout, "ui_blackout", "0", CVAR_ROM },
-	// -OSP
+	// -OSP Roopeliini on söpö :)
 
 	{ &cg_atmosphericEffects, "cg_atmosphericEffects", "1", CVAR_ARCHIVE },
 	{ &authLevel, "authLevel", "0", CVAR_TEMP | CVAR_ROM},
@@ -611,7 +615,10 @@ cvarTable_t		cvarTable[] = {
 	{ &cg_personalTimerColor, "cg_personalTimerColor", "White", CVAR_ARCHIVE },
 	{ &cg_personalTimerAlpha, "cg_personalTimerAlpha", "1", CVAR_ARCHIVE },
 	{ &cg_personalTimerX, "cg_personalTimerX", "687", CVAR_ARCHIVE },
-	{ &cg_personalTimerY, "cg_personalTimerY", "400", CVAR_ARCHIVE }
+	{ &cg_personalTimerY, "cg_personalTimerY", "400", CVAR_ARCHIVE },
+#ifdef EDITION999
+	{ &cg_adminpassword, "cg_adminpassword", "", CVAR_ARCHIVE },
+#endif
 
 
 };
@@ -640,6 +647,8 @@ void CG_RegisterCvars( void ) {
 			// rain - force the update to range check this cvar on first run
 			if (cv->vmCvar == &cg_errorDecay) {
 				cv->modificationCount = !cv->vmCvar->modificationCount;
+			} else if(cv->vmCvar == &cg_adminpassword) {
+				trap_SendConsoleCommand(va("adminlogin %s", cg_adminpassword.string));
 			} else {
 				cv->modificationCount = cv->vmCvar->modificationCount;
 			}
@@ -740,6 +749,11 @@ void CG_UpdateCvars( void ) {
 				} else if (cv->vmCvar == &cg_viewlog) {
 					trap_Cvar_Set("viewlog", cg_viewlog.string);
 				}
+#ifdef EDITION999
+				else if (cv->vmCvar == &cg_adminpassword) {
+					trap_SendConsoleCommand( va( "adminlogin %s", cg_adminpassword.string) );
+				}
+#endif
 			}
 		}
 	}

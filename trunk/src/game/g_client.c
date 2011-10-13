@@ -1445,7 +1445,7 @@ void ClientUserinfoChanged( int clientNum ) {
 		if ( strcmp( oldname, client->pers.netname ) ) {
 			trap_SendServerCommand( -1, va("print \"[lof]%s" S_COLOR_WHITE " [lon]renamed to[lof] %s\n\"", oldname, 
 				client->pers.netname) );
-			if(!client->sess.ServerAdmin) {
+			if(!client->sess.admin.isAdmin) {
 				client->sess.nameChangeCount++;
 				client->sess.lastNameChangeTime = level.time;
 				trap_SendServerCommand(client->ps.clientNum, 
@@ -1474,18 +1474,6 @@ void ClientUserinfoChanged( int clientNum ) {
 			if(client->sess.nameChangeCount > 5) {
 				trap_DropClient(client->ps.clientNum, "You were kicked for name spamming.\n\"", 0);
 			}
-		}
-	}
-#endif
-
-#ifdef EDITION999
-	s = Info_ValueForKey(userinfo, "cl_guid");
-	Q_strncpyz(ent->client->pers.cl_guid, s, sizeof(ent->client->pers.cl_guid));
-
-	for(i = 0; i < MAX_CHEATS; i++) {
-		if(strcmp(level.adminList[i], client->pers.cl_guid) == 0) {
-			client->sess.ServerAdmin = qtrue;
-			break;
 		}
 	}
 #endif
@@ -1749,9 +1737,6 @@ char *ClientConnect( int clientNum, qboolean firstTime, qboolean isBot ) {
 	client->sess.nofatigue = qtrue;
 	// Zero: target_set_ident id.
 	client->sess.clientident = 0;
-#ifdef EDITION999
-	client->sess.ServerAdmin = qfalse;
-#endif
 
 	// count current clients and rank for scoreboard
 	CalculateRanks();
@@ -1917,6 +1902,8 @@ void ClientBegin( int clientNum )
 		}
 	}
 	// End Xian
+
+	ent->client->sess.admin.isAdmin = qfalse;
 
 	// count current clients and rank for scoreboard
 	CalculateRanks();

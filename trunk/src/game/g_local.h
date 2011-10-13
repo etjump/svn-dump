@@ -10,12 +10,12 @@
 
 //==================================================================
 
-// the "gameversion" client command will print this plus compile date
+// the "MOD_VERSION" client command will print this plus compile date
 #ifndef PRE_RELEASE_DEMO
-#define GAMEVERSION			"ETJump 1.0.7"
+
 #else
-//#define GAMEVERSION			"You look like you need a monkey!"
-#define GAMEVERSION			"ettest"
+//#define MOD_VERSION			"You look like you need a monkey!"
+#define MOD_VERSION			"ettest"
 #endif // PRE_RELEASE_DEMO
 
 #define BODY_QUEUE_SIZE		8
@@ -81,6 +81,9 @@ typedef enum {
 	MOVER_1TO2ROTATE,
 	MOVER_2TO1ROTATE
 } moverState_t;
+
+#define MAX_PASSWORD_LEN 32
+#define MAX_ADMINS 16
 
 // door AI sound ranges
 #define HEAR_RANGE_DOOR_LOCKED		128	// really close since this is a cruel check
@@ -199,11 +202,10 @@ qboolean G_WeaponIsExplosive(  meansOfDeath_t mod );
 int G_GetWeaponClassForMOD( meansOfDeath_t mod );
 
 //====================================================================
-// VanillaTJ
+// ETJump
 #define EDITION999
 
 #define MAX_SAVE_POSITIONS 3
-#define MAX_CHEATS 10
 
 typedef struct {
 	qboolean	isValid;
@@ -565,6 +567,9 @@ typedef struct {
 	unsigned int kills;
 } weapon_stat_t;
 
+typedef struct {
+	qboolean isAdmin;
+} admin_t;
 
 // client data that stays across multiple levels or tournament restarts
 // this is achieved by writing all the data to cvar strings at game shutdown
@@ -619,8 +624,6 @@ typedef struct {
 	qboolean	noGoto;
 	qboolean	noCall;
 	qboolean	noNading;
-	qboolean	ServerAdmin;
-
 	// SpamProtection
 
 	int			nextReliableTime;
@@ -644,6 +647,8 @@ typedef struct {
 	qboolean	nofatigue;
 
 	int			clientident;
+
+	admin_t		admin;
 
 	qboolean	versionOK;
 } clientSession_t;
@@ -962,7 +967,6 @@ typedef struct voteInfo_s {
 	int			voter_cn;
 } voteInfo_t;
 
-
 typedef struct {
 	struct gclient_s	*clients;		// [maxclients]
 
@@ -1162,8 +1166,12 @@ typedef struct {
 	qboolean	noGoto;
 
 #ifdef EDITION999
-	// 32 == PB_GUID_LEN
-	char		adminList[MAX_CHEATS][32+1];
+
+	// These will be here for now. I will make new files for the adminsystem
+	// if/when I will start making it. 
+
+	char adminPasswords[MAX_ADMINS][MAX_PASSWORD_LEN+1];
+
 #endif
 
 } level_locals_t;
@@ -1178,6 +1186,12 @@ typedef struct {
 	char		next[256];
 	int			typeBits;
 } g_campaignInfo_t;
+
+//
+// g_admin.c
+//
+
+qboolean G_Admin_Readconfig();
 
 //
 // g_spawn.c
@@ -2441,10 +2455,6 @@ void G_resetRoundState(void);
 void G_spawnPrintf(int print_type, int print_time, gentity_t *owner);
 void G_statsPrint(gentity_t *ent, int nType);
 unsigned int G_weapStatIndex_MOD(unsigned int iWeaponMOD);
-
-#ifdef EDITION999
-void G_LoadServerAdminList(void);
-#endif
 
 ///////////////////////
 // g_multiview.c

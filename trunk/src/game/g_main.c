@@ -226,7 +226,7 @@ cvarTable_t		gameCvarTable[] = {
 	{ &g_cheats, "sv_cheats", "", 0, qfalse },
 
 	// noset vars
-	{ NULL, "gamename", GAMEVERSION , CVAR_SERVERINFO | CVAR_ROM, 0, qfalse  },
+	{ NULL, "gamename", MOD_VERSION , CVAR_SERVERINFO | CVAR_ROM, 0, qfalse  },
 	{ NULL, "gamedate", __DATE__ , CVAR_ROM, 0, qfalse  },
 	{ &g_restarted, "g_restarted", "0", CVAR_ROM, 0, qfalse  },
 	{ NULL, "sv_mapname", "", CVAR_SERVERINFO | CVAR_ROM, 0, qfalse  },
@@ -1522,8 +1522,8 @@ void bani_clearmapxp( void ) {
 	trap_SetConfigstring( CS_AXIS_MAPS_XP, "" );
 	trap_SetConfigstring( CS_ALLIED_MAPS_XP, "" );
 
-	trap_Cvar_Set( va( "%s_axismapxp0", GAMEVERSION ), "" );
-	trap_Cvar_Set( va( "%s_alliedmapxp0", GAMEVERSION ), "" );
+	trap_Cvar_Set( va( "%s_axismapxp0", MOD_VERSION ), "" );
+	trap_Cvar_Set( va( "%s_alliedmapxp0", MOD_VERSION ), "" );
 }
 
 void bani_storemapxp( void ) {
@@ -1546,7 +1546,7 @@ void bani_storemapxp( void ) {
 		if( strlen( u ) == SNIPSIZE ) {
 			strcat( u, "+" );
 		}
-		trap_Cvar_Set( va( "%s_axismapxp%i", GAMEVERSION, j ), u );
+		trap_Cvar_Set( va( "%s_axismapxp%i", MOD_VERSION, j ), u );
 		j++;
 		k = strcut( u, k, SNIPSIZE );
 	}
@@ -1565,7 +1565,7 @@ void bani_storemapxp( void ) {
 		if( strlen( u ) == SNIPSIZE ) {
 			strcat( u, "+" );
 		}
-		trap_Cvar_Set( va( "%s_alliedmapxp%i", GAMEVERSION, j ), u );
+		trap_Cvar_Set( va( "%s_alliedmapxp%i", MOD_VERSION, j ), u );
 		j++;
 		k = strcut( u, k, SNIPSIZE );
 	}
@@ -1577,23 +1577,23 @@ void bani_getmapxp( void ) {
 	char t[MAX_STRING_CHARS];
 
 	j = 0;
-	trap_Cvar_VariableStringBuffer( va( "%s_axismapxp%i", GAMEVERSION, j ), s, sizeof(s) );
+	trap_Cvar_VariableStringBuffer( va( "%s_axismapxp%i", MOD_VERSION, j ), s, sizeof(s) );
 	//reassemble string...
 	while( strrchr( s, '+' ) ) {
 		j++;
 		*strrchr( s, '+' ) = (char)0;
-		trap_Cvar_VariableStringBuffer( va( "%s_axismapxp%i", GAMEVERSION, j ), t, sizeof(t) );
+		trap_Cvar_VariableStringBuffer( va( "%s_axismapxp%i", MOD_VERSION, j ), t, sizeof(t) );
 		strcat( s, t );
 	}
 	trap_SetConfigstring( CS_AXIS_MAPS_XP, s );
 
 	j = 0;
-	trap_Cvar_VariableStringBuffer( va( "%s_alliedmapxp%i", GAMEVERSION, j ), s, sizeof(s) );
+	trap_Cvar_VariableStringBuffer( va( "%s_alliedmapxp%i", MOD_VERSION, j ), s, sizeof(s) );
 	//reassemble string...
 	while( strrchr( s, '+' ) ) {
 		j++;
 		*strrchr( s, '+' ) = (char)0;
-		trap_Cvar_VariableStringBuffer( va( "%s_alliedmapxp%i", GAMEVERSION, j ), t, sizeof(t) );
+		trap_Cvar_VariableStringBuffer( va( "%s_alliedmapxp%i", MOD_VERSION, j ), t, sizeof(t) );
 		strcat( s, t );
 	}
 	trap_SetConfigstring( CS_ALLIED_MAPS_XP, s );
@@ -1617,7 +1617,7 @@ void G_InitGame( int levelTime, int randomSeed, int restart ) {
 	trap_RealTime(&ct);
 
 	G_Printf ("------- Game Initialization -------\n");
-	G_Printf ("gamename: %s\n", GAMEVERSION);
+	G_Printf ("gamename: %s\n", MOD_VERSION);
 	G_Printf ("gamedate: %s\n", __DATE__);
 	trap_Cvar_Set("g_gametype", "2");
 	G_Printf ("Gametype forced to 2.\n");
@@ -1927,12 +1927,16 @@ void G_InitGame( int levelTime, int randomSeed, int restart ) {
 
 	// Match init work
 	G_loadMatchGame();
-#ifdef EDITION999
-	G_LoadServerAdminList();
-#endif
+
 	// Reinstate any MV views for clients -- need to do this after all init is complete
 	// --- maybe not the best place to do this... seems to be some race conditions on map_restart
 	G_spawnPrintf(DP_MVSPAWN, level.time + 2000, NULL);
+
+#ifdef EDITION999
+
+	G_Admin_Readconfig();
+
+#endif
 }
 
 

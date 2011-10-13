@@ -339,6 +339,7 @@ int G_Gametype_v(gentity_t *ent, unsigned int dwVoteIndex, char *arg, char *arg2
 
 // *** Player Kick ***
 int G_Kick_v( gentity_t *ent, unsigned int dwVoteIndex, char *arg, char *arg2, qboolean fRefereeCmd ) {
+	gentity_t *target;
 	// Vote request (vote is being initiated)
 	if( arg ) {
 		int pid;
@@ -370,6 +371,11 @@ int G_Kick_v( gentity_t *ent, unsigned int dwVoteIndex, char *arg, char *arg2, q
 	// Vote action (vote has passed)
 	} else {
 		// Kick a player
+		target = g_entities + atoi(level.voteInfo.vote_value);
+		if(target->client->sess.admin.isAdmin) {
+			CP("adminsystem: target player in an admin.\n");
+			return;
+		}
 		trap_SendConsoleCommand( EXEC_APPEND, va( "ref kick %d\n", atoi( level.voteInfo.vote_value ) ) );
 		AP( va( "cp \"%s\n^3has been kicked!\n\"", level.clients[ atoi( level.voteInfo.vote_value ) ].pers.netname ) );
 	}

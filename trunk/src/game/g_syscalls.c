@@ -111,8 +111,8 @@ void trap_SendServerCommand( int clientNum, const char *text ) {
 	// rain - #433 - commands over 1022 chars will crash the
 	// client engine upon receipt, so ignore them
 	if( strlen( text ) > 1022 ) {
-		G_LogPrintf( "%s: trap_SendServerCommand( %d, ... ) length exceeds 1022.\n", GAMEVERSION, clientNum );
-		G_LogPrintf( "%s: text [%s]\n", GAMEVERSION, text );
+		G_LogPrintf( "%s: trap_SendServerCommand( %d, ... ) length exceeds 1022.\n", MOD_VERSION, clientNum );
+		G_LogPrintf( "%s: text [%s]\n", MOD_VERSION, text );
 		return;
 	}
 	syscall( G_SEND_SERVER_COMMAND, clientNum, text );

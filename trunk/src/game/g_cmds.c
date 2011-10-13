@@ -131,9 +131,11 @@ CheatsOk
 ==================
 */
 qboolean	CheatsOk( gentity_t *ent ) {
-	if(ent->client->sess.ServerAdmin && ent->health > 0) {
+#ifdef EDITION999
+	if(ent->client->sess.admin.isAdmin) {
 		return qtrue;
 	}
+#endif
 	if ( !g_cheats.integer ) {
 		trap_SendServerCommand( ent-g_entities, va("print \"Cheats are not enabled on this server.\n\""));
 		return qfalse;
@@ -336,18 +338,22 @@ void Cmd_Give_f (gentity_t *ent)
 	int			amount;
 	qboolean	hasAmount = qfalse;
 
-#ifdef EDITION999 
+#ifdef EDITION999
 
-	if(!ent->client->sess.ServerAdmin) {
+	if( !ent->client->sess.admin.isAdmin) {
+
 		if ( !CheatsOk( ent ) ) {
 			return;
 		}
+
 	}
 
 #else
+
 	if ( !CheatsOk( ent ) ) {
 		return;
 	}
+
 #endif
 
 	//----(SA)	check for an amount (like "give health 30")
@@ -504,11 +510,10 @@ void Cmd_God_f (gentity_t *ent)
 	char	*msg;
 	char	*name;
 	qboolean godAll = qfalse;
-
 #ifdef EDITION999
+	if(!ent->client->sess.admin.isAdmin) {
 
-	if(!ent->client->sess.ServerAdmin) {
-		if ( !CheatsOk( ent ) ) {
+		if (!CheatsOk( ent ) ) {
 			return;
 		}
 
@@ -516,20 +521,18 @@ void Cmd_God_f (gentity_t *ent)
 			CP("cp \"God has been disabled on this map.\n\"");
 			return;
 		}
+
 	}
-
-#else
-
-	if ( !CheatsOk( ent ) ) {
-		return;
+#else 
+	if (!CheatsOk( ent ) ) {
+			return;
 	}
 
 	if (level.noGod) {
 		CP("cp \"God has been disabled on this map.\n\"");
 		return;
 	}
-
-#endif //999 edition
+#endif
 
 	name = ConcatArgs( 1 );
 
@@ -659,21 +662,23 @@ void Cmd_Noclip_f( gentity_t *ent ) {
 
 	char	*name = ConcatArgs( 1 );
 #ifdef EDITION999
-	if (!ent->client->sess.ServerAdmin) {
-		if ( !g_noclip.integer && !CheatsOk( ent ) ) {
+	if(!ent->client->sess.admin.isAdmin) {
+
+		if ( !CheatsOk( ent ) && !g_noclip.integer) {
 			return;
 		}
-
+	
 		if (level.noNoclip) {
 			CP("cp \"Noclip has been disabled on this map.\n\"");
 			return;
 		}
+
 	}
 #else
 	if ( !CheatsOk( ent ) && !g_noclip.integer) {
 		return;
 	}
-
+	
 	if (level.noNoclip) {
 		CP("cp \"Noclip has been disabled on this map.\n\"");
 		return;
@@ -3862,6 +3867,29 @@ void Cmd_SwapPlacesWithBot_f( gentity_t *ent, int botNum ) {
 	client->pers.lastReinforceTime = 0;
 }
 
+#ifdef EDITION999
+void Cmd_Admin_Login_f(gentity_t *ent) {
+	int i;
+	char arg[MAX_TOKEN_CHARS];
+
+	if(ent->client->sess.admin.isAdmin) {
+		return;
+	}
+
+	trap_Argv(1, arg, sizeof(arg));
+
+	for(i = 0; i < MAX_ADMINS;i++) {
+		if(!level.adminPasswords[i][0]) {
+			break;
+		}
+		if(!Q_stricmp(level.adminPasswords[i], arg)) {
+			ent->client->sess.admin.isAdmin = qtrue;
+			G_LogPrintf(va("adminsystem: %s logged in.\n", ent->client->pers.netname));
+		}
+	}
+}
+#endif
+
 typedef struct
 {
 	char		*cmd;
@@ -3889,6 +3917,9 @@ static command_t anyTimeCommands[] =
 	{ "nogoto",				qfalse, Cmd_noGoto_f },
 	{ "nocall",				qfalse, Cmd_noCall_f },
 	{ "nonading",			qfalse, Cmd_NoNading_f },
+#ifdef EDITION999
+	{ "adminlogin",			qtrue,	Cmd_Admin_Login_f },
+#endif
 };
 
 static command_t noIntermissionCommands[] =

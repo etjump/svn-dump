@@ -1169,6 +1169,7 @@ Kick a user off of the server
 */
 
 static void Svcmd_KickNum_f( void ) {
+	gentity_t *target;
 	int timeout = 300;
 	int clientNum;
 	char name[MAX_TOKEN_CHARS], sTimeout[MAX_TOKEN_CHARS];
@@ -1197,6 +1198,17 @@ static void Svcmd_KickNum_f( void ) {
 		return;
 	}
 
+	target = g_entities + clientNum;
+
+#ifdef EDITION999
+
+	if(target->client->sess.admin.isAdmin) {
+		G_Printf(va("adminsystem: target player in an admin.\n"));
+		return;
+	}
+
+#endif
+
 	trap_DropClient(clientNum, "player kicked", timeout);
 }
 
@@ -1211,48 +1223,6 @@ void Svcmd_Passvote_f() {
 	level.voteInfo.voteYes = level.numConnectedClients;
 	trap_SendServerCommand(-1, "print \"Vote has been passed by an admin!\n\"");
 }
-
-#ifdef EDITION999
-
-void Svcmd_addServerAdmin_f() {
-	gentity_t	*other;
-	int		clientNum;
-	char	arg[MAX_TOKEN_CHARS];
-	char	string[1024];
-	fileHandle_t f;
-	int i;
-
-	G_LoadServerAdminList();
-
-	trap_Argv(1, arg, sizeof(arg));
-
-	clientNum = refClientNumFromString(arg);
-	if (clientNum == -1)
-	{
-		G_Printf("^7addServerAdmin: Invalid player specified.\n");
-		return;
-	}
-	other = g_entities + clientNum;
-	other->client->sess.ServerAdmin = qtrue;
-	for(i = 0;i < MAX_CHEATS; i++) {
-		if(strcmp(other->client->pers.cl_guid, level.adminList[i]) == 0) {
-			G_Printf(va("%s is already on the list.\n\"", other->client->pers.netname));
-			return;
-		}
-	}
-
-	G_Printf(va("%s added to the admin list. Guid: %s\n\"", other->client->pers.netname, other->client->pers.cl_guid));
-
-	trap_FS_FOpenFile("adminList.txt", &f, FS_APPEND);
-
-	Com_sprintf(string, sizeof(string), 
-		"\\guid\\%s\\\n", other->client->pers.cl_guid);
-
-	trap_FS_Write(string, strlen(string), f);
-	trap_FS_FCloseFile(f);
-}
-
-#endif
 
 void Svcmd_Rename_f() {
 	gentity_t	*other;
@@ -1473,18 +1443,18 @@ qboolean	ConsoleCommand( void ) {
 		return qfalse;
 	}
 
-#ifdef EDITION999
-	if(Q_stricmp(cmd, "addServerAdmin") == 0) {
-		Svcmd_addServerAdmin_f();
-		return qtrue;
-	}
-#endif
-
 	if (!Q_stricmp(cmd, "rename"))
 	{
 		Svcmd_Rename_f();
 		return qtrue;
 	}
+
+#ifdef EDITION999
+	if (!Q_stricmp(cmd, "readconfig")) {
+		G_Admin_Readconfig();		
+		return qtrue;
+	}
+#endif
 	// -fretn
 
 	if( g_dedicated.integer ) {
