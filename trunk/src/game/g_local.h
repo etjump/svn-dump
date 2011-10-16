@@ -5,6 +5,7 @@
 #include "q_shared.h"
 #include "bg_public.h"
 #include "g_public.h"
+#include "g_admin.h"
 
 #include "../game/be_aas.h"
 
@@ -1188,12 +1189,6 @@ typedef struct {
 } g_campaignInfo_t;
 
 //
-// g_admin.c
-//
-
-qboolean G_Admin_Readconfig();
-
-//
 // g_spawn.c
 //
 #define		G_SpawnString(		key, def, out ) G_SpawnStringExt	( key, def, out, __FILE__, __LINE__ )
@@ -1908,6 +1903,8 @@ extern vmCvar_t	g_savemsg;
 
 extern vmCvar_t	g_mapScriptDir;
 extern vmCvar_t	g_blockedMaps;
+
+extern vmCvar_t	g_admin;
 
 void	trap_Printf( const char *fmt );
 void	trap_Error( const char *fmt );

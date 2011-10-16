@@ -220,6 +220,10 @@ vmCvar_t		g_savemsg;
 vmCvar_t		g_mapScriptDir;
 vmCvar_t		g_blockedMaps;
 
+// ETJump admin system
+
+vmCvar_t		g_admin;
+
 
 cvarTable_t		gameCvarTable[] = {
 	// don't override the cheat state set by the system
@@ -458,6 +462,8 @@ cvarTable_t		gameCvarTable[] = {
 
 	{ &g_mapScriptDir, "g_mapScriptDir", "scripts", CVAR_ARCHIVE },
 	{ &g_blockedMaps, "g_blockedMaps", "", CVAR_ARCHIVE },
+
+	{ &g_admin, "g_admin", "admins.dat", CVAR_ARCHIVE },
 };
 
 // bk001129 - made static to avoid aliasing
@@ -1931,12 +1937,6 @@ void G_InitGame( int levelTime, int randomSeed, int restart ) {
 	// Reinstate any MV views for clients -- need to do this after all init is complete
 	// --- maybe not the best place to do this... seems to be some race conditions on map_restart
 	G_spawnPrintf(DP_MVSPAWN, level.time + 2000, NULL);
-
-#ifdef EDITION999
-
-	G_Admin_Readconfig();
-
-#endif
 }
 
 
