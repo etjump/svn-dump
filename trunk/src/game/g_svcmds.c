@@ -1245,7 +1245,7 @@ void Svcmd_Rename_f() {
 
 // -fretn
 
-
+qboolean G_admin_readconfig(gentity_t *ent);
 
 char	*ConcatArgs( int start );
 
@@ -1443,18 +1443,17 @@ qboolean	ConsoleCommand( void ) {
 		return qfalse;
 	}
 
+	if (!Q_stricmp(cmd, "readconfig")) {
+		G_admin_readconfig(NULL);
+		return qtrue;
+	}
+
 	if (!Q_stricmp(cmd, "rename"))
 	{
 		Svcmd_Rename_f();
 		return qtrue;
 	}
 
-#ifdef EDITION999
-	if (!Q_stricmp(cmd, "readconfig")) {
-		G_Admin_Readconfig();		
-		return qtrue;
-	}
-#endif
 	// -fretn
 
 	if( g_dedicated.integer ) {
