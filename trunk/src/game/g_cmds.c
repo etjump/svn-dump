@@ -4045,6 +4045,12 @@ void ClientCommand(int clientNum)
 		return;
 	}
 
+	if (!Q_stricmp(cmd, "request_greeting"))
+	{
+		G_admin_greeting(ent);
+		return;
+	}
+
 	// regular no intermission commands
 	for (i = 0 ; i < sizeof(noIntermissionCommands) / sizeof(noIntermissionCommands[0]) ; i++)
 		if (!Q_stricmp(cmd, noIntermissionCommands[i].cmd))

@@ -35,11 +35,13 @@
 #define MAX_USERS 2048
 #define MAX_ADMIN_NAME_LEN 36
 #define PASSWORD_LEN 40
+#define MAX_STRING_CHARS 1024
 
 typedef struct {
 	int level;
 	char name[MAX_ADMIN_NAME_LEN];
 	char commands[MAX_COMMANDS];
+	char greeting[MAX_STRING_CHARS];
 } admin_level_t;
 
 typedef struct {

@@ -654,6 +654,8 @@ typedef struct {
 	// adminlevel
 	admin_t		uinfo;
 
+	qboolean	need_greeting;
+
 	qboolean	versionOK;
 } clientSession_t;
 
@@ -2626,6 +2628,7 @@ qboolean G_LandmineSnapshotCallback( int entityNum, int clientNum );
 
 // g_admin.c
 
+char *Q_StrReplace(char *haystack, char *needle, char *newp);
 int Q_SayArgc();
 qboolean Q_SayArgv(int n, char *buffer, int bufferLength);
 char *G_SHA1(char *string);
@@ -2633,6 +2636,9 @@ void G_admin_identify(gentity_t *ent);
 
 qboolean G_admin_cmd_check(gentity_t *ent);
 void G_admin_register_client(gentity_t *ent);
-qboolean G_admin_setlevel(gentity_t *ent, int skiparg);
 void G_admin_login(gentity_t *ent);
+void G_admin_greeting(gentity_t *ent);
+
+qboolean G_admin_setlevel(gentity_t *ent, int skiparg);
 qboolean G_admin_admintest(gentity_t *ent, int skiparg);
+qboolean G_admin_kick(gentity_t *ent, int skiparg);

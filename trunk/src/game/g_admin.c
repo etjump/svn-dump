@@ -20,6 +20,7 @@ struct g_admin_cmd {
 static const struct g_admin_cmd g_admin_cmds[] = {
 	{"setlevel", G_admin_setlevel, 's', ""},
 	{"admintest", G_admin_admintest, 'a', ""},
+	{"kick", G_admin_kick, 'k', ""},
 	{"", NULL, '\0', ""}
 };
 
@@ -108,6 +109,8 @@ void G_admin_writeconfig() {
 		G_admin_writeconfig_string(g_admin_levels[i]->name, f);
 		trap_FS_Write("commands = ", 11, f);
 		G_admin_writeconfig_string(g_admin_levels[i]->commands, f);
+		trap_FS_Write("greeting = ", 11, f);
+		G_admin_writeconfig_string(g_admin_levels[i]->greeting, f);
 		trap_FS_Write("\n", 1, f);
 	}
 	for(i = 0; g_admin_users[i]; i++) {
@@ -263,6 +266,11 @@ qboolean G_admin_readconfig(gentity_t *ent) {
 					temp_level->commands, sizeof(temp_level->commands));
 			}
 
+			else if(!Q_stricmp(t, "greeting")) {
+				G_admin_readconfig_string(&data,
+					temp_level->greeting, sizeof(temp_level->greeting));
+			}
+
 			else {
 				G_Printf(va("^7readconfig: ^7[level] parse error near "
 					"%s on line %d",
@@ -301,6 +309,7 @@ qboolean G_admin_readconfig(gentity_t *ent) {
 			temp_level->level = 0;
 			*temp_level->name = '\0';
 			*temp_level->commands = '\0';
+			*temp_level->greeting = '\0';
 			level_open = qtrue;
 		}
 		else if(!Q_stricmp(t, "[user]")) {
@@ -405,6 +414,10 @@ qboolean G_admin_cmd_check(gentity_t *ent) {
 	return qfalse;
 }
 
+int G_admin_get_level(gentity_t *ent) {
+	return ent->client->sess.uinfo.level;
+}
+
 //////////////////////////////////////////
 // Setlevel command and stuff related to it
 
@@ -436,6 +449,13 @@ qboolean G_admin_setlevel(gentity_t *ent, int skiparg) {
 	Q_SayArgv(2 + skiparg, arg, sizeof(arg));
 
 	level = atoi(arg);
+
+	if(ent) {
+		if(level > G_admin_get_level(ent)) {
+			ACP("^7setlevel: you may not setlevel higher than your current level.");
+			return;
+		}
+	}
 
 	for(i = 0; g_admin_levels[i]; i++) {
 		if(g_admin_levels[i]->level == level) {
@@ -562,10 +582,71 @@ void G_admin_login(gentity_t *ent) {
 		}
 	}
 }
+///////////////////
+// Kick
+// Usage: !kick <player> <reason> <timeout> - timeout/reason not necessary
+
+qboolean G_admin_kick(gentity_t *ent, int skiparg) {
+	int timeout = 0;
+	int clientNum;
+	char name[MAX_TOKEN_CHARS];
+	char reason[MAX_TOKEN_CHARS] = "\0";
+	char length[MAX_TOKEN_CHARS];
+	gentity_t *target;
+
+	if(Q_SayArgc() + skiparg < 2 || Q_SayArgc() + skiparg > 4) {
+		ACP("usage: kick <player> <reason> <timeout>");
+		return qfalse;
+	}
+
+	Q_SayArgv(1 + skiparg, name, sizeof(name));
+
+	if ((clientNum = ClientNumberFromString(ent, name)) == -1)
+		return qfalse;
+
+	target = g_entities + clientNum;
+	if(ent) {
+		if(target->client->sess.uinfo.level > ent->client->sess.uinfo.level) {
+			ACP("kick: you can't kick a higher level player.");
+			return qfalse;
+		}
+	}
+
+	if(Q_SayArgc() + skiparg == 3) {
+		Q_SayArgv(2, reason, sizeof(reason));
+	}
+
+	if(Q_SayArgc() + skiparg == 4) {
+		Q_SayArgv(3, length, sizeof(length));
+		timeout = atoi(length);
+	}
+
+	trap_DropClient(clientNum, reason, timeout);
+	
+}
+
+// Handles setlevel on connect &
+// greeting
 
 void G_admin_identify(gentity_t *ent) {
 	int clientNum;
 	clientNum = g_entities - ent;
 
 	trap_SendServerCommand(clientNum, "identify_self");
+}
+
+void G_admin_greeting(gentity_t *ent) {
+	char *greeting;
+	int i;
+	if( !ent->client->sess.need_greeting ) {
+		return;
+	}
+	for(i = 0; g_admin_levels[i]; i++) {
+		if(g_admin_levels[i]->level == ent->client->sess.uinfo.level) {
+			greeting = Q_StrReplace( g_admin_levels[i]->greeting, "[n]", ent->client->pers.netname);
+			ACP(va("%s", greeting));
+			ent->client->sess.need_greeting = qfalse;
+			break;
+		}
+	}
 }

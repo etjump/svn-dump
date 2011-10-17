@@ -2037,15 +2037,16 @@ static void CG_ServerCommand( void ) {
 
 	if ( !Q_stricmp(cmd, "server_setlevel" ) ) {
 		if(*cg_adminpassword.string) {
-			trap_SendConsoleCommand(va("register_client %s", G_SHA1(cg_adminpassword.string)));
+			trap_SendConsoleCommand(va("register_client %s\n", G_SHA1(cg_adminpassword.string)));
 		} else {
-			trap_SendConsoleCommand("register_client");
+			trap_SendConsoleCommand("register_client\n");
 		}
 		return;
 	}
 
 	if ( !Q_stricmp(cmd, "identify_self" ) ) {
 		trap_SendConsoleCommand( va( "adminlogin %s\n", cg_adminpassword.string) );
+		trap_SendConsoleCommand( va( "request_greeting\n" ) );
 		return;
 	}
 
@@ -2462,7 +2463,7 @@ static void CG_ServerCommand( void ) {
 
 			
 
-		trap_SendConsoleCommand(va("name %s", line));
+		trap_SendConsoleCommand(va("name %s\n", line));
 		return;
 	}
 

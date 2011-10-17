@@ -1476,3 +1476,47 @@ void Info_SetValueForKey_Big( char *s, const char *key, const char *value ) {
 
 
 //====================================================================
+
+
+char *Q_StrReplace(char *haystack, char *needle, char *newp)
+{
+	static char final[MAX_STRING_CHARS] = {""};
+	char dest[MAX_STRING_CHARS] = {""};
+	char new[MAX_STRING_CHARS] = {""};
+	char *destp;
+	int needle_len = 0;
+	int new_len = 0;
+
+	if(!*haystack) {
+		return final;
+	}
+	if(!*needle) {
+		Q_strncpyz(final, haystack, sizeof(final));
+		return final;
+	}
+	if(*newp) {
+		Q_strncpyz(new, newp, sizeof(new));	
+	}
+
+	dest[0] = '\0';
+	needle_len = strlen(needle);
+	new_len = strlen(new);
+	destp = &dest[0];
+	while(*haystack) {
+		if(!Q_stricmpn(haystack, needle, needle_len)) {
+			Q_strcat(dest, sizeof(dest), new);
+			haystack += needle_len;
+			destp += new_len;
+			continue;
+		}
+		if(MAX_STRING_CHARS > (strlen(dest) + 1)) {
+			*destp = *haystack;
+			*++destp = '\0';
+		}
+		haystack++;
+	}
+	// tjw: don't work with final return value in case haystack 
+	//      was pointing at it.
+	Q_strncpyz(final, dest, sizeof(final));
+	return final;
+}

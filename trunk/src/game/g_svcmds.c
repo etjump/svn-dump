@@ -1282,6 +1282,10 @@ qboolean	ConsoleCommand( void ) {
 	}
 #endif // SAVEGAME_SUPPORT
 
+	if(G_admin_cmd_check(NULL)) {
+		return qtrue;
+	}
+
 	if ( Q_stricmp (cmd, "entitylist") == 0 ) {
 		Svcmd_EntityList_f();
 		return qtrue;
@@ -1437,10 +1441,6 @@ qboolean	ConsoleCommand( void ) {
 	if (!Q_stricmp(cmd, "rename"))
 	{
 		Svcmd_Rename_f();
-		return qtrue;
-	}
-
-	if(G_admin_cmd_check(NULL)) {
 		return qtrue;
 	}
 

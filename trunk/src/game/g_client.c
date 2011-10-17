@@ -1627,8 +1627,12 @@ char *ClientConnect( int clientNum, qboolean firstTime, qboolean isBot ) {
 	client->pers.connected = CON_CONNECTING;
 	client->pers.connectTime = level.time;			// DHM - Nerve
 
-	if( firstTime )
+	if( firstTime ) {
+		client->sess.need_greeting = qtrue;
 		client->pers.initialSpawn = qtrue;				// DHM - Nerve
+	} else {
+		client->sess.need_greeting = qfalse;
+	}
 
 	// read or initialize the session data
 	if( firstTime ) {
