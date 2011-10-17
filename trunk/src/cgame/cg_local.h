@@ -15,6 +15,8 @@
 #include "cg_public.h"
 #include "../ui/ui_shared.h"
 
+#define TRICKJUMP_VER "ETJump 1.0.7"
+
 #define MAX_LOCATIONS		256
 #define	POWERUP_BLINKS		5
 
@@ -2307,9 +2309,7 @@ extern vmCvar_t			cg_personalTimerAlpha;
 extern vmCvar_t			cg_personalTimerX;
 extern vmCvar_t			cg_personalTimerY;
 
-#ifdef EDITION999
 extern vmCvar_t			cg_adminpassword;
-#endif
 
 
 //
@@ -3565,3 +3565,5 @@ void CG_Fireteams_Setup( void );
 
 void CG_Fireteams_MenuText_Draw( panel_button_t* button );
 void CG_Fireteams_MenuTitleText_Draw( panel_button_t* button );
+
+char *G_SHA1(char *string);

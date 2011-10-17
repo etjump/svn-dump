@@ -173,6 +173,12 @@
     <ClCompile Include="..\ui\ui_shared.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\sha-1\sha1.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\sha-1\bg_sha.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\game\bg_classes.h">
@@ -206,6 +212,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\ui\ui_shared.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="cg_sha1.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\sha-1\sha1.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
