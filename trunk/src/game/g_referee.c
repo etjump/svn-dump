@@ -71,7 +71,6 @@ void G_refHelp_cmd(gentity_t *ent)
 }
 // Console ref kick
 void G_refKick(char *name) {
-	gentity_t *target;
 	int clientNum, timeout = 300;
 
 	if(!*name) {
@@ -81,12 +80,6 @@ void G_refKick(char *name) {
 
 	if((clientNum = ClientNumberFromString(NULL, name)) == -1) {
 		G_Printf("Client not found!\n");
-		return;
-	}
-
-	target = g_entities + clientNum;
-	if(target->client->sess.admin.isAdmin) {
-		G_Printf(va("adminsystem: target player in an admin.\n"));
 		return;
 	}
 

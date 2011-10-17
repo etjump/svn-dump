@@ -1,6 +1,5 @@
 #include "g_admin.h"
 #include "g_local.h"
-#include "g_sha1.h"
 
 // I don't think anyone needs over 64 admin levels.
 
@@ -10,6 +9,24 @@ admin_level_t *g_admin_levels[MAX_ADMIN_LEVELS];
 // memory I'll edit this.
 
 admin_user_t *g_admin_users[MAX_USERS];
+
+struct g_admin_cmd {
+	const char *keyword;
+	qboolean (* const handler)(gentity_t *ent, int skiparg);
+	char flag;
+	const char *function;
+};
+
+static const struct g_admin_cmd g_admin_cmds[] = {
+	{"setlevel", G_admin_setlevel, 's', ""},
+	{"admintest", G_admin_admintest, 'a', ""},
+	{"", NULL, '\0', ""}
+};
+
+void G_admin_chat_print(char *string) {
+	AP(va("chat \"%s", string));
+	G_Printf("%s\n", string);
+}
 
 // This will print a default config in the mod
 // folder when executed. If the mod can't find 
@@ -69,6 +86,43 @@ void G_admin_writeconfig_string(char *s, fileHandle_t f) {
 		trap_FS_Write(buf, strlen(buf), f);
 	}
 	trap_FS_Write("\n", 1, f);
+}
+
+void G_admin_writeconfig() {
+	fileHandle_t f;
+	int len, i;
+	
+	if(!*g_admin.string) return;
+
+	len = trap_FS_FOpenFile(g_admin.string, &f, FS_WRITE);
+	if(len < 0) {
+		G_Printf(va("adminsystem: could not open %s\n", g_admin.string));
+		return;
+	}
+
+	for(i = 0; g_admin_levels[i]; i++) {
+		trap_FS_Write("[level]\n", 8, f);
+		trap_FS_Write("level    = ", 11, f);
+		G_admin_writeconfig_int(g_admin_levels[i]->level, f);
+		trap_FS_Write("name     = ", 11, f);
+		G_admin_writeconfig_string(g_admin_levels[i]->name, f);
+		trap_FS_Write("commands = ", 11, f);
+		G_admin_writeconfig_string(g_admin_levels[i]->commands, f);
+		trap_FS_Write("\n", 1, f);
+	}
+	for(i = 0; g_admin_users[i]; i++) {
+		if(g_admin_users[i]->level == 0) continue;
+
+		trap_FS_Write("[user]\n", 7, f);
+		trap_FS_Write("name     = ", 11, f);
+		G_admin_writeconfig_string(g_admin_users[i]->name, f);
+		trap_FS_Write("password = ", 11, f);
+		G_admin_writeconfig_string(g_admin_users[i]->password, f);
+		trap_FS_Write("level    = ", 11, f);
+		G_admin_writeconfig_int(g_admin_users[i]->level, f);
+		trap_FS_Write("\n", 1, f);
+	}
+	trap_FS_FCloseFile(f);
 }
 
 void G_admin_cleanup()
@@ -269,10 +323,249 @@ qboolean G_admin_readconfig(gentity_t *ent) {
 
 	free(data2);
 	G_Printf(va("^7readconfig: loaded %d levels and %d users\n", lc, uc));
-	if(ent) CP(va("^7readconfig: loaded %d levels and %d users\n", lc, uc));
+	if(ent) CP(va("print \"^7readconfig: loaded %d levels and %d users\"\n", lc, uc));
 
 	if(lc == 0) {
 		G_admin_writeconfig_default();
 	}
+	trap_FS_FCloseFile(f);
 	return qtrue;
+}
+
+qboolean G_admin_permission(gentity_t *ent, char flag) {
+	int i;
+	char *flags;
+
+	if(!ent) return qtrue;
+
+	for(i = 0; g_admin_levels[i]; i++) {
+		if(ent->client->sess.uinfo.level == 
+		   g_admin_levels[i]->level) {
+			   flags = g_admin_levels[i]->commands;
+			while(*flags) {
+				if(*flags == flag)
+					return qtrue;
+				else if(*flags == '-') {
+					while(*flags++) {
+						if(*flags == flag)
+							return qfalse;
+						else if(*flags == '+')
+							break;
+					}
+				}
+				else if(*flags == '*') {
+					while(*flags++) {
+						if(*flags == flag)
+							return qfalse;
+					}
+				}
+			*flags++;
+			}
+		}
+	}
+	return qfalse;
+}
+
+qboolean G_admin_cmd_check(gentity_t *ent) {
+	int i;
+	char command[MAX_CMD_LEN];
+	char *cmd;
+	int skip = 0;
+
+	if(!*g_admin.string) return qfalse;
+
+	command[0] = '\0';
+
+	Q_SayArgv(0, command, sizeof(command));
+	if(!Q_stricmp(command, "say")) {
+		skip = 1;
+		Q_SayArgv(1, command, sizeof(command));
+	}
+
+	if(!*command) return qfalse;
+
+	// Store cmd without ! in cmd
+	if(command[0] == '!') cmd = &command[1];
+	else if(!ent) cmd = &command[0];
+	else return qfalse;
+
+	for(i = 0; g_admin_cmds[i].keyword[0]; i++) {
+		if(Q_stricmp(cmd, g_admin_cmds[i].keyword)) {
+			continue;
+		}
+		else if(G_admin_permission(ent, g_admin_cmds[i].flag)) {
+			g_admin_cmds[i].handler(ent, skip);
+			return qtrue;
+		}
+		else {
+			ACP(va("%s: permission denied", g_admin_cmds[i].keyword));
+			return qfalse;
+		}
+	}
+	return qfalse;
+}
+
+//////////////////////////////////////////
+// Setlevel command and stuff related to it
+
+admin_t temp;
+
+qboolean G_admin_setlevel(gentity_t *ent, int skiparg) {
+	int level = 0, i;
+	qboolean found = qfalse;
+	char arg[MAX_TOKEN_CHARS];
+	int clientNum;
+
+	gentity_t *target;
+
+	if(Q_SayArgc() != (3+skiparg)) {
+		if(ent) CP(va("print \"usage: setlevel <user> <level>\n\""));
+		else G_Printf(va("usage: setlevel <user> <level>\n"));
+		return qfalse;
+	}
+
+	Q_SayArgv(1 + skiparg, arg, sizeof(arg));
+
+	if ((clientNum = ClientNumberFromString(ent, arg)) == -1)
+		return qfalse;
+
+	target = g_entities + clientNum;
+	// Allows client to use the register cmd
+	target->client->sess.allowRegister = qtrue;
+
+	Q_SayArgv(2 + skiparg, arg, sizeof(arg));
+
+	level = atoi(arg);
+
+	for(i = 0; g_admin_levels[i]; i++) {
+		if(g_admin_levels[i]->level == level) {
+			temp.level = level;
+			found = qtrue;
+			break;
+		}
+	}
+
+	if(!found) {
+		if(ent) CP(va("print \"setlevel: level not found\n\""));
+		else G_Printf(va("setlevel: level not found\n"));
+		return qfalse;
+	}
+	trap_SendServerCommand(clientNum, "server_setlevel");
+}
+
+void G_clear_temp_admin() {
+	temp.level = 0;
+	temp.password[0] = '\0';
+}
+// part of setlevel cmd
+void G_admin_register_client(gentity_t *ent) {
+	int i ;
+	admin_user_t *a;
+	qboolean updated = qfalse;
+	char arg[MAX_TOKEN_CHARS];
+	char level[MAX_TOKEN_CHARS];
+	// Do not allow player to register
+	// if it's not done with setlevel
+
+	if(!ent->client->sess.allowRegister) {
+		return;
+	}
+
+	ent->client->sess.allowRegister = qfalse;
+
+	// Syntax register_client <password>
+	// if no password -> no register can be done
+
+	if(trap_Argc() != 2) {
+		return;
+	}
+
+	trap_Argv(1, arg, sizeof(arg));
+
+	// Give user a level + a "finger" name
+
+	for(i = 0; g_admin_users[i]; i++) {
+		if(!Q_stricmp(arg, g_admin_users[i]->password)) {
+			ent->client->sess.uinfo.level = temp.level;
+			Q_strncpyz(ent->client->sess.uinfo.name,
+				ent->client->pers.netname, sizeof(ent->client->sess.uinfo.name));
+			updated = qtrue;
+		}
+	}
+
+	if(!updated) {
+		if(i == MAX_USERS) {
+			return;
+		}
+		a = malloc(sizeof(admin_user_t));
+		a->level = temp.level;
+		Q_strncpyz(a->name, ent->client->pers.netname, sizeof(a->name));
+		Q_strncpyz(a->password, arg, sizeof(a->password));	
+		g_admin_users[i] = a;
+	}
+
+	AP(va("chat \"^7setlevel: %s^7 is now a level %d user\"", ent->client->pers.netname, ent->client->sess.uinfo.level));
+
+	G_admin_writeconfig();
+
+	G_clear_temp_admin();
+}
+
+qboolean G_admin_admintest(gentity_t *ent, int skiparg) {
+	int level = ent->client->sess.uinfo.level, i;
+	char name[MAX_NETNAME];
+	if(!ent) return qtrue;
+
+	for(i = 0; g_admin_levels[i]; i++) {
+		if(g_admin_levels[i]->level == level) {
+			Q_strncpyz(name, g_admin_levels[i]->name, sizeof(name));
+			break;
+		}
+	}
+
+	ACP(va("^7admintest: %s^7 is a level %d user (%s^7)", ent->client->pers.netname, level , name));
+	return qtrue;
+}
+
+void G_admin_login(gentity_t *ent) {
+	int i;
+	qboolean found = qfalse;
+	char arg[MAX_TOKEN_CHARS];
+	char password[PASSWORD_LEN+1];
+	
+	if(trap_Argc() != 2) {
+		return;
+	}
+
+	trap_Argv(1, arg, sizeof(arg));
+
+	Q_strncpyz(password, G_SHA1(arg), sizeof(password));
+
+	for(i = 0; g_admin_users[i]; i++) {
+		if(!Q_stricmp(g_admin_users[i]->password, password)) {
+			ent->client->sess.uinfo.level = g_admin_users[i]->level;
+			found = qtrue;
+			break;
+		}
+	}
+	if(!found) {
+		ent->client->sess.uinfo.level = 0;
+		for(i = 0; g_admin_users[i]; i++) {
+			if(g_admin_levels[i]->level == 0) {
+				Q_strncpyz(ent->client->sess.uinfo.name, g_admin_users[i]->name, sizeof(ent->client->sess.uinfo.name));
+				found = qtrue;
+				break;
+			}
+		}
+		if(!found) {
+			Q_strncpyz(ent->client->sess.uinfo.name, "ET Jumper", sizeof(ent->client->sess.uinfo.name));
+		}
+	}
+}
+
+void G_admin_identify(gentity_t *ent) {
+	int clientNum;
+	clientNum = g_entities - ent;
+
+	trap_SendServerCommand(clientNum, "identify_self");
 }

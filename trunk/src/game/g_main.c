@@ -1847,6 +1847,10 @@ void G_InitGame( int levelTime, int randomSeed, int restart ) {
 	// load level script
 	G_Script_ScriptLoad();
 
+	G_Printf ("-----------------------------------\n");
+	G_admin_readconfig(NULL);
+	G_Printf ("-----------------------------------\n");
+
 	// reserve some spots for dead player bodies
 	InitBodyQue();
 

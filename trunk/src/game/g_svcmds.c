@@ -1169,7 +1169,6 @@ Kick a user off of the server
 */
 
 static void Svcmd_KickNum_f( void ) {
-	gentity_t *target;
 	int timeout = 300;
 	int clientNum;
 	char name[MAX_TOKEN_CHARS], sTimeout[MAX_TOKEN_CHARS];
@@ -1197,17 +1196,6 @@ static void Svcmd_KickNum_f( void ) {
 		G_Printf("Client not found!\n");
 		return;
 	}
-
-	target = g_entities + clientNum;
-
-#ifdef EDITION999
-
-	if(target->client->sess.admin.isAdmin) {
-		G_Printf(va("adminsystem: target player in an admin.\n"));
-		return;
-	}
-
-#endif
 
 	trap_DropClient(clientNum, "player kicked", timeout);
 }
@@ -1244,8 +1232,6 @@ void Svcmd_Rename_f() {
 }
 
 // -fretn
-
-qboolean G_admin_readconfig(gentity_t *ent);
 
 char	*ConcatArgs( int start );
 
@@ -1451,6 +1437,10 @@ qboolean	ConsoleCommand( void ) {
 	if (!Q_stricmp(cmd, "rename"))
 	{
 		Svcmd_Rename_f();
+		return qtrue;
+	}
+
+	if(G_admin_cmd_check(NULL)) {
 		return qtrue;
 	}
 

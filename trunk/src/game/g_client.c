@@ -1440,7 +1440,7 @@ void ClientUserinfoChanged( int clientNum ) {
 		client->sess.nameChangeCount = 0;
 	}
 
-#ifdef EDITION999
+#ifdef EDITION999FIX
 	if ( client->pers.connected == CON_CONNECTED ) {
 		if ( strcmp( oldname, client->pers.netname ) ) {
 			trap_SendServerCommand( -1, va("print \"[lof]%s" S_COLOR_WHITE " [lon]renamed to[lof] %s\n\"", oldname, 
@@ -1737,9 +1737,13 @@ char *ClientConnect( int clientNum, qboolean firstTime, qboolean isBot ) {
 	client->sess.nofatigue = qtrue;
 	// Zero: target_set_ident id.
 	client->sess.clientident = 0;
+	client->sess.allowRegister = qfalse;
 
 	// count current clients and rank for scoreboard
 	CalculateRanks();
+
+	// Tell client to identify self
+	G_admin_identify(ent);
 
 	return NULL;
 }
@@ -1902,8 +1906,6 @@ void ClientBegin( int clientNum )
 		}
 	}
 	// End Xian
-
-	ent->client->sess.admin.isAdmin = qfalse;
 
 	// count current clients and rank for scoreboard
 	CalculateRanks();

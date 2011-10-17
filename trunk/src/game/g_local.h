@@ -1,5 +1,3 @@
-
-
 // g_local.h -- local definitions for game module
 
 #include "q_shared.h"
@@ -569,7 +567,9 @@ typedef struct {
 } weapon_stat_t;
 
 typedef struct {
-	qboolean isAdmin;
+	int level;
+	char name[MAX_NAME_LENGTH];
+	char password[40+1];
 } admin_t;
 
 // client data that stays across multiple levels or tournament restarts
@@ -649,7 +649,10 @@ typedef struct {
 
 	int			clientident;
 
-	admin_t		admin;
+	qboolean	allowRegister;
+
+	// adminlevel
+	admin_t		uinfo;
 
 	qboolean	versionOK;
 } clientSession_t;
@@ -1210,6 +1213,10 @@ qboolean G_CallSpawn( gentity_t *ent );
 // done.
 char *G_AddSpawnVarToken( const char *string );
 void G_ParseField( const char *key, const char *value, gentity_t *ent );
+
+// g_admin.c
+char *hexToString(unsigned int msgDigest[]);
+qboolean G_admin_readconfig(gentity_t *ent);
 
 //
 // g_cmds.c
@@ -2617,6 +2624,15 @@ qboolean G_CanPickupWeapon( weapon_t weapon, gentity_t* ent );
 
 qboolean G_LandmineSnapshotCallback( int entityNum, int clientNum );
 
-// g_admin
+// g_admin.c
 
-void G_admin_command_check(gentity_t *ent);
+int Q_SayArgc();
+qboolean Q_SayArgv(int n, char *buffer, int bufferLength);
+char *G_SHA1(char *string);
+void G_admin_identify(gentity_t *ent);
+
+qboolean G_admin_cmd_check(gentity_t *ent);
+void G_admin_register_client(gentity_t *ent);
+qboolean G_admin_setlevel(gentity_t *ent, int skiparg);
+void G_admin_login(gentity_t *ent);
+qboolean G_admin_admintest(gentity_t *ent, int skiparg);

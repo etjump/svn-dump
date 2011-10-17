@@ -30,9 +30,11 @@
 /////////////////////////////////////////////////////////////////////////////
 
 #define MAX_COMMANDS 128
+#define MAX_CMD_LEN 20
 #define MAX_ADMIN_LEVELS 64
 #define MAX_USERS 2048
 #define MAX_ADMIN_NAME_LEN 36
+#define PASSWORD_LEN 40
 
 typedef struct {
 	int level;
@@ -40,14 +42,14 @@ typedef struct {
 	char commands[MAX_COMMANDS];
 } admin_level_t;
 
-#define PASSWORD_HASH_LEN 40
-
 typedef struct {
 	int level;
 	char name[MAX_ADMIN_NAME_LEN];
-	char password[PASSWORD_HASH_LEN];
+	char password[PASSWORD_LEN+1];
 } admin_user_t;
 
+void G_admin_chat_print(char *string);
 
+#define ACP(x) G_admin_chat_print(x);
 
 #endif

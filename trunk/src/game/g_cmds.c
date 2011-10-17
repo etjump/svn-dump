@@ -131,11 +131,6 @@ CheatsOk
 ==================
 */
 qboolean	CheatsOk( gentity_t *ent ) {
-#ifdef EDITION999
-	if(ent->client->sess.admin.isAdmin) {
-		return qtrue;
-	}
-#endif
 	if ( !g_cheats.integer ) {
 		trap_SendServerCommand( ent-g_entities, va("print \"Cheats are not enabled on this server.\n\""));
 		return qfalse;
@@ -338,23 +333,9 @@ void Cmd_Give_f (gentity_t *ent)
 	int			amount;
 	qboolean	hasAmount = qfalse;
 
-#ifdef EDITION999
-
-	if( !ent->client->sess.admin.isAdmin) {
-
-		if ( !CheatsOk( ent ) ) {
-			return;
-		}
-
-	}
-
-#else
-
 	if ( !CheatsOk( ent ) ) {
 		return;
 	}
-
-#endif
 
 	//----(SA)	check for an amount (like "give health 30")
 	amt = ConcatArgs(2);
@@ -510,20 +491,7 @@ void Cmd_God_f (gentity_t *ent)
 	char	*msg;
 	char	*name;
 	qboolean godAll = qfalse;
-#ifdef EDITION999
-	if(!ent->client->sess.admin.isAdmin) {
 
-		if (!CheatsOk( ent ) ) {
-			return;
-		}
-
-		if (level.noGod) {
-			CP("cp \"God has been disabled on this map.\n\"");
-			return;
-		}
-
-	}
-#else 
 	if (!CheatsOk( ent ) ) {
 			return;
 	}
@@ -532,7 +500,6 @@ void Cmd_God_f (gentity_t *ent)
 		CP("cp \"God has been disabled on this map.\n\"");
 		return;
 	}
-#endif
 
 	name = ConcatArgs( 1 );
 
@@ -661,20 +628,7 @@ void Cmd_Noclip_f( gentity_t *ent ) {
 	char	*msg;
 
 	char	*name = ConcatArgs( 1 );
-#ifdef EDITION999
-	if(!ent->client->sess.admin.isAdmin) {
 
-		if ( !CheatsOk( ent ) && !g_noclip.integer) {
-			return;
-		}
-	
-		if (level.noNoclip) {
-			CP("cp \"Noclip has been disabled on this map.\n\"");
-			return;
-		}
-
-	}
-#else
 	if ( !CheatsOk( ent ) && !g_noclip.integer) {
 		return;
 	}
@@ -683,7 +637,6 @@ void Cmd_Noclip_f( gentity_t *ent ) {
 		CP("cp \"Noclip has been disabled on this map.\n\"");
 		return;
 	}
-#endif
 
 	if(!Q_stricmp( name, "on" ) || atoi( name ) ) {
 		ent->client->noclip = qtrue;
@@ -1605,6 +1558,7 @@ void G_Say(gentity_t *ent, gentity_t *target, int mode, qboolean encoded, const 
 			G_SayTo(ent, other, mode, color, name, text, localize, encoded);
 		}
 	}
+	G_admin_cmd_check(ent);
 }
 
 
@@ -3867,29 +3821,6 @@ void Cmd_SwapPlacesWithBot_f( gentity_t *ent, int botNum ) {
 	client->pers.lastReinforceTime = 0;
 }
 
-#ifdef EDITION999
-void Cmd_Admin_Login_f(gentity_t *ent) {
-	int i;
-	char arg[MAX_TOKEN_CHARS];
-
-	if(ent->client->sess.admin.isAdmin) {
-		return;
-	}
-
-	trap_Argv(1, arg, sizeof(arg));
-
-	for(i = 0; i < MAX_ADMINS;i++) {
-		if(!level.adminPasswords[i][0]) {
-			break;
-		}
-		if(!Q_stricmp(level.adminPasswords[i], arg)) {
-			ent->client->sess.admin.isAdmin = qtrue;
-			G_LogPrintf(va("adminsystem: %s logged in.\n", ent->client->pers.netname));
-		}
-	}
-}
-#endif
-
 typedef struct
 {
 	char		*cmd;
@@ -3917,9 +3848,6 @@ static command_t anyTimeCommands[] =
 	{ "nogoto",				qfalse, Cmd_noGoto_f },
 	{ "nocall",				qfalse, Cmd_noCall_f },
 	{ "nonading",			qfalse, Cmd_NoNading_f },
-#ifdef EDITION999
-	{ "adminlogin",			qtrue,	Cmd_Admin_Login_f },
-#endif
 };
 
 static command_t noIntermissionCommands[] =
@@ -4099,6 +4027,24 @@ void ClientCommand(int clientNum)
 		return;
 	}
 
+	if (!Q_stricmp(cmd, "adminlogin"))
+	{
+		G_admin_login(ent);
+		return;
+	}
+
+	if (!Q_stricmp(cmd, "register_failure"))
+	{
+		ent->client->sess.allowRegister = qfalse;
+		return;
+	}
+
+	if (!Q_stricmp(cmd, "register_client")) 
+	{
+		G_admin_register_client(ent);
+		return;
+	}
+
 	// regular no intermission commands
 	for (i = 0 ; i < sizeof(noIntermissionCommands) / sizeof(noIntermissionCommands[0]) ; i++)
 		if (!Q_stricmp(cmd, noIntermissionCommands[i].cmd))
@@ -4117,3 +4063,75 @@ void ClientCommand(int clientNum)
 	CP(va("print \"Unknown command %s^7.\n\"", cmd));
 }
 
+// A replacement for trap_Argc() that can correctly handle
+//   say "!cmd arg0 arg1"
+// as well as
+//   say !cmd arg0 arg1
+// The client uses the latter for messages typed in the console
+// and the former when the message is typed in the chat popup
+int Q_SayArgc() 
+{
+	int c = 1;
+	char *s;
+
+	s = ConcatArgs(0);
+	if(!*s) return 0;
+	while(*s) {
+		if(*s == ' ') {
+			s++;
+			if(*s != ' ') {
+				c++;
+				continue;
+			}
+			while(*s && *s == ' ') s++;
+			c++;
+		}
+		s++;
+	}
+	return c;
+}
+
+// A replacement for trap_Argv() that can correctly handle
+//   say "!cmd arg0 arg1"
+// as well as
+//   say !cmd arg0 arg1
+// The client uses the latter for messages typed in the console
+// and the former when the message is typed in the chat popup
+qboolean Q_SayArgv(int n, char *buffer, int bufferLength)
+{
+	int bc = 1;
+	int c = 0;
+	char *s;
+
+	if(bufferLength < 1) return qfalse;
+	if(n < 0) return qfalse;
+	*buffer = '\0';
+	s = ConcatArgs(0);
+	while(*s) {
+		if(c == n) {
+			while(*s && (bc < bufferLength)) {
+				if(*s == ' ') {
+					*buffer = '\0';
+					return qtrue;
+				}
+				*buffer = *s;
+				buffer++;
+				s++;
+				bc++;
+			}
+			*buffer = '\0';
+			return qtrue;
+		}
+		if(*s == ' ') {
+			s++;
+			if(*s != ' ') {
+				c++;
+				continue;
+			}
+			while(*s && *s == ' ') s++;
+			c++;
+		}
+		s++;
+	}
+	return qfalse;
+}
