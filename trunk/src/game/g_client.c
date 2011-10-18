@@ -2476,6 +2476,9 @@ void ClientDisconnect( int clientNum ) {
 	i = ent->client->sess.sessionTeam;
 	ent->client->sess.sessionTeam = TEAM_FREE;
 	ent->active = 0;
+	ent->client->sess.uinfo.level = 0;
+	ent->client->sess.uinfo.name[0] = '\0';
+	ent->client->sess.uinfo.password[0] = '\0';
 
 	trap_SetConfigstring( CS_PLAYERS + clientNum, "");
 

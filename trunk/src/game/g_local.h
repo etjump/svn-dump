@@ -2633,6 +2633,7 @@ int Q_SayArgc();
 qboolean Q_SayArgv(int n, char *buffer, int bufferLength);
 char *G_SHA1(char *string);
 void G_admin_identify(gentity_t *ent);
+void G_admin_identify_all();
 
 qboolean G_admin_cmd_check(gentity_t *ent);
 void G_admin_register_client(gentity_t *ent);
@@ -2642,3 +2643,4 @@ void G_admin_greeting(gentity_t *ent);
 qboolean G_admin_setlevel(gentity_t *ent, int skiparg);
 qboolean G_admin_admintest(gentity_t *ent, int skiparg);
 qboolean G_admin_kick(gentity_t *ent, int skiparg);
+qboolean G_admin_finger(gentity_t *ent, int skiparg);

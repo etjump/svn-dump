@@ -21,6 +21,7 @@ static const struct g_admin_cmd g_admin_cmds[] = {
 	{"setlevel", G_admin_setlevel, 's', ""},
 	{"admintest", G_admin_admintest, 'a', ""},
 	{"kick", G_admin_kick, 'k', ""},
+	{"finger", G_admin_finger, 'f', ""},
 	{"", NULL, '\0', ""}
 };
 
@@ -46,19 +47,22 @@ void G_admin_writeconfig_default() {
 	trap_FS_Write("[level]\n", 8, f);
 	trap_FS_Write("level = 0\n", 10, f);
 	trap_FS_Write("name = ET Jumper\n", 17, f);
-	trap_FS_Write("commands = a\n", 10, f);
+	trap_FS_Write("commands = a\n", 13, f);
+	trap_FS_Write("greeting = hi\n", 14, f);
 	trap_FS_Write("\n", 1, f);
 
 	trap_FS_Write("[level]\n", 8, f);
 	trap_FS_Write("level = 1\n", 10, f);
 	trap_FS_Write("name = ET Admin I\n", 18, f);
-	trap_FS_Write("commands = ak\n", 12, f);
+	trap_FS_Write("commands = ak\n", 14, f);
+	trap_FS_Write("greeting = hi\n", 14, f);
 	trap_FS_Write("\n", 1, f);
 
 	trap_FS_Write("[level]\n", 8, f);
 	trap_FS_Write("level = 2\n", 10, f);
 	trap_FS_Write("name = ET Admin II\n", 19, f);
-	trap_FS_Write("commands = ak\n", 12, f);
+	trap_FS_Write("commands = ak\n", 14, f);
+	trap_FS_Write("greeting = hi\n", 14, f);
 	trap_FS_Write("\n", 1, f);
 
 	trap_FS_FCloseFile(f);
@@ -334,6 +338,8 @@ qboolean G_admin_readconfig(gentity_t *ent) {
 	G_Printf(va("^7readconfig: loaded %d levels and %d users\n", lc, uc));
 	if(ent) CP(va("print \"^7readconfig: loaded %d levels and %d users\"\n", lc, uc));
 
+	G_admin_identify_all();
+
 	if(lc == 0) {
 		G_admin_writeconfig_default();
 	}
@@ -386,7 +392,7 @@ qboolean G_admin_cmd_check(gentity_t *ent) {
 	command[0] = '\0';
 
 	Q_SayArgv(0, command, sizeof(command));
-	if(!Q_stricmp(command, "say")) {
+	if(!Q_stricmp(command, "say") || !Q_stricmp(command, "enc_say")) {
 		skip = 1;
 		Q_SayArgv(1, command, sizeof(command));
 	}
@@ -439,8 +445,10 @@ qboolean G_admin_setlevel(gentity_t *ent, int skiparg) {
 
 	Q_SayArgv(1 + skiparg, arg, sizeof(arg));
 
-	if ((clientNum = ClientNumberFromString(ent, arg)) == -1)
+	if ((clientNum = ClientNumberFromString(ent, arg)) == -1) {
+		ACP("setlevel: client is not on server.");
 		return qfalse;
+	}
 
 	target = g_entities + clientNum;
 	// Allows client to use the register cmd
@@ -453,7 +461,7 @@ qboolean G_admin_setlevel(gentity_t *ent, int skiparg) {
 	if(ent) {
 		if(level > G_admin_get_level(ent)) {
 			ACP("^7setlevel: you may not setlevel higher than your current level.");
-			return;
+			return qfalse;
 		}
 	}
 
@@ -466,11 +474,11 @@ qboolean G_admin_setlevel(gentity_t *ent, int skiparg) {
 	}
 
 	if(!found) {
-		if(ent) CP(va("print \"setlevel: level not found\n\""));
-		else G_Printf(va("setlevel: level not found\n"));
+		ACP("setlevel: level not found.");
 		return qfalse;
 	}
 	trap_SendServerCommand(clientNum, "server_setlevel");
+	return qtrue;
 }
 
 void G_clear_temp_admin() {
@@ -506,9 +514,15 @@ void G_admin_register_client(gentity_t *ent) {
 
 	for(i = 0; g_admin_users[i]; i++) {
 		if(!Q_stricmp(arg, g_admin_users[i]->password)) {
+
 			ent->client->sess.uinfo.level = temp.level;
+
 			Q_strncpyz(ent->client->sess.uinfo.name,
 				ent->client->pers.netname, sizeof(ent->client->sess.uinfo.name));
+
+			g_admin_users[i]->level = temp.level;
+			Q_strncpyz(g_admin_users[i]->password, ent->client->pers.netname, sizeof(g_admin_users[i]->password));
+
 			updated = qtrue;
 		}
 	}
@@ -521,6 +535,8 @@ void G_admin_register_client(gentity_t *ent) {
 		a->level = temp.level;
 		Q_strncpyz(a->name, ent->client->pers.netname, sizeof(a->name));
 		Q_strncpyz(a->password, arg, sizeof(a->password));	
+		ent->client->sess.uinfo.level = temp.level;
+		Q_strncpyz(ent->client->sess.uinfo.name, ent->client->pers.netname, sizeof(ent->client->sess.uinfo.name));
 		g_admin_users[i] = a;
 	}
 
@@ -560,10 +576,12 @@ void G_admin_login(gentity_t *ent) {
 	trap_Argv(1, arg, sizeof(arg));
 
 	Q_strncpyz(password, G_SHA1(arg), sizeof(password));
+	Q_strncpyz(ent->client->sess.uinfo.password, G_SHA1(arg), sizeof(ent->client->sess.uinfo.password));
 
 	for(i = 0; g_admin_users[i]; i++) {
 		if(!Q_stricmp(g_admin_users[i]->password, password)) {
 			ent->client->sess.uinfo.level = g_admin_users[i]->level;
+			Q_strncpyz(ent->client->sess.uinfo.name, g_admin_users[i]->name, sizeof(ent->client->sess.uinfo.name));
 			found = qtrue;
 			break;
 		}
@@ -590,34 +608,39 @@ qboolean G_admin_kick(gentity_t *ent, int skiparg) {
 	int timeout = 0;
 	int clientNum;
 	char name[MAX_TOKEN_CHARS];
-	char reason[MAX_TOKEN_CHARS] = "\0";
+	char reason[MAX_TOKEN_CHARS] = "Player kicked!";
 	char length[MAX_TOKEN_CHARS];
 	gentity_t *target;
 
-	if(Q_SayArgc() + skiparg < 2 || Q_SayArgc() + skiparg > 4) {
+	if(Q_SayArgc() - skiparg < 2 || Q_SayArgc() - skiparg > 4) {
 		ACP("usage: kick <player> <reason> <timeout>");
 		return qfalse;
 	}
 
 	Q_SayArgv(1 + skiparg, name, sizeof(name));
 
-	if ((clientNum = ClientNumberFromString(ent, name)) == -1)
+	if ((clientNum = ClientNumberFromString(ent, name)) == -1) {
+		ACP("adminsystem: target not found.");
 		return qfalse;
+	}
 
 	target = g_entities + clientNum;
 	if(ent) {
 		if(target->client->sess.uinfo.level > ent->client->sess.uinfo.level) {
-			ACP("kick: you can't kick a higher level player.");
+			ACP("adminsystem: you can't kick a higher level player!");
+			return qfalse;
+		} else if(target == ent) {
+			ACP("adminsystem: you can't kick yourself!");
 			return qfalse;
 		}
 	}
 
-	if(Q_SayArgc() + skiparg == 3) {
-		Q_SayArgv(2, reason, sizeof(reason));
+	if(Q_SayArgc() -skiparg >= 3) {
+		Q_SayArgv(2 + skiparg, reason, sizeof(reason));
 	}
 
-	if(Q_SayArgc() + skiparg == 4) {
-		Q_SayArgv(3, length, sizeof(length));
+	if(Q_SayArgc() -skiparg == 4) {
+		Q_SayArgv(3 + skiparg, length, sizeof(length));
 		timeout = atoi(length);
 	}
 
@@ -635,18 +658,77 @@ void G_admin_identify(gentity_t *ent) {
 	trap_SendServerCommand(clientNum, "identify_self");
 }
 
+void G_admin_identify_all() {
+	int i;
+	for(i = 0; i < level.numConnectedClients; i++) {
+		trap_SendServerCommand(i, "identify_self");
+	}
+}
+
 void G_admin_greeting(gentity_t *ent) {
 	char *greeting;
+	qboolean broadcast = qfalse;
+	int level = 0;
 	int i;
+
+	if( !ent ) {
+		return;
+	}
+
 	if( !ent->client->sess.need_greeting ) {
 		return;
 	}
+
+	for(i = 0; g_admin_users[i]; i++) {
+		if(!Q_stricmp(ent->client->sess.uinfo.password, g_admin_users[i]->password)) {
+			level = g_admin_users[i]->level;
+		}
+	}
+
 	for(i = 0; g_admin_levels[i]; i++) {
-		if(g_admin_levels[i]->level == ent->client->sess.uinfo.level) {
-			greeting = Q_StrReplace( g_admin_levels[i]->greeting, "[n]", ent->client->pers.netname);
-			ACP(va("%s", greeting));
-			ent->client->sess.need_greeting = qfalse;
+		if(g_admin_levels[i]->level == level) {
+			if(*g_admin_levels[i]->greeting)
+				greeting = Q_StrReplace( g_admin_levels[i]->greeting, "[n]", ent->client->pers.netname);
 			break;
 		}
 	}
+
+	if(*greeting) {
+		broadcast = qtrue;
+	}
+
+	if(broadcast) {
+		ent->client->sess.need_greeting = qfalse;
+		ACP(va("%s", greeting));
+	}
+}
+
+qboolean G_admin_finger(gentity_t *ent, int skipargs) {
+	int clientNum;
+	int i;
+	char name[MAX_TOKEN_CHARS];
+	char levelname[MAX_NETNAME];
+	qboolean found = qfalse;
+	gentity_t *target;
+
+	if(Q_SayArgc() - skipargs != 2) {
+		ACP("usage: !finger <name>");
+		return qfalse;
+	}
+
+	if ((clientNum = ClientNumberFromString(ent, name)) == -1)
+		return qfalse;
+
+	target = g_entities + clientNum;
+
+	for(i = 0; g_admin_levels[i]; i++) {
+		if(g_admin_levels[i]->level == target->client->sess.uinfo.level) {
+			Q_strncpyz(levelname, g_admin_levels[i]->name, sizeof(levelname));
+			break;
+		}
+	}
+
+	ACP(va("^7finger: %s ^7(%s^7) is a level %d user (%s^7)", target->client->pers.netname,
+		target->client->sess.uinfo.name, target->client->sess.uinfo.level, levelname));
+	return qtrue;
 }
