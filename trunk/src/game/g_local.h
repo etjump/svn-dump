@@ -654,6 +654,8 @@ typedef struct {
 	// adminlevel
 	admin_t		uinfo;
 
+	int			password_change_count;
+
 	qboolean	need_greeting;
 
 	qboolean	versionOK;
@@ -1215,11 +1217,6 @@ qboolean G_CallSpawn( gentity_t *ent );
 // done.
 char *G_AddSpawnVarToken( const char *string );
 void G_ParseField( const char *key, const char *value, gentity_t *ent );
-
-// g_admin.c
-char *hexToString(unsigned int msgDigest[]);
-qboolean G_admin_readconfig(gentity_t *ent);
-
 //
 // g_cmds.c
 //
@@ -2644,3 +2641,6 @@ qboolean G_admin_setlevel(gentity_t *ent, int skiparg);
 qboolean G_admin_admintest(gentity_t *ent, int skiparg);
 qboolean G_admin_kick(gentity_t *ent, int skiparg);
 qboolean G_admin_finger(gentity_t *ent, int skiparg);
+qboolean G_admin_mute(gentity_t *ent, int skiparg);
+qboolean G_admin_unmute(gentity_t *ent, int skiparg);
+qboolean G_admin_readconfig(gentity_t *ent, int skiparg);

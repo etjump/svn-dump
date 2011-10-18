@@ -1848,7 +1848,7 @@ void G_InitGame( int levelTime, int randomSeed, int restart ) {
 	G_Script_ScriptLoad();
 
 	G_Printf ("-----------------------------------\n");
-	G_admin_readconfig(NULL);
+	G_admin_readconfig(NULL, 0);
 	G_Printf ("-----------------------------------\n");
 
 	// reserve some spots for dead player bodies

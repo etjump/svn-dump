@@ -1743,6 +1743,12 @@ char *ClientConnect( int clientNum, qboolean firstTime, qboolean isBot ) {
 	client->sess.clientident = 0;
 	client->sess.allowRegister = qfalse;
 
+	if(firstTime) {
+		client->sess.password_change_count = 0;
+	} else {
+		client->sess.password_change_count = 3;
+	}
+
 	// count current clients and rank for scoreboard
 	CalculateRanks();
 

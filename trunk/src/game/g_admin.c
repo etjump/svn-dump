@@ -18,11 +18,14 @@ struct g_admin_cmd {
 };
 
 static const struct g_admin_cmd g_admin_cmds[] = {
-	{"setlevel", G_admin_setlevel, 's', ""},
-	{"admintest", G_admin_admintest, 'a', ""},
-	{"kick", G_admin_kick, 'k', ""},
-	{"finger", G_admin_finger, 'f', ""},
-	{"", NULL, '\0', ""}
+	{"admintest",	G_admin_admintest,	'a',	""},
+	{"finger",		G_admin_finger,		'f',	""},
+	{"kick",		G_admin_kick,		'k',	""},
+	{"mute",		G_admin_mute,		'm',	""},
+	{"readconfig",	G_admin_readconfig,	'R',	""},
+	{"setlevel",	G_admin_setlevel,	's',	""},
+	{"unmute",		G_admin_unmute,		'm',	""},
+	{"",			NULL,				'\0',	""}
 };
 
 void G_admin_chat_print(char *string) {
@@ -213,7 +216,7 @@ void G_admin_readconfig_float(char **cnf, float *v)
 }
 
 
-qboolean G_admin_readconfig(gentity_t *ent) {
+qboolean G_admin_readconfig(gentity_t *ent, int skiparg) {
 	admin_level_t *temp_level = NULL;
 	admin_user_t  *temp_user = NULL;
 	int lc = 0, uc = 0;
@@ -335,8 +338,7 @@ qboolean G_admin_readconfig(gentity_t *ent) {
 	if(user_open) g_admin_users[uc++] = temp_user;
 
 	free(data2);
-	G_Printf(va("^7readconfig: loaded %d levels and %d users\n", lc, uc));
-	if(ent) CP(va("print \"^7readconfig: loaded %d levels and %d users\"\n", lc, uc));
+	G_Printf("^7readconfig: loaded %d levels and %d users", lc, uc);
 
 	G_admin_identify_all();
 
@@ -373,6 +375,7 @@ qboolean G_admin_permission(gentity_t *ent, char flag) {
 						if(*flags == flag)
 							return qfalse;
 					}
+					return qtrue;
 				}
 			*flags++;
 			}
@@ -521,7 +524,7 @@ void G_admin_register_client(gentity_t *ent) {
 				ent->client->pers.netname, sizeof(ent->client->sess.uinfo.name));
 
 			g_admin_users[i]->level = temp.level;
-			Q_strncpyz(g_admin_users[i]->password, ent->client->pers.netname, sizeof(g_admin_users[i]->password));
+			Q_strncpyz(g_admin_users[i]->password, arg, sizeof(g_admin_users[i]->password));
 
 			updated = qtrue;
 		}
@@ -569,9 +572,16 @@ void G_admin_login(gentity_t *ent) {
 	char arg[MAX_TOKEN_CHARS];
 	char password[PASSWORD_LEN+1];
 	
+	if(ent->client->sess.password_change_count > 2) {
+		CP("print \"adminsystem: you can only change password 2 times\n\"");
+		return;
+	}
+
 	if(trap_Argc() != 2) {
 		return;
 	}
+	// Don't want people to change password too many times.
+	ent->client->sess.password_change_count++;
 
 	trap_Argv(1, arg, sizeof(arg));
 
@@ -588,16 +598,7 @@ void G_admin_login(gentity_t *ent) {
 	}
 	if(!found) {
 		ent->client->sess.uinfo.level = 0;
-		for(i = 0; g_admin_users[i]; i++) {
-			if(g_admin_levels[i]->level == 0) {
-				Q_strncpyz(ent->client->sess.uinfo.name, g_admin_users[i]->name, sizeof(ent->client->sess.uinfo.name));
-				found = qtrue;
-				break;
-			}
-		}
-		if(!found) {
-			Q_strncpyz(ent->client->sess.uinfo.name, "ET Jumper", sizeof(ent->client->sess.uinfo.name));
-		}
+		Q_strncpyz(ent->client->sess.uinfo.name, ent->client->pers.netname, sizeof(ent->client->sess.uinfo.name));
 	}
 }
 ///////////////////
@@ -620,17 +621,17 @@ qboolean G_admin_kick(gentity_t *ent, int skiparg) {
 	Q_SayArgv(1 + skiparg, name, sizeof(name));
 
 	if ((clientNum = ClientNumberFromString(ent, name)) == -1) {
-		ACP("adminsystem: target not found.");
+		ACP("adminsystem: target not found");
 		return qfalse;
 	}
 
 	target = g_entities + clientNum;
 	if(ent) {
 		if(target->client->sess.uinfo.level > ent->client->sess.uinfo.level) {
-			ACP("adminsystem: you can't kick a higher level player!");
+			ACP("adminsystem: you can't kick a higher level player");
 			return qfalse;
 		} else if(target == ent) {
-			ACP("adminsystem: you can't kick yourself!");
+			ACP("adminsystem: you can't kick yourself");
 			return qfalse;
 		}
 	}
@@ -730,5 +731,53 @@ qboolean G_admin_finger(gentity_t *ent, int skipargs) {
 
 	ACP(va("^7finger: %s ^7(%s^7) is a level %d user (%s^7)", target->client->pers.netname,
 		target->client->sess.uinfo.name, target->client->sess.uinfo.level, levelname));
+	return qtrue;
+}
+
+qboolean G_admin_mute(gentity_t *ent, int skipargs) {
+	int clientNum;
+	gentity_t *target;
+	char name[MAX_TOKEN_CHARS];
+
+	if(Q_SayArgc() - skipargs != 2) {
+		ACP("usage: !mute <name>");
+		return qfalse;
+	}
+
+	if ((clientNum = ClientNumberFromString(ent, name)) == -1)
+		return qfalse;
+
+	target = g_entities + clientNum;
+
+	target->client->sess.muted = qtrue;
+
+	CPx(clientNum, "print \"^5You've been muted\n\"" );
+
+	ACP(va("%s ^7has been muted", target->client->pers.netname));
+
+	return qtrue;
+}
+
+qboolean G_admin_unmute(gentity_t *ent, int skipargs) {
+	int clientNum;
+	gentity_t *target;
+	char name[MAX_TOKEN_CHARS];
+
+	if(Q_SayArgc() - skipargs != 2) {
+		ACP("usage: !unmute <name>");
+		return qfalse;
+	}
+
+	if ((clientNum = ClientNumberFromString(ent, name)) == -1)
+		return qfalse;
+
+	target = g_entities + clientNum;
+
+	target->client->sess.muted = qfalse;
+
+	CPx(clientNum, "print \"^5You've been unmuted\n\"" );
+
+	ACP(va("%s ^7has been unmuted", target->client->pers.netname));
+
 	return qtrue;
 }

@@ -1433,11 +1433,6 @@ qboolean	ConsoleCommand( void ) {
 		return qfalse;
 	}
 
-	if (!Q_stricmp(cmd, "readconfig")) {
-		G_admin_readconfig(NULL);
-		return qtrue;
-	}
-
 	if (!Q_stricmp(cmd, "rename"))
 	{
 		Svcmd_Rename_f();
