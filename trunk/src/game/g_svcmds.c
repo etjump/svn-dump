@@ -1212,25 +1212,6 @@ void Svcmd_Passvote_f() {
 	trap_SendServerCommand(-1, "print \"Vote has been passed by an admin!\n\"");
 }
 
-void Svcmd_Rename_f() {
-	gentity_t	*other;
-	int		clientNum;
-	char	arg[MAX_TOKEN_CHARS];
-
-	trap_Argv(1, arg, sizeof(arg));
-
-	clientNum = refClientNumFromString(arg);
-	if (clientNum == -1)
-	{
-		G_Printf("^7Rename: Invalid player specified.\n");
-		return;
-	}
-	
-	other = g_entities + clientNum;
-
-	trap_SendServerCommand(clientNum, va("rename %s", ConcatArgs(2)));
-}
-
 // -fretn
 
 char	*ConcatArgs( int start );
@@ -1431,12 +1412,6 @@ qboolean	ConsoleCommand( void ) {
 	if (!Q_stricmp(cmd, "ref")) {
 		G_ref_con();
 		return qfalse;
-	}
-
-	if (!Q_stricmp(cmd, "rename"))
-	{
-		Svcmd_Rename_f();
-		return qtrue;
 	}
 
 	// -fretn

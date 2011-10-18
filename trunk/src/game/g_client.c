@@ -878,7 +878,8 @@ void SetWolfSpawnWeapons( gclient_t *client )
 						case WP_CARBINE:
 							if (AddWeaponToPlayer(client, WP_CARBINE, GetAmmoTableData(WP_CARBINE)->defaultStartingAmmo, GetAmmoTableData(WP_CARBINE)->defaultStartingClip, qtrue))
 							{
-								AddWeaponToPlayer(client, WP_M7, GetAmmoTableData(WP_M7)->defaultStartingAmmo, GetAmmoTableData(WP_M7)->defaultStartingClip, qfalse);
+								if(!level.noExplosives)
+									AddWeaponToPlayer(client, WP_M7, GetAmmoTableData(WP_M7)->defaultStartingAmmo, GetAmmoTableData(WP_M7)->defaultStartingClip, qfalse);
 							}
 							break;
 						default:
@@ -1730,7 +1731,7 @@ char *ClientConnect( int clientNum, qboolean firstTime, qboolean isBot ) {
 	if ( firstTime && !G_IsSinglePlayerGame())
 	{
 		value = Info_ValueForKey(userinfo, "ip");
-		G_LogPrintf("%s Connected. IP: %s\n", client->pers.netname, value);
+		G_LogPrintf("ClientConnect: /USER/%s/IP/%s/\n", client->pers.netname, value);
 		trap_SendServerCommand( -1, va("cpm \"%s" S_COLOR_WHITE " connected\n\"", client->pers.netname) );
 	}
 

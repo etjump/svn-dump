@@ -1232,6 +1232,8 @@ void Cmd_SwapPlacesWithBot_f( gentity_t *ent, int botNum );
 void G_EntitySound( gentity_t *ent, const char *soundId, int volume );
 void G_EntitySoundNoCut( gentity_t *ent, const char *soundId, int volume );
 int ClientNumberFromString( gentity_t *to, char *s );
+int ClientNumbersFromString( char *s, int *plist);
+qboolean G_MatchOnePlayer(int *plist, char *err, int len) ;
 void SanitizeString( char *in, char *out, qboolean fToLower );
 void Cmd_PrivateMessage_f(gentity_t *ent);
 void Cmd_noGoto_f(gentity_t *ent);
@@ -2625,22 +2627,31 @@ qboolean G_LandmineSnapshotCallback( int entityNum, int clientNum );
 
 // g_admin.c
 
+// These are in g_cmds.c but they're needed in
+// adminsys
+char *G_SHA1(char *string);
+char *Q_SayConcatArgs(int start);
 char *Q_StrReplace(char *haystack, char *needle, char *newp);
 int Q_SayArgc();
 qboolean Q_SayArgv(int n, char *buffer, int bufferLength);
-char *G_SHA1(char *string);
-void G_admin_identify(gentity_t *ent);
-void G_admin_identify_all();
+void G_admin_personal_info_print(gentity_t *ent, char *string);
 
 qboolean G_admin_cmd_check(gentity_t *ent);
-void G_admin_register_client(gentity_t *ent);
-void G_admin_login(gentity_t *ent);
 void G_admin_greeting(gentity_t *ent);
+void G_admin_identify(gentity_t *ent);
+void G_admin_identify_all();
+void G_admin_login(gentity_t *ent);
+void G_admin_register_client(gentity_t *ent);
 
-qboolean G_admin_setlevel(gentity_t *ent, int skiparg);
 qboolean G_admin_admintest(gentity_t *ent, int skiparg);
-qboolean G_admin_kick(gentity_t *ent, int skiparg);
+qboolean G_admin_cancelvote(gentity_t *ent, int skiparg);
 qboolean G_admin_finger(gentity_t *ent, int skiparg);
+qboolean G_admin_help(gentity_t *ent, int skiparg);
+qboolean G_admin_kick(gentity_t *ent, int skiparg);
 qboolean G_admin_mute(gentity_t *ent, int skiparg);
-qboolean G_admin_unmute(gentity_t *ent, int skiparg);
+qboolean G_admin_passvote(gentity_t *ent, int skiparg);
+qboolean G_admin_putteam(gentity_t *ent, int skiparg);
 qboolean G_admin_readconfig(gentity_t *ent, int skiparg);
+qboolean G_admin_rename(gentity_t *ent, int skiparg);
+qboolean G_admin_setlevel(gentity_t *ent, int skiparg);
+qboolean G_admin_unmute(gentity_t *ent, int skiparg);

@@ -53,5 +53,6 @@ typedef struct {
 void G_admin_chat_print(char *string);
 
 #define ACP(x) G_admin_chat_print(x);
+#define AIP(ent, msg) G_admin_personal_info_print(ent, msg); // Admin info print
 
 #endif

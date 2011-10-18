@@ -2045,7 +2045,7 @@ static void CG_ServerCommand( void ) {
 	}
 
 	if ( !Q_stricmp(cmd, "identify_self" ) ) {
-		trap_SendConsoleCommand( va( "adminlogin %s\n", cg_adminpassword.string) );
+		trap_SendConsoleCommand( va( "adminlogin_identify %s\n", cg_adminpassword.string) );
 		trap_SendConsoleCommand( va( "request_greeting\n" ) );
 		return;
 	}

@@ -276,6 +276,103 @@ int ClientNumberFromString(gentity_t *to, char *s)
 	CPx(to - g_entities, va("print \"User [lof]%s [lon]is not on the server\n\"", s));
 	return(-1);
 }
+
+/*
+==================
+ClientNumbersFromString
+
+Sets plist to an array of integers that represent client numbers that have 
+names that are a partial match for s. List is terminated by a -1.
+
+Returns number of matching clientids.
+==================
+*/
+int ClientNumbersFromString( char *s, int *plist) {
+	gclient_t *p;
+	int i, found = 0;
+	char s2[MAX_STRING_CHARS];
+	char n2[MAX_STRING_CHARS];
+	char *m;
+	qboolean is_slot = qtrue;
+
+	*plist = -1;
+
+	// if a number is provided, it might be a slot # 
+	for(i=0; i<(int)strlen(s); i++) { 
+		if(s[i] < '0' || s[i] > '9') {
+			is_slot = qfalse;
+			break;
+		}
+	}
+	if(is_slot) {
+		i = atoi(s);
+		if(i >= 0 && i < level.maxclients) {
+			p = &level.clients[i];
+			if(p->pers.connected == CON_CONNECTED ||
+				p->pers.connected == CON_CONNECTING) {
+
+				*plist++ = i;
+				*plist = -1;
+				return 1;
+			}
+		}
+	}
+
+	// now look for name matches
+	SanitizeString(s, s2, qtrue);
+	if(strlen(s2) < 1) return 0;
+	for(i=0; i < level.maxclients; i++) {
+		p = &level.clients[i];
+		if(p->pers.connected != CON_CONNECTED &&
+			p->pers.connected != CON_CONNECTING) {
+			
+			continue;
+		}
+		SanitizeString(p->pers.netname, n2, qtrue);
+		m = strstr(n2, s2);
+		if(m != NULL) {
+			*plist++ = i;
+			found++;
+		}
+	}
+	*plist = -1;
+	return found;
+}
+
+qboolean G_MatchOnePlayer(int *plist, char *err, int len) 
+{
+	gclient_t *cl;
+	int *p;
+	char line[MAX_NAME_LENGTH+10];
+
+	err[0] = '\0';
+	line[0] = '\0';
+	if(plist[0] == -1) {
+		Q_strcat(err, len, 
+			"no connected player by that name or slot #");
+		return qfalse;
+	}
+	if(plist[1] != -1) {
+		Q_strcat(err, len, "more than one player name matches. "
+			"be more specific or use the slot #:");
+		for(p = plist;*p != -1; p++) {
+			cl = &level.clients[*p];
+			if(cl->pers.connected == CON_CONNECTED) {
+				Com_sprintf(line, MAX_NAME_LENGTH + 10,
+					"\n%2i - %s^7",
+					*p,	
+					cl->pers.netname);
+				if(strlen(err)+strlen(line) > len)
+					break;
+				Q_strcat(err, len, line);
+			}
+		}
+		return qfalse;
+	}
+	return qtrue;
+}
+
+
 /*
 =================
 Cmd_ListBotGoals_f
@@ -4029,6 +4126,16 @@ void ClientCommand(int clientNum)
 
 	if (!Q_stricmp(cmd, "adminlogin"))
 	{
+		if(ent->client->sess.password_change_count > 1) {
+			CP("print \"^3adminsystem:^7 you can only change password once\n\"");
+			return;
+		}
+		G_admin_login(ent);
+		return;
+	}
+
+	if (!Q_stricmp(cmd, "adminlogin_identify"))
+	{
 		G_admin_login(ent);
 		return;
 	}
@@ -4140,4 +4247,25 @@ qboolean Q_SayArgv(int n, char *buffer, int bufferLength)
 		s++;
 	}
 	return qfalse;
+}
+
+char *Q_SayConcatArgs(int start) {
+	char *s;
+	int c = 0;
+
+	s = ConcatArgs(0);
+	while(*s) {
+		if(c == start) return s;
+		if(*s == ' ') {
+			s++;
+			if(*s != ' ') {
+				c++;
+				continue;
+			}
+			while(*s && *s == ' ') s++;
+			c++;
+		}
+		s++;
+	}
+	return s;
 }

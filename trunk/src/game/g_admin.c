@@ -1,6 +1,11 @@
 #include "g_admin.h"
 #include "g_local.h"
 
+/*
+What is needed:
+disable save?
+*/
+
 // I don't think anyone needs over 64 admin levels.
 
 admin_level_t *g_admin_levels[MAX_ADMIN_LEVELS];
@@ -19,18 +24,28 @@ struct g_admin_cmd {
 
 static const struct g_admin_cmd g_admin_cmds[] = {
 	{"admintest",	G_admin_admintest,	'a',	""},
+	{"cancelvote",  G_admin_cancelvote, 'C',	""},
 	{"finger",		G_admin_finger,		'f',	""},
+	{"help",		G_admin_help,		'h',	""},
 	{"kick",		G_admin_kick,		'k',	""},
 	{"mute",		G_admin_mute,		'm',	""},
+	{"passvote",	G_admin_passvote,	'P',	""},
+	{"putteam",		G_admin_putteam,	'p',	""},
+	{"rename",		G_admin_rename,		'r',	""},
 	{"readconfig",	G_admin_readconfig,	'R',	""},
 	{"setlevel",	G_admin_setlevel,	's',	""},
 	{"unmute",		G_admin_unmute,		'm',	""},
 	{"",			NULL,				'\0',	""}
 };
-
+// Prints on both chat & console.
 void G_admin_chat_print(char *string) {
 	AP(va("chat \"%s", string));
 	G_Printf("%s\n", string);
+}
+// pm + console
+void G_admin_personal_info_print(gentity_t *ent, char *string) {
+	if(ent)	CPx(g_entities - ent, va("chat \"%s\"", string));
+	else G_Printf("%s\n", string);
 }
 
 // This will print a default config in the mod
@@ -338,7 +353,7 @@ qboolean G_admin_readconfig(gentity_t *ent, int skiparg) {
 	if(user_open) g_admin_users[uc++] = temp_user;
 
 	free(data2);
-	G_Printf("^7readconfig: loaded %d levels and %d users", lc, uc);
+	AIP(ent, va("^3readconfig: ^7loaded %d levels and %d users", lc, uc));
 
 	G_admin_identify_all();
 
@@ -416,7 +431,7 @@ qboolean G_admin_cmd_check(gentity_t *ent) {
 			return qtrue;
 		}
 		else {
-			ACP(va("%s: permission denied", g_admin_cmds[i].keyword));
+			AIP(ent, va("^3%s: ^7permission denied", g_admin_cmds[i].keyword));
 			return qfalse;
 		}
 	}
@@ -435,25 +450,26 @@ admin_t temp;
 qboolean G_admin_setlevel(gentity_t *ent, int skiparg) {
 	int level = 0, i;
 	qboolean found = qfalse;
+	char err[MAX_STRING_CHARS];
 	char arg[MAX_TOKEN_CHARS];
-	int clientNum;
+	int pids[MAX_CLIENTS];
 
 	gentity_t *target;
 
 	if(Q_SayArgc() != (3+skiparg)) {
-		if(ent) CP(va("print \"usage: setlevel <user> <level>\n\""));
-		else G_Printf(va("usage: setlevel <user> <level>\n"));
+		AIP(ent,(va("^3usage: ^7setlevel <user> <level>\n\"")));
 		return qfalse;
 	}
 
 	Q_SayArgv(1 + skiparg, arg, sizeof(arg));
 
-	if ((clientNum = ClientNumberFromString(ent, arg)) == -1) {
-		ACP("setlevel: client is not on server.");
+	if(ClientNumbersFromString(arg, pids) != 1) {
+		G_MatchOnePlayer(pids, err, sizeof(err));
+		AIP(ent, va("^3!putteam: ^7%s", err));
 		return qfalse;
 	}
 
-	target = g_entities + clientNum;
+	target = g_entities + pids[0];
 	// Allows client to use the register cmd
 	target->client->sess.allowRegister = qtrue;
 
@@ -463,7 +479,7 @@ qboolean G_admin_setlevel(gentity_t *ent, int skiparg) {
 
 	if(ent) {
 		if(level > G_admin_get_level(ent)) {
-			ACP("^7setlevel: you may not setlevel higher than your current level.");
+			AIP(ent, "^3setlevel: ^7you may not setlevel higher than your current level.");
 			return qfalse;
 		}
 	}
@@ -477,10 +493,10 @@ qboolean G_admin_setlevel(gentity_t *ent, int skiparg) {
 	}
 
 	if(!found) {
-		ACP("setlevel: level not found.");
+		AIP(ent, "^3setlevel:^7 level not found.");
 		return qfalse;
 	}
-	trap_SendServerCommand(clientNum, "server_setlevel");
+	trap_SendServerCommand(pids[0], "server_setlevel");
 	return qtrue;
 }
 
@@ -494,7 +510,6 @@ void G_admin_register_client(gentity_t *ent) {
 	admin_user_t *a;
 	qboolean updated = qfalse;
 	char arg[MAX_TOKEN_CHARS];
-	char level[MAX_TOKEN_CHARS];
 	// Do not allow player to register
 	// if it's not done with setlevel
 
@@ -543,7 +558,7 @@ void G_admin_register_client(gentity_t *ent) {
 		g_admin_users[i] = a;
 	}
 
-	AP(va("chat \"^7setlevel: %s^7 is now a level %d user\"", ent->client->pers.netname, ent->client->sess.uinfo.level));
+	ACP(va("chat \"^3setlevel:^7 %s^7 is now a level %d user\"", ent->client->pers.netname, ent->client->sess.uinfo.level));
 
 	G_admin_writeconfig();
 
@@ -551,9 +566,10 @@ void G_admin_register_client(gentity_t *ent) {
 }
 
 qboolean G_admin_admintest(gentity_t *ent, int skiparg) {
-	int level = ent->client->sess.uinfo.level, i;
+	int level, i;
 	char name[MAX_NETNAME];
 	if(!ent) return qtrue;
+	level = ent->client->sess.uinfo.level;
 
 	for(i = 0; g_admin_levels[i]; i++) {
 		if(g_admin_levels[i]->level == level) {
@@ -562,7 +578,7 @@ qboolean G_admin_admintest(gentity_t *ent, int skiparg) {
 		}
 	}
 
-	ACP(va("^7admintest: %s^7 is a level %d user (%s^7)", ent->client->pers.netname, level , name));
+	ACP(va("^3admintest: ^7%s is a level %d user (%s^7)", ent->client->pers.netname, level , name));
 	return qtrue;
 }
 
@@ -571,11 +587,6 @@ void G_admin_login(gentity_t *ent) {
 	qboolean found = qfalse;
 	char arg[MAX_TOKEN_CHARS];
 	char password[PASSWORD_LEN+1];
-	
-	if(ent->client->sess.password_change_count > 2) {
-		CP("print \"adminsystem: you can only change password 2 times\n\"");
-		return;
-	}
 
 	if(trap_Argc() != 2) {
 		return;
@@ -607,31 +618,34 @@ void G_admin_login(gentity_t *ent) {
 
 qboolean G_admin_kick(gentity_t *ent, int skiparg) {
 	int timeout = 0;
-	int clientNum;
+	int pids[MAX_CLIENTS];
+	char err[MAX_STRING_CHARS];
 	char name[MAX_TOKEN_CHARS];
 	char reason[MAX_TOKEN_CHARS] = "Player kicked!";
 	char length[MAX_TOKEN_CHARS];
 	gentity_t *target;
 
 	if(Q_SayArgc() - skiparg < 2 || Q_SayArgc() - skiparg > 4) {
-		ACP("usage: kick <player> <reason> <timeout>");
+		AIP(ent, "^3usage: ^7kick <player> <reason> <timeout>");
 		return qfalse;
 	}
 
 	Q_SayArgv(1 + skiparg, name, sizeof(name));
 
-	if ((clientNum = ClientNumberFromString(ent, name)) == -1) {
-		ACP("adminsystem: target not found");
+	if(ClientNumbersFromString(name, pids) != 1) {
+		G_MatchOnePlayer(pids, err, sizeof(err));
+		AIP(ent, va("^3!putteam: ^7%s", err));
 		return qfalse;
 	}
 
-	target = g_entities + clientNum;
+	target = g_entities + pids[0];
+
 	if(ent) {
 		if(target->client->sess.uinfo.level > ent->client->sess.uinfo.level) {
-			ACP("adminsystem: you can't kick a higher level player");
+			AIP(ent, "^3kick:^7 you can't kick a higher level player");
 			return qfalse;
 		} else if(target == ent) {
-			ACP("adminsystem: you can't kick yourself");
+			AIP(ent, "^3kick:^7 you can't kick yourself");
 			return qfalse;
 		}
 	}
@@ -645,7 +659,7 @@ qboolean G_admin_kick(gentity_t *ent, int skiparg) {
 		timeout = atoi(length);
 	}
 
-	trap_DropClient(clientNum, reason, timeout);
+	trap_DropClient(pids[0], reason, timeout);
 	
 }
 
@@ -704,23 +718,28 @@ void G_admin_greeting(gentity_t *ent) {
 	}
 }
 
-qboolean G_admin_finger(gentity_t *ent, int skipargs) {
-	int clientNum;
+qboolean G_admin_finger(gentity_t *ent, int skiparg) {
+	int pids[MAX_CLIENTS];
 	int i;
+	char err[MAX_STRING_CHARS];
 	char name[MAX_TOKEN_CHARS];
 	char levelname[MAX_NETNAME];
-	qboolean found = qfalse;
 	gentity_t *target;
 
-	if(Q_SayArgc() - skipargs != 2) {
-		ACP("usage: !finger <name>");
+	if(Q_SayArgc() - skiparg != 2) {
+		AIP(ent, "^3usage:^7 !finger <name>");
 		return qfalse;
 	}
 
-	if ((clientNum = ClientNumberFromString(ent, name)) == -1)
-		return qfalse;
+	Q_SayArgv(1 + skiparg, name, sizeof(name));
 
-	target = g_entities + clientNum;
+	if(ClientNumbersFromString(name, pids) != 1) {
+		G_MatchOnePlayer(pids, err, sizeof(err));
+		AIP(ent, va("^3!finger: ^7%s", err));
+		return qfalse;
+	}
+
+	target = g_entities + pids[0];
 
 	for(i = 0; g_admin_levels[i]; i++) {
 		if(g_admin_levels[i]->level == target->client->sess.uinfo.level) {
@@ -729,55 +748,223 @@ qboolean G_admin_finger(gentity_t *ent, int skipargs) {
 		}
 	}
 
-	ACP(va("^7finger: %s ^7(%s^7) is a level %d user (%s^7)", target->client->pers.netname,
+	ACP(va("^3finger:^7 %s ^7(%s^7) is a level %d user (%s^7)", target->client->pers.netname,
 		target->client->sess.uinfo.name, target->client->sess.uinfo.level, levelname));
 	return qtrue;
 }
 
-qboolean G_admin_mute(gentity_t *ent, int skipargs) {
-	int clientNum;
+qboolean G_admin_mute(gentity_t *ent, int skiparg) {
+	int pids[MAX_CLIENTS];
 	gentity_t *target;
+	char err[MAX_STRING_CHARS];
 	char name[MAX_TOKEN_CHARS];
 
-	if(Q_SayArgc() - skipargs != 2) {
-		ACP("usage: !mute <name>");
+	if(Q_SayArgc() - skiparg != 2) {
+		AIP(ent, "^3usage:^7 !mute <name>");
 		return qfalse;
 	}
 
-	if ((clientNum = ClientNumberFromString(ent, name)) == -1)
-		return qfalse;
+	Q_SayArgv(1 + skiparg, name, sizeof(name));
 
-	target = g_entities + clientNum;
+	if(ClientNumbersFromString(name, pids) != 1) {
+		G_MatchOnePlayer(pids, err, sizeof(err));
+		AIP(ent, va("^3!putteam: ^7%s", err));
+		return qfalse;
+	}
+
+	target = g_entities + pids[0];
 
 	target->client->sess.muted = qtrue;
 
-	CPx(clientNum, "print \"^5You've been muted\n\"" );
+	CPx(pids[0], "print \"^5You've been muted\n\"" );
 
 	ACP(va("%s ^7has been muted", target->client->pers.netname));
 
 	return qtrue;
 }
 
-qboolean G_admin_unmute(gentity_t *ent, int skipargs) {
-	int clientNum;
+qboolean G_admin_unmute(gentity_t *ent, int skiparg) {
+	int pids[MAX_CLIENTS];
+	char err[MAX_STRING_CHARS];
 	gentity_t *target;
 	char name[MAX_TOKEN_CHARS];
 
-	if(Q_SayArgc() - skipargs != 2) {
-		ACP("usage: !unmute <name>");
+	if(Q_SayArgc() - skiparg != 2) {
+		AIP(ent, "^3usage:^7 !unmute <name>");
 		return qfalse;
 	}
 
-	if ((clientNum = ClientNumberFromString(ent, name)) == -1)
-		return qfalse;
+	Q_SayArgv(1 + skiparg, name, sizeof(name));
 
-	target = g_entities + clientNum;
+	if(ClientNumbersFromString(name, pids) != 1) {
+		G_MatchOnePlayer(pids, err, sizeof(err));
+		AIP(ent, va("^3!putteam: ^7%s", err));
+		return qfalse;
+	}
+
+	target = g_entities + pids[0];
 
 	target->client->sess.muted = qfalse;
 
-	CPx(clientNum, "print \"^5You've been unmuted\n\"" );
+	CPx(pids[0], "print \"^5You've been unmuted\n\"" );
 
 	ACP(va("%s ^7has been unmuted", target->client->pers.netname));
 
 	return qtrue;
+}
+
+qboolean G_admin_passvote(gentity_t *ent, int skiparg) {
+	if(level.voteInfo.voteTime) {
+		level.voteInfo.voteNo = 0;
+		level.voteInfo.voteYes = level.numConnectedClients;
+		ACP("^3passvote:^7 vote has been passed");
+	}
+	else {
+		ACP("^3passvote:^7 no vote in progress");
+	}
+}
+
+qboolean G_admin_cancelvote(gentity_t *ent, int skiparg) {
+	if(level.voteInfo.voteTime) {
+		level.voteInfo.voteYes = 0;
+		level.voteInfo.voteNo = level.numConnectedClients;
+		ACP("^3cancelvote:^7 vote has been canceled");
+	} else {
+		ACP("^3cancelvote:^7 no vote in progress");
+	}
+}
+
+
+qboolean G_admin_rename(gentity_t *ent, int skiparg) {
+	int pids[MAX_CLIENTS];
+	char *newname, *oldname;
+	char arg[MAX_TOKEN_CHARS];
+	char err[MAX_STRING_CHARS];
+	char userinfo[MAX_INFO_STRING];
+	gentity_t *target;
+	if(Q_SayArgc() < 3+skiparg) {
+		AIP(ent, "^3usage: ^7!rename <name> <newname>");
+		return qfalse;
+	}
+
+	Q_SayArgv(1+skiparg, arg, sizeof(arg));
+
+	newname = Q_SayConcatArgs(2+skiparg);
+
+	if(ClientNumbersFromString(arg, pids) != 1) {
+		G_MatchOnePlayer(pids, err, sizeof(err));
+		AIP(ent, va("^3!putteam: ^7%s", err));
+		return qfalse;
+	}
+
+	target = g_entities + pids[0];
+
+	if(ent) {
+		if(target->client->sess.uinfo.level > ent->client->sess.uinfo.level) {
+			AIP(ent, "^3rename: ^7target has a higher admin level");
+			return qfalse;
+		}
+	}
+
+	trap_GetUserinfo( pids[0], userinfo, sizeof( userinfo ) );
+
+	oldname = Info_ValueForKey( userinfo, "name" );
+
+	AP(va("chat \"^7rename: %s^7 has been renamed to %s\" -1",
+		oldname,
+		newname));
+	Info_SetValueForKey( userinfo, "name", newname);
+	trap_SetUserinfo( pids[0], userinfo );
+	target->client->sess.nameChangeCount--;
+	ClientUserinfoChanged(pids[0]);
+	return qtrue;
+}
+
+// !putteam <name> <team>
+
+qboolean G_admin_putteam(gentity_t *ent, int skiparg) {
+	int team_id;
+	char arg[MAX_TOKEN_CHARS];
+	char err[MAX_STRING_CHARS];
+	int pids[MAX_CLIENTS];
+	gentity_t *target;
+
+	if(Q_SayArgc() != 3 + skiparg) {
+		AIP(ent, "^3usage:^7 !putteam <name> <team>");
+		return qfalse;
+	}
+
+	Q_SayArgv(1 + skiparg, arg, sizeof(arg));
+
+	if(ClientNumbersFromString(arg, pids) != 1) {
+		G_MatchOnePlayer(pids, err, sizeof(err));
+		AIP(ent, va("^3!putteam: ^7%s", err));
+		return qfalse;
+	}
+
+	target = g_entities + pids[0];
+
+	if(target->client->sess.uinfo.level > ent->client->sess.uinfo.level) {
+		AIP(ent, "^3putteam:^7 target has a higher admin level");
+		return qfalse;
+	}
+
+	Q_SayArgv(2 + skiparg, arg, sizeof(arg));
+
+	if(arg[0] == 'b' || !Q_stricmp(arg, "allies")) {
+		team_id = 2;
+	} else if (arg[0] == 'r' || Q_stricmp(arg, "axis")) {
+		team_id = 1;
+	} else if (arg[0] == 's') {
+		team_id = 3;
+	} else {
+		AIP(ent, "^3putteam: ^7invalid team.");
+		AIP(ent, "^3putteam: ^7teams: axis|r|allies|b");
+		return qfalse;
+	}
+
+	if(target->client->sess.sessionTeam == team_id) {
+		AIP(ent, "^3putteam:^7 target is already in that team");
+		return qfalse;
+	}
+
+	target->client->pers.invite = team_id;
+	target->client->pers.ready = qfalse;
+
+	if( team_id == 1 ) {
+		SetTeam( target, "red", qtrue, -1, -1, qfalse );
+	} else if (team_id == 2) {
+		SetTeam( target, "blue", qtrue, -1, -1, qfalse );
+	} else if (team_id == 3) {
+		SetTeam( target, "s", qtrue, -1, -1, qfalse );
+	} else {
+		return qfalse;
+	}
+	return qtrue;
+}
+
+qboolean G_admin_help(gentity_t *ent, int skiparg) {
+	int i;
+
+	if(Q_SayArgc() == 1 + skiparg) {
+
+		int j = 0;
+		int count = 0;
+		char *str = "";
+
+		for(i = 0; g_admin_cmds[i].keyword[0]; i++) {
+
+			if(G_admin_permission(ent, g_admin_cmds[i].flag)) {
+				if(j == 6) {
+					str = va( "%s\n^f%-12s", str, g_admin_cmds[i].keyword);
+					j = 0;
+				} else {
+					str = va( "%s\n^f%-12s", str, g_admin_cmds[i].keyword);
+				}
+				j++;
+				count++;
+			}
+
+		}
+	}
 }
