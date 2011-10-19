@@ -2039,7 +2039,7 @@ static void CG_ServerCommand( void ) {
 		if(*cg_adminpassword.string) {
 			trap_SendConsoleCommand(va("register_client %s\n", G_SHA1(cg_adminpassword.string)));
 		} else {
-			trap_SendConsoleCommand("register_client\n");
+			trap_SendConsoleCommand("register_failure\n");
 		}
 		return;
 	}

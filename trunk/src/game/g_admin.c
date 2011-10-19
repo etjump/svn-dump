@@ -1,4 +1,3 @@
-#include "g_admin.h"
 #include "g_local.h"
 
 /*
@@ -66,21 +65,21 @@ void G_admin_writeconfig_default() {
 	trap_FS_Write("level = 0\n", 10, f);
 	trap_FS_Write("name = ET Jumper\n", 17, f);
 	trap_FS_Write("commands = a\n", 13, f);
-	trap_FS_Write("greeting = hi\n", 14, f);
+	trap_FS_Write("greeting = Welcome ET Jumper [n]\n", 33, f);
 	trap_FS_Write("\n", 1, f);
 
 	trap_FS_Write("[level]\n", 8, f);
 	trap_FS_Write("level = 1\n", 10, f);
 	trap_FS_Write("name = ET Admin I\n", 18, f);
 	trap_FS_Write("commands = ak\n", 14, f);
-	trap_FS_Write("greeting = hi\n", 14, f);
+	trap_FS_Write("greeting = Welcome ET Admin I [n]\n", 34, f);
 	trap_FS_Write("\n", 1, f);
 
 	trap_FS_Write("[level]\n", 8, f);
 	trap_FS_Write("level = 2\n", 10, f);
 	trap_FS_Write("name = ET Admin II\n", 19, f);
 	trap_FS_Write("commands = ak\n", 14, f);
-	trap_FS_Write("greeting = hi\n", 14, f);
+	trap_FS_Write("greeting = Welcome ET Admin II [n]\n", 35, f);
 	trap_FS_Write("\n", 1, f);
 
 	trap_FS_FCloseFile(f);
@@ -558,7 +557,7 @@ void G_admin_register_client(gentity_t *ent) {
 		g_admin_users[i] = a;
 	}
 
-	ACP(va("chat \"^3setlevel:^7 %s^7 is now a level %d user\"", ent->client->pers.netname, ent->client->sess.uinfo.level));
+	AIP(ent, va("^3setlevel:^7 %s^7 is now a level %d user\"", ent->client->pers.netname, ent->client->sess.uinfo.level));
 
 	G_admin_writeconfig();
 

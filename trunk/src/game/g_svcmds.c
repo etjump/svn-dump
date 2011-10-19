@@ -1200,18 +1200,6 @@ static void Svcmd_KickNum_f( void ) {
 	trap_DropClient(clientNum, "player kicked", timeout);
 }
 
-void Svcmd_Cancelvote_f() {
-	level.voteInfo.voteYes = 0;
-	level.voteInfo.voteNo = level.numConnectedClients;
-	trap_SendServerCommand(-1, "print \"Vote has been canceled!\n\"");
-}
-
-void Svcmd_Passvote_f() {
-	level.voteInfo.voteNo = 0;
-	level.voteInfo.voteYes = level.numConnectedClients;
-	trap_SendServerCommand(-1, "print \"Vote has been passed by an admin!\n\"");
-}
-
 // -fretn
 
 char	*ConcatArgs( int start );
@@ -1262,10 +1250,6 @@ qboolean	ConsoleCommand( void ) {
 		return qtrue;
 	}
 #endif // SAVEGAME_SUPPORT
-
-	if(G_admin_cmd_check(NULL)) {
-		return qtrue;
-	}
 
 	if ( Q_stricmp (cmd, "entitylist") == 0 ) {
 		Svcmd_EntityList_f();
@@ -1384,10 +1368,6 @@ qboolean	ConsoleCommand( void ) {
 // END - Mad Doc - TDF
 
 	// fretn - moved from engine
-	if (!Q_stricmp(cmd, "kick")) {
-		Svcmd_Kick_f();
-		return qtrue;
-	}
 	
 	if (!Q_stricmp(cmd, "clientkick")) {
 		Svcmd_KickNum_f();
@@ -1399,19 +1379,13 @@ qboolean	ConsoleCommand( void ) {
 		return qtrue;
 	}
 
-	if (!Q_stricmp(cmd, "passvote")) {
-		Svcmd_Passvote_f();
-		return qtrue;
-	}
-
-	if (!Q_stricmp(cmd, "cancelvote")) {
-		Svcmd_Cancelvote_f();
-		return qfalse;
-	}
-
 	if (!Q_stricmp(cmd, "ref")) {
 		G_ref_con();
 		return qfalse;
+	}
+
+	if(G_admin_cmd_check(NULL)) {
+		return qtrue;
 	}
 
 	// -fretn

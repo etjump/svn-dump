@@ -1437,47 +1437,26 @@ void ClientUserinfoChanged( int clientNum ) {
 	s = Info_ValueForKey (userinfo, "name");
 	ClientCleanName( s, client->pers.netname, sizeof(client->pers.netname) );
 
-	if(level.time > client->sess.lastNameChangeTime + 30000) {
+	if(level.time > client->sess.lastNameChangeTime + 60000) {
 		client->sess.nameChangeCount = 0;
 	}
 
-#ifdef EDITION999FIX
 	if ( client->pers.connected == CON_CONNECTED ) {
 		if ( strcmp( oldname, client->pers.netname ) ) {
 			trap_SendServerCommand( -1, va("print \"[lof]%s" S_COLOR_WHITE " [lon]renamed to[lof] %s\n\"", oldname, 
 				client->pers.netname) );
-			if(!client->sess.admin.isAdmin) {
+			if(!G_admin_permission( ent, AF_NONAMECHANGELIMIT )) {
 				client->sess.nameChangeCount++;
 				client->sess.lastNameChangeTime = level.time;
-				trap_SendServerCommand(client->ps.clientNum, 
-					va("print \"You have %i more name changes left.\n\"", (5 - client->sess.nameChangeCount)));
+				G_refPrintf(ent, "You have %d name changes left.", (g_nameChangeLimit.integer - client->sess.nameChangeCount));
 				if(5 - client->sess.nameChangeCount == 0)
-					trap_SendServerCommand(client->ps.clientNum, 
-						"print \"You must wait atleast 30 seconds to rename again.\n\"");
-				if(client->sess.nameChangeCount > 5) {
-					trap_DropClient(client->ps.clientNum, "You were kicked for name spamming.\n\"", 0);
+					G_refPrintf(ent, "You must wait atleast 1 minute to rename again.");
+				if(client->sess.nameChangeCount > g_nameChangeLimit.integer) {
+					trap_DropClient(client->ps.clientNum, "You were kicked for rename spamming.", 0);
 				}
 			}
 		}
 	}
-#else
-	if ( client->pers.connected == CON_CONNECTED ) {
-		if ( strcmp( oldname, client->pers.netname ) ) {
-			trap_SendServerCommand( -1, va("print \"[lof]%s" S_COLOR_WHITE " [lon]renamed to[lof] %s\n\"", oldname, 
-				client->pers.netname) );
-			client->sess.nameChangeCount++;
-			client->sess.lastNameChangeTime = level.time;
-			trap_SendServerCommand(client->ps.clientNum, 
-				va("print \"You have %i more name changes left.\n\"", (5 - client->sess.nameChangeCount)));
-			if(5 - client->sess.nameChangeCount == 0)
-				trap_SendServerCommand(client->ps.clientNum, 
-					"print \"You must wait atleast 30 seconds to rename again.\n\"");
-			if(client->sess.nameChangeCount > 5) {
-				trap_DropClient(client->ps.clientNum, "You were kicked for name spamming.\n\"", 0);
-			}
-		}
-	}
-#endif
 
 	for( i = 0; i < SK_NUM_SKILLS; i++ ) {
 		Q_strcat( skillStr, sizeof(skillStr), va("%i",client->sess.skill[i]) );
@@ -1731,7 +1710,7 @@ char *ClientConnect( int clientNum, qboolean firstTime, qboolean isBot ) {
 	if ( firstTime && !G_IsSinglePlayerGame())
 	{
 		value = Info_ValueForKey(userinfo, "ip");
-		G_LogPrintf("ClientConnect: /USER/%s/IP/%s/\n", client->pers.netname, value);
+		G_LogPrintf("ClientConnect: \\user\\%s\\ip\\%s\\adminuser\\%s\\\n", client->pers.netname, value, client->sess.uinfo.name);
 		trap_SendServerCommand( -1, va("cpm \"%s" S_COLOR_WHITE " connected\n\"", client->pers.netname) );
 	}
 

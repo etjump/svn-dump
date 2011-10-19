@@ -29,6 +29,10 @@
 // password = user password // This will be hashed for security purposes.
 /////////////////////////////////////////////////////////////////////////////
 
+// admin flags for variety of things
+#define AF_IMMUNITY '1'
+#define AF_NONAMECHANGELIMIT '@'
+
 #define MAX_COMMANDS 128
 #define MAX_CMD_LEN 20
 #define MAX_ADMIN_LEVELS 64

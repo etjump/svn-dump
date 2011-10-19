@@ -357,6 +357,11 @@ int G_Kick_v( gentity_t *ent, unsigned int dwVoteIndex, char *arg, char *arg2, q
 			return G_INVALID;
 		}
 
+		if(G_admin_permission( &g_entities[pid], AF_IMMUNITY )) {
+			G_refPrintf( ent, "Can't vote to kick admins!" );
+			return G_INVALID;
+		}
+
 		if( !fRefereeCmd && ent ) {
 			if( level.clients[ pid ].sess.sessionTeam != TEAM_SPECTATOR && level.clients[ pid ].sess.sessionTeam != ent->client->sess.sessionTeam ) {
 				G_refPrintf( ent, "Can't vote to kick players on opposing team!" );
@@ -400,6 +405,11 @@ int G_Mute_v(gentity_t *ent, unsigned int dwVoteIndex, char *arg, char *arg2, qb
 		if(level.clients[pid].sess.referee) {
 			G_refPrintf(ent, "Can't vote to mute referees!");
 			return(G_INVALID);
+		}
+
+		if(G_admin_permission( &g_entities[pid], AF_IMMUNITY )) {
+			G_refPrintf( ent, "Can't vote to mute admins!" );
+			return G_INVALID;
 		}
 
 		if(level.clients[pid].sess.muted) {

@@ -219,6 +219,7 @@ vmCvar_t		g_noclip;
 vmCvar_t		g_savemsg;
 vmCvar_t		g_mapScriptDir;
 vmCvar_t		g_blockedMaps;
+vmCvar_t		g_nameChangeLimit;
 
 // ETJump admin system
 
@@ -459,9 +460,10 @@ cvarTable_t		gameCvarTable[] = {
 	{ &g_weapons, "g_weapons", "1", CVAR_ARCHIVE },
 	{ &g_noclip, "g_noclip", "0", CVAR_ARCHIVE },
 	{ &g_savemsg, "g_savemsg", "^7Saved", CVAR_ARCHIVE },
-
+	{ &g_nameChangeLimit, "g_nameChangeLimit", "5", CVAR_ARCHIVE },
 	{ &g_mapScriptDir, "g_mapScriptDir", "scripts", CVAR_ARCHIVE },
 	{ &g_blockedMaps, "g_blockedMaps", "", CVAR_ARCHIVE },
+	
 
 	{ &g_admin, "g_admin", "admins.dat", CVAR_ARCHIVE },
 };

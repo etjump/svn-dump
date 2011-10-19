@@ -140,7 +140,6 @@ void SP_trigger_multiple( gentity_t *ent ) {
 	trap_LinkEntity (ent);
 }
 
-
 /*
 ==============================================================================
 

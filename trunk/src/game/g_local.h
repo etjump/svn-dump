@@ -1908,6 +1908,7 @@ extern vmCvar_t	g_blockCheatCvars;
 extern vmCvar_t	g_weapons;
 extern vmCvar_t	g_noclip;
 extern vmCvar_t	g_savemsg;
+extern vmCvar_t g_nameChangeLimit;
 
 extern vmCvar_t	g_mapScriptDir;
 extern vmCvar_t	g_blockedMaps;
@@ -2634,6 +2635,7 @@ char *Q_SayConcatArgs(int start);
 char *Q_StrReplace(char *haystack, char *needle, char *newp);
 int Q_SayArgc();
 qboolean Q_SayArgv(int n, char *buffer, int bufferLength);
+
 void G_admin_personal_info_print(gentity_t *ent, char *string);
 
 qboolean G_admin_cmd_check(gentity_t *ent);
@@ -2655,3 +2657,5 @@ qboolean G_admin_readconfig(gentity_t *ent, int skiparg);
 qboolean G_admin_rename(gentity_t *ent, int skiparg);
 qboolean G_admin_setlevel(gentity_t *ent, int skiparg);
 qboolean G_admin_unmute(gentity_t *ent, int skiparg);
+
+qboolean G_admin_permission(gentity_t *ent, char flag);
