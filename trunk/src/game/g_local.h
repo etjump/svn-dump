@@ -213,6 +213,11 @@ typedef struct {
 	vec3_t		velocity;
 } save_position_t;
 
+#define MAX_MAPS 300
+#define MAX_FLEN 30
+
+char g_maplist[MAX_MAPS][MAX_FLEN];
+
 //====================================================================
 
 #define MAX_NETNAME			36
@@ -772,10 +777,6 @@ typedef struct {
 
 	int				hideMe;
 
-#ifdef EDITION999
-	char			cl_guid[PB_GUID_LEN+1];
-#endif
-
 	ipFilter_t		complaintips[MAX_COMPLAINTIPS];
 } clientPersistant_t;
 
@@ -1173,14 +1174,7 @@ typedef struct {
 	qboolean	noGod;
 	qboolean	noGoto;
 
-#ifdef EDITION999
-
-	// These will be here for now. I will make new files for the adminsystem
-	// if/when I will start making it. 
-
-	char adminPasswords[MAX_ADMINS][MAX_PASSWORD_LEN+1];
-
-#endif
+	int			mapCount;
 
 } level_locals_t;
 
@@ -2626,12 +2620,15 @@ qboolean G_CanPickupWeapon( weapon_t weapon, gentity_t* ent );
 
 qboolean G_LandmineSnapshotCallback( int entityNum, int clientNum );
 
+void G_cache_map_names();
+
 // g_admin.c
 
 // These are in g_cmds.c but they're needed in
 // adminsys
 char *G_SHA1(char *string);
 char *Q_SayConcatArgs(int start);
+void DecolorString( char *in, char *out);
 char *Q_StrReplace(char *haystack, char *needle, char *newp);
 int Q_SayArgc();
 qboolean Q_SayArgv(int n, char *buffer, int bufferLength);
@@ -2650,12 +2647,13 @@ qboolean G_admin_cancelvote(gentity_t *ent, int skiparg);
 qboolean G_admin_finger(gentity_t *ent, int skiparg);
 qboolean G_admin_help(gentity_t *ent, int skiparg);
 qboolean G_admin_kick(gentity_t *ent, int skiparg);
+qboolean G_admin_listmaps(gentity_t *ent, int skiparg);
 qboolean G_admin_mute(gentity_t *ent, int skiparg);
 qboolean G_admin_passvote(gentity_t *ent, int skiparg);
 qboolean G_admin_putteam(gentity_t *ent, int skiparg);
 qboolean G_admin_readconfig(gentity_t *ent, int skiparg);
 qboolean G_admin_rename(gentity_t *ent, int skiparg);
+qboolean G_admin_restart(gentity_t *ent, int skiparg);
 qboolean G_admin_setlevel(gentity_t *ent, int skiparg);
 qboolean G_admin_unmute(gentity_t *ent, int skiparg);
-
 qboolean G_admin_permission(gentity_t *ent, char flag);

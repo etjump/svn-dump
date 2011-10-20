@@ -1704,6 +1704,8 @@ void G_InitGame( int levelTime, int randomSeed, int restart ) {
 	level.engineerChargeTimeModifier[0] = level.engineerChargeTimeModifier[1] = 1.f;
 	level.lieutenantChargeTimeModifier[0] = level.lieutenantChargeTimeModifier[1] = 1.f;
 	level.covertopsChargeTimeModifier[0] = level.covertopsChargeTimeModifier[1] = 1.f;
+	
+	level.mapCount = 0;
 
 	cs[0] = '\0';
 	Info_SetValueForKey( cs, "axs_sld", va("%i", level.soldierChargeTime[0]) );
@@ -1852,6 +1854,7 @@ void G_InitGame( int levelTime, int randomSeed, int restart ) {
 	G_Printf ("-----------------------------------\n");
 	G_admin_readconfig(NULL, 0);
 	G_Printf ("-----------------------------------\n");
+	G_cache_map_names();
 
 	// reserve some spots for dead player bodies
 	InitBodyQue();

@@ -31,7 +31,8 @@
 
 // admin flags for variety of things
 #define AF_IMMUNITY '1'
-#define AF_NONAMECHANGELIMIT '@'
+#define AF_NONAMECHANGELIMIT '2'
+#define AF_SILENTCOMMANDS '/'
 
 #define MAX_COMMANDS 128
 #define MAX_CMD_LEN 20
@@ -56,7 +57,11 @@ typedef struct {
 
 void G_admin_chat_print(char *string);
 
-#define ACP(x) G_admin_chat_print(x);
-#define AIP(ent, msg) G_admin_personal_info_print(ent, msg); // Admin info print
+#define ACP(x) G_admin_chat_print(x); // admin chat print
+#define AIP(ent, msg) G_admin_personal_info_print(ent, msg); // Admin info print (if ent -> priv else g_printf)
+#define ASP(x) G_admin_print(ent, x) 
+#define ABP(ent, msg) G_admin_buffer_print(ent, msg);
+#define ABP_begin() G_shrubbot_buffer_begin()
+#define ABP_end() G_shrubbot_buffer_end(ent)
 
 #endif

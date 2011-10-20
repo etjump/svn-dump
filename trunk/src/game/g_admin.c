@@ -1,8 +1,11 @@
 #include "g_local.h"
 
+char bigTextBuffer[100000];
+
 /*
-What is needed:
+What is needed:	
 disable save?
+ban	
 */
 
 // I don't think anyone needs over 64 admin levels.
@@ -22,18 +25,19 @@ struct g_admin_cmd {
 };
 
 static const struct g_admin_cmd g_admin_cmds[] = {
-	{"admintest",	G_admin_admintest,	'a',	""},
-	{"cancelvote",  G_admin_cancelvote, 'C',	""},
-	{"finger",		G_admin_finger,		'f',	""},
-	{"help",		G_admin_help,		'h',	""},
-	{"kick",		G_admin_kick,		'k',	""},
-	{"mute",		G_admin_mute,		'm',	""},
-	{"passvote",	G_admin_passvote,	'P',	""},
-	{"putteam",		G_admin_putteam,	'p',	""},
-	{"rename",		G_admin_rename,		'r',	""},
-	{"readconfig",	G_admin_readconfig,	'R',	""},
-	{"setlevel",	G_admin_setlevel,	's',	""},
-	{"unmute",		G_admin_unmute,		'm',	""},
+	{"admintest",	G_admin_admintest,	'a',	"displays your current admin level"},
+	{"cancelvote",  G_admin_cancelvote, 'C',	"cancels the current vote in progress"},
+	{"finger",		G_admin_finger,		'f',	"displays target's admin level"},
+	{"help",		G_admin_help,		'h',	"displays info about commands"},
+	{"kick",		G_admin_kick,		'k',	"kicks target player"},
+	{"mute",		G_admin_mute,		'm',	"mutes target player"},
+	{"passvote",	G_admin_passvote,	'P',	"passes the current vote in progress"},
+	{"putteam",		G_admin_putteam,	'p',	"puts target to a team"},
+	{"readconfig",	G_admin_readconfig,	'G',	""},
+	{"rename",		G_admin_rename,		'R',	"renames the target player"},
+	{"restart",		G_admin_restart,	'r',	"restarts the map"},
+	{"setlevel",	G_admin_setlevel,	's',	"sets target level"},
+	{"unmute",		G_admin_unmute,		'm',	"unmutes target player"},
 	{"",			NULL,				'\0',	""}
 };
 // Prints on both chat & console.
@@ -45,6 +49,46 @@ void G_admin_chat_print(char *string) {
 void G_admin_personal_info_print(gentity_t *ent, char *string) {
 	if(ent)	CPx(g_entities - ent, va("chat \"%s\"", string));
 	else G_Printf("%s\n", string);
+}
+
+void G_admin_print(gentity_t *ent, char *m)
+{
+
+	if(ent) CP(va("print \"%s\"", m));
+	else {
+		char m2[MAX_STRING_CHARS];
+		DecolorString(m, m2);
+		G_Printf(m2);
+	}
+}
+
+void G_shrubbot_buffer_begin()
+{
+	bigTextBuffer[0] = '\0';
+}
+
+void G_shrubbot_buffer_end(gentity_t *ent)
+{
+	ASP(bigTextBuffer);
+}
+
+void G_admin_buffer_print(gentity_t *ent, char *string) {
+	if(!ent) {
+		char string2[MAX_STRING_CHARS];
+		DecolorString(string, string2);
+
+		if(strlen(string2) + strlen(bigTextBuffer) > 239) {
+			ASP(bigTextBuffer);
+			bigTextBuffer[0] = '\0';
+		}
+		Q_strcat(bigTextBuffer, sizeof(bigTextBuffer), string2);
+	} else {
+		if(strlen(string) + strlen(bigTextBuffer) >= 1009) {
+			ASP(bigTextBuffer);
+			bigTextBuffer[0] = '\0';
+		}
+		Q_strcat(bigTextBuffer, sizeof(bigTextBuffer), string);
+	}
 }
 
 // This will print a default config in the mod
@@ -659,7 +703,7 @@ qboolean G_admin_kick(gentity_t *ent, int skiparg) {
 	}
 
 	trap_DropClient(pids[0], reason, timeout);
-	
+	return qtrue;
 }
 
 // Handles setlevel on connect &
@@ -821,6 +865,7 @@ qboolean G_admin_passvote(gentity_t *ent, int skiparg) {
 	else {
 		ACP("^3passvote:^7 no vote in progress");
 	}
+	return qtrue;
 }
 
 qboolean G_admin_cancelvote(gentity_t *ent, int skiparg) {
@@ -831,6 +876,7 @@ qboolean G_admin_cancelvote(gentity_t *ent, int skiparg) {
 	} else {
 		ACP("^3cancelvote:^7 no vote in progress");
 	}
+	return qtrue;
 }
 
 
@@ -955,15 +1001,41 @@ qboolean G_admin_help(gentity_t *ent, int skiparg) {
 
 			if(G_admin_permission(ent, g_admin_cmds[i].flag)) {
 				if(j == 6) {
-					str = va( "%s\n^f%-12s", str, g_admin_cmds[i].keyword);
+					str = va( "%s\n^<%-12s", str, g_admin_cmds[i].keyword);
 					j = 0;
 				} else {
-					str = va( "%s\n^f%-12s", str, g_admin_cmds[i].keyword);
+					str = va( "%s\n^<%-12s", str, g_admin_cmds[i].keyword);
 				}
 				j++;
 				count++;
 			}
-
 		}
+		ABP_begin();
+		ASP(str);
 	}
+	else {
+		char parameter[20];
+
+		Q_SayArgv(1+skiparg, parameter, sizeof(parameter));
+
+		for(i = 0; g_admin_cmds[i].keyword[0]; i++) {
+			if(!Q_stricmp(parameter, g_admin_cmds[i].keyword)) {
+				if(!G_admin_permission(ent, g_admin_cmds[i].flag)) {
+					AIP(ent, "^3help: ^7permission denied");
+					return qfalse;
+				}
+				AIP(ent, va("^3%s:^7 %s", g_admin_cmds[i].keyword, g_admin_cmds[i].function));
+				return qtrue;
+			} else {
+				continue;
+			}
+		}
+		AIP(ent, "^3help: ^7unknown command");
+		return qfalse;
+	}
+}
+
+qboolean G_admin_restart(gentity_t *ent, int skiparg) {
+	Svcmd_ResetMatch_f(qfalse, qtrue);
+	return qtrue;
 }

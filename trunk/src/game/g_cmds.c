@@ -2027,6 +2027,17 @@ qboolean Cmd_CallVote_f( gentity_t *ent, unsigned int dwCommand, qboolean fRefCo
 		return(qfalse);
 	}
 
+	if(!Q_stricmp(arg1, "random")) {
+		int random;
+		if(Q_stricmp(arg2, "map")) {
+			CP("print \"^3Usage:^7 Callvote random map");
+			return qfalse;
+		}
+		random = rand() % level.mapCount;
+		Q_strncpyz(arg1, "map", sizeof("map"));
+		Q_strncpyz(arg2, g_maplist[random], sizeof(arg1));
+	}
+
 	if (!Q_stricmp(arg1, "map"))
 	{
 		char			mapfile[MAX_QPATH];
@@ -2057,7 +2068,6 @@ qboolean Cmd_CallVote_f( gentity_t *ent, unsigned int dwCommand, qboolean fRefCo
 		}
 
 	}
-
 
 	if(trap_Argc() > 1 && (i = G_voteCmdCheck(ent, arg1, arg2, fRefCommand)) != G_NOTFOUND) {	//  --OSP
 		if(i != G_OK)	 {
@@ -4173,6 +4183,15 @@ void ClientCommand(int clientNum)
 	if (G_commandCheck(ent, cmd, qfalse))
 		return;
 
+	if (G_admin_permission(ent, AF_SILENTCOMMANDS)) {
+		if(G_admin_cmd_check(ent)) {
+			return;
+		}
+	} else {
+		AIP(ent, "^3silent commands: ^7permission denied");
+		return;
+	}
+
 	CP(va("print \"Unknown command %s^7.\n\"", cmd));
 }
 
@@ -4268,4 +4287,37 @@ char *Q_SayConcatArgs(int start) {
 		s++;
 	}
 	return s;
+}
+
+void DecolorString( char *in, char *out)
+{
+	while(*in) {
+		if(*in == 27 || *in == '^') {
+			in++;		// skip color code
+			if(*in) in++;
+			continue;
+		}
+		*out++ = *in++;
+	}
+	*out = 0;
+}
+
+void G_cache_map_names() {
+	int numdirs;
+	char dirlist[1024];
+	char* dirptr;
+	int i;
+	int dirlen;
+	numdirs = trap_FS_GetFileList("maps", ".bsp", dirlist, 1024);
+
+	dirptr = dirlist;
+	for(i = 0; i < numdirs; i++, dirptr += dirlen+1) {
+		dirlen = strlen(dirptr);
+		if(strlen(dirptr) > 4)
+			dirptr[strlen(dirptr)-4] = '\0';
+		if(i < MAX_MAPS) {
+			Q_strncpyz(g_maplist[i], dirptr, sizeof(g_maplist[i]));
+		}		
+	}
+	level.mapCount = i;
 }
