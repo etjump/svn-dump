@@ -571,10 +571,13 @@ typedef struct {
 	unsigned int kills;
 } weapon_stat_t;
 
+#define MAX_IP_LEN 15
+
 typedef struct {
 	int level;
 	char name[MAX_NAME_LENGTH];
 	char password[40+1];
+	char ip[MAX_IP_LEN];
 } admin_t;
 
 // client data that stays across multiple levels or tournament restarts
@@ -986,6 +989,7 @@ typedef struct {
 	int			warmupTime;			// restart match at this time
 
 	fileHandle_t	logFile;
+	fileHandle_t	adminLogFile; 
 
 	char		rawmapname[MAX_QPATH];
 
@@ -1532,6 +1536,7 @@ void Cmd_SetClass_f( gentity_t *ent, unsigned int dwCommand, qboolean fValue );
 void FindIntermissionPoint( void );
 void G_RunThink (gentity_t *ent);
 void QDECL G_LogPrintf( const char *fmt, ... )_attribute((format(printf,1,2)));
+void QDECL G_ALog( const char *fmt, ... )_attribute((format(printf,1,2)));
 void SendScoreboardMessageToAllClients( void );
 void QDECL G_Printf( const char *fmt, ... )_attribute((format(printf,1,2)));
 void QDECL G_DPrintf( const char *fmt, ... )_attribute((format(printf,1,2)));
@@ -1908,6 +1913,8 @@ extern vmCvar_t	g_mapScriptDir;
 extern vmCvar_t	g_blockedMaps;
 
 extern vmCvar_t	g_admin;
+extern vmCvar_t	g_adminLog;
+extern vmCvar_t	g_logCommands;
 
 void	trap_Printf( const char *fmt );
 void	trap_Error( const char *fmt );
@@ -2643,11 +2650,13 @@ void G_admin_login(gentity_t *ent);
 void G_admin_register_client(gentity_t *ent);
 
 qboolean G_admin_admintest(gentity_t *ent, int skiparg);
+qboolean G_admin_ban_check(char *userinfo, char *reason);
+qboolean G_admin_ban(gentity_t *ent, int skiparg);
 qboolean G_admin_cancelvote(gentity_t *ent, int skiparg);
 qboolean G_admin_finger(gentity_t *ent, int skiparg);
 qboolean G_admin_help(gentity_t *ent, int skiparg);
 qboolean G_admin_kick(gentity_t *ent, int skiparg);
-qboolean G_admin_listmaps(gentity_t *ent, int skiparg);
+qboolean G_admin_listbans(gentity_t *ent, int skiparg);
 qboolean G_admin_mute(gentity_t *ent, int skiparg);
 qboolean G_admin_passvote(gentity_t *ent, int skiparg);
 qboolean G_admin_putteam(gentity_t *ent, int skiparg);
@@ -2655,5 +2664,6 @@ qboolean G_admin_readconfig(gentity_t *ent, int skiparg);
 qboolean G_admin_rename(gentity_t *ent, int skiparg);
 qboolean G_admin_restart(gentity_t *ent, int skiparg);
 qboolean G_admin_setlevel(gentity_t *ent, int skiparg);
+qboolean G_admin_unban(gentity_t *ent, int skiparg);
 qboolean G_admin_unmute(gentity_t *ent, int skiparg);
 qboolean G_admin_permission(gentity_t *ent, char flag);

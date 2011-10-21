@@ -32,6 +32,7 @@
 // admin flags for variety of things
 #define AF_IMMUNITY '1'
 #define AF_NONAMECHANGELIMIT '2'
+#define AF_NOVOTELIMIT '3'
 #define AF_SILENTCOMMANDS '/'
 
 #define MAX_COMMANDS 128
@@ -41,6 +42,11 @@
 #define MAX_ADMIN_NAME_LEN 36
 #define PASSWORD_LEN 40
 #define MAX_STRING_CHARS 1024
+#define MAX_BANS 512
+
+// Offset for ban, don't ask.
+#define ADMIN_BAN_EXPIRE_OFFSET 946490400
+#define ADMIN_MAX_SHOWBANS 30
 
 typedef struct {
 	int level;
@@ -55,6 +61,15 @@ typedef struct {
 	char password[PASSWORD_LEN+1];
 } admin_user_t;
 
+typedef struct {
+	char name[MAX_NAME_LENGTH];
+	char ip[18];
+	char reason[MAX_STRING_CHARS];
+	char made[50];
+	int expires;
+	char banner[MAX_NAME_LENGTH];
+} admin_ban_t;
+
 void G_admin_chat_print(char *string);
 
 #define ACP(x) G_admin_chat_print(x); // admin chat print
@@ -63,5 +78,7 @@ void G_admin_chat_print(char *string);
 #define ABP(ent, msg) G_admin_buffer_print(ent, msg);
 #define ABP_begin() G_shrubbot_buffer_begin()
 #define ABP_end() G_shrubbot_buffer_end(ent)
+
+
 
 #endif

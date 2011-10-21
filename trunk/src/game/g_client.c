@@ -1539,6 +1539,7 @@ char *ClientConnect( int clientNum, qboolean firstTime, qboolean isBot ) {
 	gclient_t	*client;
 	char		userinfo[MAX_INFO_STRING];
 	gentity_t	*ent;
+	char reason[MAX_STRING_CHARS] = "";
 #ifdef USEXPSTORAGE
 	ipXPStorage_t* xpBackup;
 	int			i;
@@ -1555,6 +1556,12 @@ char *ClientConnect( int clientNum, qboolean firstTime, qboolean isBot ) {
 	value = Info_ValueForKey (userinfo, "ip");
 	if ( G_FilterIPBanPacket( value ) ) {
 		return "You are banned from this server.";
+	}
+
+	if(G_admin_ban_check(userinfo, reason)) {
+		value = Info_ValueForKey(userinfo, "name");
+		AP(va("cpm \"Banned player: %s^7, tried to connect.\"", value));
+		return va("You are banned from this server.\n%s\n", reason);
 	}
 
 	// Xian - check for max lives enforcement ban
@@ -1709,8 +1716,6 @@ char *ClientConnect( int clientNum, qboolean firstTime, qboolean isBot ) {
 	//		TAT 12/10/2002 - Don't display connected messages in single player
 	if ( firstTime && !G_IsSinglePlayerGame())
 	{
-		value = Info_ValueForKey(userinfo, "ip");
-		G_LogPrintf("ClientConnect: \\user\\%s\\ip\\%s\\adminuser\\%s\\\n", client->pers.netname, value, client->sess.uinfo.name);
 		trap_SendServerCommand( -1, va("cpm \"%s" S_COLOR_WHITE " connected\n\"", client->pers.netname) );
 	}
 

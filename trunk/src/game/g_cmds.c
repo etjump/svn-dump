@@ -2116,8 +2116,8 @@ qboolean Cmd_CallVote_f( gentity_t *ent, unsigned int dwCommand, qboolean fRefCo
 		for(i=0; i<level.numConnectedClients; i++) {
 			level.clients[level.sortedClients[i]].ps.eFlags &= ~EF_VOTED;
 		}
-
-		ent->client->pers.voteCount++;
+		if(!G_admin_permission(ent, AF_NOVOTELIMIT)) 
+			ent->client->pers.voteCount++;
 		ent->client->ps.eFlags |= EF_VOTED;
 
 		trap_SetConfigstring(CS_VOTE_YES,	 va("%i", level.voteInfo.voteYes));

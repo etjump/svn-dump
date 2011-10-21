@@ -224,6 +224,8 @@ vmCvar_t		g_nameChangeLimit;
 // ETJump admin system
 
 vmCvar_t		g_admin;
+vmCvar_t		g_adminLog;
+vmCvar_t		g_logCommands;
 
 
 cvarTable_t		gameCvarTable[] = {
@@ -466,6 +468,8 @@ cvarTable_t		gameCvarTable[] = {
 	
 
 	{ &g_admin, "g_admin", "admins.dat", CVAR_ARCHIVE },
+	{ &g_adminLog, "g_adminLog", "adminsystem.log", CVAR_ARCHIVE },
+	{ &g_logCommands, "g_logCommands", "1", CVAR_ARCHIVE },
 };
 
 // bk001129 - made static to avoid aliasing
@@ -1780,14 +1784,18 @@ void G_InitGame( int levelTime, int randomSeed, int restart ) {
 
 	G_DebugOpenSkillLog();
 
-	if (g_dailyLogs.integer)
+	if (g_dailyLogs.integer) {
 		trap_Cvar_Set("g_log", va("%s-%02d-%02d.log", Months[ct.tm_mon], ct.tm_mday, 1900 + ct.tm_year));
+		trap_Cvar_Set("g_adminLog", va("admin-%s-%02d-%02d.log", Months[ct.tm_mon], ct.tm_mday, 1900 + ct.tm_year));
+	}
 
 	if ( g_log.string[0] ) {
 		if ( g_logSync.integer ) {
 			trap_FS_FOpenFile( g_log.string, &level.logFile, FS_APPEND_SYNC );
+			trap_FS_FOpenFile( g_adminLog.string, &level.adminLogFile, FS_APPEND_SYNC );
 		} else {
 			trap_FS_FOpenFile( g_log.string, &level.logFile, FS_APPEND );
+			trap_FS_FOpenFile( g_adminLog.string, &level.adminLogFile, FS_APPEND );
 		}
 		if ( !level.logFile ) {
 			G_Printf( "WARNING: Couldn't open logfile: %s\n", g_log.string );
@@ -2573,6 +2581,49 @@ void QDECL G_LogPrintf( const char *fmt, ... ) {
 }
 //bani
 void QDECL G_LogPrintf( const char *fmt, ... )_attribute((format(printf,1,2)));
+
+/*
+=================
+G_AdminLogPrintf
+Prints to the admin logfile with a time stamp if it is open
+=================
+*/
+
+void QDECL G_ALog( const char *fmt, ...) {
+	va_list		argptr;
+	char		string[1024];
+	int			min, tens, sec, l;
+
+	sec = level.time / 1000;
+
+	min = sec / 60;
+	sec -= min * 60;
+	tens = sec / 10;
+	sec -= tens * 10;
+	
+	Com_sprintf( string, sizeof(string), "%i:%i%i ", min, tens, sec );
+
+	l = strlen( string );
+	
+	va_start( argptr, fmt );
+	Q_vsnprintf( string + l, sizeof( string ) - l, fmt, argptr );
+	va_end( argptr );
+
+	/*
+	if ( g_dedicated.integer ) {
+		G_Printf( "%s\n", string + l );
+	} 
+	*/
+
+	if ( !level.adminLogFile ) {
+		return;
+	}
+
+	Q_strcat(string, sizeof(string), "\n");
+
+	trap_FS_Write( string, strlen( string ), level.adminLogFile );
+}
+void QDECL G_ALog( const char *fmt, ... )_attribute((format(printf,1,2)));
 
 /*
 ================
