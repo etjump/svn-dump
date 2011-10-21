@@ -626,9 +626,6 @@ typedef struct {
 	// VanillaTJ
 	save_position_t allies_save_pos[MAX_SAVE_POSITIONS];
 	save_position_t axis_save_pos[MAX_SAVE_POSITIONS];
-	save_position_t backup_pos[MAX_SAVE_POSITIONS];
-
-	save_position_t goto_backup_pos;
 
 	qboolean	noGoto;
 	qboolean	noCall;

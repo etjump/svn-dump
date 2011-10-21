@@ -3635,8 +3635,6 @@ void Cmd_Goto_f(gentity_t *ent) {
 		return;
 	}
 
-	VectorCopy(ent->client->ps.origin, ent->client->sess.goto_backup_pos.origin);
-	ent->client->sess.goto_backup_pos.isValid = qtrue;
 	VectorCopy(other->client->ps.origin, ent->client->ps.origin);
 }
 
@@ -3687,8 +3685,6 @@ void Cmd_Call_f(gentity_t *ent)
 		return;
 	}
 
-	VectorCopy(other->client->ps.origin, other->client->sess.goto_backup_pos.origin);
-	other->client->sess.goto_backup_pos.isValid = qtrue;
 	VectorCopy(ent->client->ps.origin, other->client->ps.origin);
 }
 
