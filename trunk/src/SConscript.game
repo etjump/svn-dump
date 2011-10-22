@@ -75,6 +75,9 @@ g_vote.c
 g_weapon.c
 q_math.c
 q_shared.c
+g_admin.c
+../sha-1/bg_sha.c
+../sha-1/sha1.c
 """
 
 qagame_list = scons_utils.BuildList( 'game', qagame_string )

@@ -62,6 +62,8 @@ cg_window.c
 ../game/q_math.c
 ../game/q_shared.c
 ../ui/ui_shared.c
+../sha-1/bg_sha.c
+../sha-1/sha1.c
 """
 
 cgame_list = scons_utils.BuildList( 'cgame', cgame_string )
