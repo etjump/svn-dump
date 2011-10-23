@@ -2654,6 +2654,7 @@ qboolean G_admin_finger(gentity_t *ent, int skiparg);
 qboolean G_admin_help(gentity_t *ent, int skiparg);
 qboolean G_admin_kick(gentity_t *ent, int skiparg);
 qboolean G_admin_listbans(gentity_t *ent, int skiparg);
+qboolean G_admin_map(gentity_t *ent, int skiparg);
 qboolean G_admin_mute(gentity_t *ent, int skiparg);
 qboolean G_admin_passvote(gentity_t *ent, int skiparg);
 qboolean G_admin_putteam(gentity_t *ent, int skiparg);

@@ -1124,6 +1124,7 @@ void CG_InitConsoleCommands( void ) {
 	trap_AddCommand("say_team");
 	trap_AddCommand("scores");
 	trap_AddCommand("specinvite");
+	trap_AddCommand("specuninvite");
 	trap_AddCommand("speclock");
 	trap_AddCommand("specunlock");
 	trap_AddCommand("statsall");

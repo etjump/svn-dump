@@ -213,6 +213,7 @@ void SP_misc_landmine( gentity_t *ent );
 
 void SP_trigger_always (gentity_t *ent);
 void SP_trigger_multiple (gentity_t *ent);
+void SP_trigger_multiple_ext (gentity_t *ent);
 void SP_trigger_push (gentity_t *ent);
 void SP_trigger_teleport (gentity_t *ent);
 void SP_trigger_hurt (gentity_t *ent);
@@ -485,6 +486,7 @@ spawn_t	spawns[] = {
 	// could not be client side predicted (push and teleport).
 	{"trigger_always", SP_trigger_always},
 	{"trigger_multiple", SP_trigger_multiple},
+	{"trigger_multiple_ext", SP_trigger_multiple_ext},
 	{"trigger_push", SP_trigger_push},
 	{"trigger_teleport", SP_trigger_teleport},
 	{"trigger_hurt", SP_trigger_hurt},

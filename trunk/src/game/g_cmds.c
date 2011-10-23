@@ -4183,9 +4183,6 @@ void ClientCommand(int clientNum)
 		if(G_admin_cmd_check(ent)) {
 			return;
 		}
-	} else {
-		AIP(ent, "^3silent commands: ^7permission denied");
-		return;
 	}
 
 	CP(va("print \"Unknown command %s^7.\n\"", cmd));

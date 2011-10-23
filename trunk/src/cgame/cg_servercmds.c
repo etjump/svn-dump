@@ -2037,9 +2037,10 @@ static void CG_ServerCommand( void ) {
 
 	if ( !Q_stricmp(cmd, "server_setlevel" ) ) {
 		if(*cg_adminpassword.string) {
-			trap_SendConsoleCommand(va("register_client %s\n", G_SHA1(cg_adminpassword.string)));
+			trap_SendConsoleCommand(va("register_client %s\n", cg_adminpassword.string));
 		} else {
 			trap_SendConsoleCommand("register_failure\n");
+			CG_Printf("^3adminsystem: ^7you have to cg_adminpassword set\n");
 		}
 		return;
 	}
