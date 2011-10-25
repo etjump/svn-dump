@@ -202,7 +202,6 @@ int G_GetWeaponClassForMOD( meansOfDeath_t mod );
 
 //====================================================================
 // ETJump
-#define EDITION999
 
 #define MAX_SAVE_POSITIONS 3
 
@@ -2665,3 +2664,7 @@ qboolean G_admin_setlevel(gentity_t *ent, int skiparg);
 qboolean G_admin_unban(gentity_t *ent, int skiparg);
 qboolean G_admin_unmute(gentity_t *ent, int skiparg);
 qboolean G_admin_permission(gentity_t *ent, char flag);
+
+#ifdef EDITION999
+
+#endif

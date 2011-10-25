@@ -5,7 +5,17 @@ char bigTextBuffer[100000];
 /*
 What is needed:	
 disable save?
-ban	
+BUGS:
+AFTER 110B
+no greeting -> lil lagspike on connect?
+adminhelp
+callvote kick
+
+!setlevel x 2
+!setlevel x 0
+!rename x y
+!setlevel y 2
+-> finger y = user (x)
 */
 
 // I don't think anyone needs over 64 admin levels.
@@ -41,7 +51,7 @@ static const struct g_admin_cmd g_admin_cmds[] = {
 	{"mute",		G_admin_mute,		'm',	"mutes target player"},
 	{"passvote",	G_admin_passvote,	'P',	"passes the current vote in progress"},
 	{"putteam",		G_admin_putteam,	'p',	"puts target to a team"},
-	{"readconfig",	G_admin_readconfig,	'G',	""},
+	{"readconfig",	G_admin_readconfig,	'G',	"reads admin config"},
 	{"rename",		G_admin_rename,		'R',	"renames the target player"},
 	{"restart",		G_admin_restart,	'r',	"restarts the map"},
 	{"setlevel",	G_admin_setlevel,	's',	"sets target level"},
@@ -904,7 +914,7 @@ void G_admin_identify_all() {
 }
 
 void G_admin_greeting(gentity_t *ent) {
-	char *greeting;
+	char *greeting = "";
 	qboolean broadcast = qfalse;
 	int level = 0;
 	int i;
@@ -1011,6 +1021,12 @@ qboolean G_admin_mute(gentity_t *ent, int skiparg) {
 			return qfalse;
 		}
 	}
+
+	if(target->client->sess.muted) {
+		AIP(ent, "^3mute:^7 target is already muted");
+		return qfalse;
+	}
+
 	target->client->sess.muted = qtrue;
 
 	CPx(pids[0], "print \"^5You've been muted\n\"" );
@@ -1040,6 +1056,11 @@ qboolean G_admin_unmute(gentity_t *ent, int skiparg) {
 	}
 
 	target = g_entities + pids[0];
+
+	if(!target->client->sess.muted) {
+		AIP(ent, "^3unmute: ^7target is not muted");
+		return qfalse;
+	}
 
 	target->client->sess.muted = qfalse;
 
@@ -1151,9 +1172,9 @@ qboolean G_admin_putteam(gentity_t *ent, int skiparg) {
 
 	Q_SayArgv(2 + skiparg, arg, sizeof(arg));
 
-	ent->client->sess.lastTeamSwitch = level.time;
+	target->client->sess.lastTeamSwitch = level.time;
 
-	SetTeam(ent, arg, qfalse, -1, -1, qtrue);
+	SetTeam(target, arg, qfalse, -1, -1, qtrue);
 
 	return qtrue;
 }
@@ -1269,8 +1290,9 @@ qboolean G_admin_ban(gentity_t *ent, int skiparg) {
 
 	if(seconds <= 0) {
 		seconds = 0;
-		reason = Q_SayConcatArgs(3+skiparg);
 	}
+
+	reason = Q_SayConcatArgs(3+skiparg);
 
 	if(ClientNumbersFromString(name, pids) != 1) {
 		G_MatchOnePlayer(pids, err, sizeof(err));
@@ -1577,3 +1599,7 @@ qboolean G_admin_map(gentity_t *ent, int skiparg) {
 	trap_SendConsoleCommand(EXEC_APPEND, va("map %s", map));
 	return qtrue;
 }
+
+#ifdef EDITION999
+
+#endif

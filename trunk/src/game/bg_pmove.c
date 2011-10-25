@@ -607,12 +607,6 @@ static float PM_CmdScale( usercmd_t *cmd ) {
 	if (pm->ps->pm_type == PM_NOCLIP)
 		scale *= 3;
 
-// JPW NERVE -- half move speed if heavy weapon is carried
-// this is the counterstrike way of doing it -- ie you can switch to a non-heavy weapon and move at
-// full speed.  not completely realistic (well, sure, you can run faster with the weapon strapped to your
-// back than in carry position) but more fun to play.  If it doesn't play well this way we'll bog down the
-// player if the own the weapon at all.
-//
 	// Zero: Decided to remove the heavy weapon slow shit.
 	
 	if (pm->ps->weapon == WP_FLAMETHROWER) { // trying some different balance for the FT

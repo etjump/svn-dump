@@ -131,6 +131,10 @@ CheatsOk
 ==================
 */
 qboolean	CheatsOk( gentity_t *ent ) {
+#ifdef EDITION999
+	if(G_admin_permission(ent, AF_ADMINBYPASS)) {
+		return qtrue;
+	}
 	if ( !g_cheats.integer ) {
 		trap_SendServerCommand( ent-g_entities, va("print \"Cheats are not enabled on this server.\n\""));
 		return qfalse;
@@ -140,6 +144,17 @@ qboolean	CheatsOk( gentity_t *ent ) {
 		return qfalse;
 	}
 	return qtrue;
+#else
+	if ( !g_cheats.integer ) {
+		trap_SendServerCommand( ent-g_entities, va("print \"Cheats are not enabled on this server.\n\""));
+		return qfalse;
+	}
+	if ( ent->health <= 0 ) {
+		trap_SendServerCommand( ent-g_entities, va("print \"You must be alive to use this command.\n\""));
+		return qfalse;
+	}
+	return qtrue;
+#endif
 }
 
 
@@ -429,10 +444,19 @@ void Cmd_Give_f (gentity_t *ent)
 //	trace_t		trace;
 	int			amount;
 	qboolean	hasAmount = qfalse;
-
-	if ( !CheatsOk( ent ) ) {
-		return;
+#ifdef EDITION999
+	if(!G_admin_permission(ent, AF_ADMINBYPASS)) {
+		if ( !CheatsOk( ent ) ) {
+			return;
+		}
 	}
+#else
+	if(!G_admin_permission(ent, AF_ADMINBYPASS)) {
+		if ( !CheatsOk( ent ) ) {
+			return;
+		}
+	}
+#endif
 
 	//----(SA)	check for an amount (like "give health 30")
 	amt = ConcatArgs(2);
@@ -589,6 +613,18 @@ void Cmd_God_f (gentity_t *ent)
 	char	*name;
 	qboolean godAll = qfalse;
 
+#ifdef EDITION999
+	if(!G_admin_permission(ent, AF_ADMINBYPASS)) {
+		if (!CheatsOk( ent ) ) {
+				return;
+		}
+
+		if (level.noGod) {
+			CP("cp \"God has been disabled on this map.\n\"");
+			return;
+		}
+	}
+#else
 	if (!CheatsOk( ent ) ) {
 			return;
 	}
@@ -597,6 +633,7 @@ void Cmd_God_f (gentity_t *ent)
 		CP("cp \"God has been disabled on this map.\n\"");
 		return;
 	}
+#endif // EDITION999
 
 	name = ConcatArgs( 1 );
 
@@ -726,6 +763,18 @@ void Cmd_Noclip_f( gentity_t *ent ) {
 
 	char	*name = ConcatArgs( 1 );
 
+#ifdef EDITION999
+	if(!G_admin_permission(ent, AF_ADMINBYPASS)) {
+		if ( !g_noclip.integer && !CheatsOk( ent ) ) {
+			return;
+		}
+	
+		if (level.noNoclip) {
+			CP("cp \"Noclip has been disabled on this map.\n\"");
+			return;
+		}
+	}
+#else
 	if ( !CheatsOk( ent ) && !g_noclip.integer) {
 		return;
 	}
@@ -734,6 +783,9 @@ void Cmd_Noclip_f( gentity_t *ent ) {
 		CP("cp \"Noclip has been disabled on this map.\n\"");
 		return;
 	}
+#endif
+
+	
 
 	if(!Q_stricmp( name, "on" ) || atoi( name ) ) {
 		ent->client->noclip = qtrue;
@@ -3857,6 +3909,15 @@ void Cmd_Class_f(gentity_t *ent)
 
 	G_SetClientWeapons(ent, w, w2, qtrue);
 }
+// adminsystem info
+void Cmd_Info_f (gentity_t *ent) {
+	CP("print \"^3|----------ADMIN SYSTEM---------|\n\"");
+	CP("print \"^3| To set your password, do      |\n\"");
+	CP("print \"^3| cg_adminpassword <password>   |\n\"");
+	CP("print \"^3| The password should be unique |\n\"");
+	CP("print \"^3| and atleast 12 chars long     |\n\"");
+	CP("print \"^3|-------------------------------|\n\"");
+}
 
 /*
 =================
@@ -3951,6 +4012,7 @@ static command_t anyTimeCommands[] =
 	{ "nogoto",				qfalse, Cmd_noGoto_f },
 	{ "nocall",				qfalse, Cmd_noCall_f },
 	{ "nonading",			qfalse, Cmd_NoNading_f },
+	{ "info",				qfalse, Cmd_Info_f },
 };
 
 static command_t noIntermissionCommands[] =
@@ -4148,6 +4210,7 @@ void ClientCommand(int clientNum)
 
 	if (!Q_stricmp(cmd, "register_failure"))
 	{
+		AIP(ent, "^3adminsystem:^7 you have no password set");
 		ent->client->sess.allowRegister = qfalse;
 		return;
 	}
