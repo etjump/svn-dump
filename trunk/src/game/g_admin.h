@@ -85,5 +85,4 @@ void G_admin_chat_print(char *string);
 #define AF_ADMINBYPASS 'Z'
 #endif // EDITION999
 
-
 #endif // G_ADMIN_H

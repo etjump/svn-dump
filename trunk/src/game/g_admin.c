@@ -1204,6 +1204,8 @@ qboolean G_admin_help(gentity_t *ent, int skiparg) {
 		AIP(ent, "^3help: ^7check console for more information");
 		ABP_begin();
 		ASP(str);
+		if(ent) CP("print \"\n");
+		else G_Printf("\n");
 	}
 	else {
 		char parameter[20];
