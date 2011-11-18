@@ -808,7 +808,7 @@ qboolean G_admin_admintest(gentity_t *ent, int skiparg) {
 }
 
 void G_admin_login(gentity_t *ent) {
-	int i, clientNum;
+	int i;
 	qboolean found = qfalse;
 	char arg[MAX_TOKEN_CHARS];
 	char password[PASSWORD_LEN+1];
@@ -1227,6 +1227,7 @@ qboolean G_admin_help(gentity_t *ent, int skiparg) {
 		AIP(ent, "^3help: ^7unknown command");
 		return qfalse;
 	}
+	return qtrue;
 }
 
 qboolean G_admin_restart(gentity_t *ent, int skiparg) {

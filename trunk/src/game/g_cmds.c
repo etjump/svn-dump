@@ -3501,6 +3501,11 @@ void Cmd_Load_f(gentity_t *ent)
 		return;
 	}
 
+	if (!ent->client->sess.save_allowed) {
+		CP("print \"You are not allowed to load position.\n\"");
+		return;
+	}
+
 	// get save slot (do this first so players can get usage message even if
 	// they are not allowed to use this command)
 	argc = trap_Argc();
@@ -3564,6 +3569,11 @@ void Cmd_Save_f(gentity_t *ent)
 	if (!g_save.integer)
 	{
 		CP("print \"^3Save ^7is not enabled.\n\"");
+		return;
+	}
+
+	if (!ent->client->sess.save_allowed) {
+		CP("print \"You are not allowed to save position.\n\"");
 		return;
 	}
 
@@ -3652,6 +3662,11 @@ void Cmd_Goto_f(gentity_t *ent) {
 		return;
 	}
 
+	if(!ent->client->sess.goto_allowed) {
+		CP("print \"You are not allowed to use goto.\n\"");
+		return;
+	}
+
 	if(trap_Argc() != 2) {
 		CP("print \"^7Usage: ^3goto ^7<Player ID> | <Partname> | <Name>\n\"");
 		return;
@@ -3698,6 +3713,11 @@ void Cmd_Call_f(gentity_t *ent)
 
 	if(level.noGoto) {
 		CP("print \"Call is disabled on this map.\n\"");
+		return;
+	}
+
+	if(!ent->client->sess.goto_allowed) {
+		CP("print \"You are not allowed to use call.\n\"");
 		return;
 	}
 
@@ -3758,6 +3778,8 @@ void Cmd_PrivateMessage_f(gentity_t *ent)
 		return;
 
 	other = g_entities + clientNum;
+
+	G_LogPrintf("%s -> %s: %s", ent->client->pers.netname, other->client->pers.netname, msg);
 
 	if(!ent) {
 		msg = ConcatArgs(2);

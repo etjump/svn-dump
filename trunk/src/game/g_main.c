@@ -1990,6 +1990,10 @@ void G_ShutdownGame( int restart ) {
 		trap_FS_FCloseFile( level.logFile );
 		level.logFile = 0;
 	}
+	if (level.adminLogFile ) {
+		trap_FS_FCloseFile( level.adminLogFile );
+		level.adminLogFile = 0;
+	}
 
 	// write all the client session data so we can get it back
 	G_WriteSessionData( restart );

@@ -1617,6 +1617,8 @@ char *ClientConnect( int clientNum, qboolean firstTime, qboolean isBot ) {
 	if( firstTime ) {
 		client->sess.need_greeting = qtrue;
 		client->pers.initialSpawn = qtrue;				// DHM - Nerve
+		client->sess.goto_allowed = qtrue;
+		client->sess.save_allowed = qfalse;
 	} else {
 		client->sess.need_greeting = qfalse;
 	}

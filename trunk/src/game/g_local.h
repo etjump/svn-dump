@@ -629,6 +629,10 @@ typedef struct {
 	qboolean	noGoto;
 	qboolean	noCall;
 	qboolean	noNading;
+
+	// goto_allowed for both call & goto
+	qboolean	goto_allowed;
+	qboolean	save_allowed;
 	// SpamProtection
 
 	int			nextReliableTime;
