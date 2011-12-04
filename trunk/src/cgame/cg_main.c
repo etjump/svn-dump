@@ -344,6 +344,11 @@ vmCvar_t	cg_personalTimerY;
 
 vmCvar_t	cg_adminpassword;
 
+vmCvar_t	cg_popupTime;
+vmCvar_t	cg_popupStayTime;
+vmCvar_t	cg_popupFadeTime;
+vmCvar_t	cg_numPopup;
+
 typedef struct {
 	vmCvar_t	*vmCvar;
 	char		*cvarName;
@@ -614,7 +619,11 @@ cvarTable_t		cvarTable[] = {
 	{ &cg_personalTimerAlpha, "cg_personalTimerAlpha", "1", CVAR_ARCHIVE },
 	{ &cg_personalTimerX, "cg_personalTimerX", "687", CVAR_ARCHIVE },
 	{ &cg_personalTimerY, "cg_personalTimerY", "400", CVAR_ARCHIVE },
-	{ &cg_adminpassword, "cg_adminpassword", "", CVAR_ARCHIVE }
+	{ &cg_adminpassword, "cg_adminpassword", "", CVAR_ARCHIVE },
+	{ &cg_popupTime, "cg_popupTime", "1000", CVAR_ARCHIVE},
+	{ &cg_popupStayTime, "cg_popupStayTime", "2000", CVAR_ARCHIVE },
+	{ &cg_popupFadeTime, "cg_popupFadeTime", "2500", CVAR_ARCHIVE },
+	{ &cg_numPopup, "cg_numPopup", "5", CVAR_ARCHIVE },
 
 
 };

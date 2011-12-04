@@ -77,8 +77,12 @@ void CG_InitPM( void ) {
 	cg_pmWaitingListBig =	NULL;
 }
 
+/*
+Replaced these with cg_popupTime,
+cg_popupFadeTime & cg_popupStayTime
 #define PM_FADETIME 2500
 #define PM_WAITTIME 2000
+*/
 
 #define PM_FADETIME_BIG 1000
 #define PM_WAITTIME_BIG 3500
@@ -86,7 +90,7 @@ void CG_InitPM( void ) {
 int CG_TimeForPopup( popupMessageType_t type ) {
 	switch( type ) {
 		default:
-			return 1000;
+			return cg_popupTime.integer;
 	}
 }
 
@@ -117,7 +121,7 @@ void CG_UpdatePMLists( void ) {
 
 				CG_AddToListFront( &cg_pmOldList, listItem );
 			} else {
-				if( cg.time > t + PM_WAITTIME + PM_FADETIME ) {
+				if( cg.time > t + cg_popupStayTime.integer + cg_popupFadeTime.integer ) {
 					// we're gone completely
 					cg_pmWaitingList = NULL;
 					listItem->inuse = qfalse;
@@ -132,7 +136,7 @@ void CG_UpdatePMLists( void ) {
 	listItem = cg_pmOldList;
 	lastItem = NULL;
 	while( listItem ) {
-		int t = (CG_TimeForPopup( listItem->type ) + listItem->time + PM_WAITTIME + PM_FADETIME);
+		int t = (CG_TimeForPopup( listItem->type ) + listItem->time + cg_popupStayTime.integer + cg_popupFadeTime.integer);
 		if( cg.time > t ) {
 			// nuke this, and everything below it (though there shouldn't BE anything below us anyway)
 			pmListItem_t* next;
@@ -174,7 +178,7 @@ void CG_UpdatePMLists( void ) {
 				listItem2->inuse = qfalse;
 				listItem2->next = NULL;
 			} else {
-				if( cg.time > t + PM_WAITTIME + PM_FADETIME ) {
+				if( cg.time > t + cg_popupStayTime.integer + cg_popupFadeTime.integer ) {
 					// we're gone completely
 					cg_pmWaitingListBig = NULL;
 					listItem2->inuse = qfalse;
@@ -364,9 +368,9 @@ void CG_DrawPMItems( void ) {
 		return;
 	}
 
-	t = cg_pmWaitingList->time + CG_TimeForPopup( cg_pmWaitingList->type ) + PM_WAITTIME;
+	t = cg_pmWaitingList->time + CG_TimeForPopup( cg_pmWaitingList->type ) + cg_popupStayTime.integer;
 	if( cg.time > t ) {
-		colourText[3] = colour[3] = 1 - ((cg.time - t) / (float)PM_FADETIME);
+		colourText[3] = colour[3] = 1 - ((cg.time - t) / (float)cg_popupFadeTime.integer);
 	}
 
 	trap_R_SetColor( colourText );
@@ -374,12 +378,12 @@ void CG_DrawPMItems( void ) {
 	trap_R_SetColor( NULL );
 	CG_Text_Paint_Ext( 4 + size + 2, y + 12, 0.2f, 0.2f, colourText, cg_pmWaitingList->message, 0, 0, 0, &cgs.media.limboFont2 );
 
-	for( i = 0; i < 4 && listItem; i++, listItem = listItem->next ) {
+	for( i = 0; i < cg_numPopup.integer - 1 && listItem; i++, listItem = listItem->next ) {
 		y -= size + 2;
 
-		t = listItem->time + CG_TimeForPopup( listItem->type ) + PM_WAITTIME;
+		t = listItem->time + CG_TimeForPopup( listItem->type ) + cg_popupStayTime.integer;
 		if( cg.time > t ) {
-			colourText[3] = colour[3] = 1 - ((cg.time - t) / (float)PM_FADETIME);
+			colourText[3] = colour[3] = 1 - ((cg.time - t) / (float)cg_popupFadeTime.integer);
 		} else {
 			colourText[3] = colour[3] = 1.f;
 		}

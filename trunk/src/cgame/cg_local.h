@@ -2279,22 +2279,17 @@ extern	vmCvar_t		cg_keysX;
 extern	vmCvar_t		cg_keysY;
 extern	vmCvar_t		cg_keysColor;
 extern	vmCvar_t		cg_loadviewangles;
-
 // forty - speedometer
 extern	vmCvar_t		cg_drawspeed;
 extern	vmCvar_t		cg_speedinterval;
 extern	vmCvar_t		cg_speedXYonly;
 extern	vmCvar_t		cg_speedunit;
-
 extern pmove_t			cg_pmove;
-
 // Cheat cvars
-extern	vmCvar_t		cl_yawspeed;
-extern	vmCvar_t		cl_freelook;
-extern	vmCvar_t		cg_viewlog;
-
-extern	vmCvar_t		cg_drawClock;
-
+extern vmCvar_t			cl_yawspeed;
+extern vmCvar_t			cl_freelook;
+extern vmCvar_t			cg_viewlog;
+extern vmCvar_t			cg_drawClock;
 extern vmCvar_t			cg_drawSpeed2;
 extern vmCvar_t			cg_speedX;
 extern vmCvar_t			cg_speedY;
@@ -2302,14 +2297,16 @@ extern vmCvar_t			cg_speedSizeX;
 extern vmCvar_t			cg_speedSizeY;
 extern vmCvar_t			cg_speedColor;
 extern vmCvar_t			cg_speedAlpha;
-
 extern vmCvar_t			cg_drawPersonalTimer;
 extern vmCvar_t			cg_personalTimerColor;
 extern vmCvar_t			cg_personalTimerAlpha;
 extern vmCvar_t			cg_personalTimerX;
 extern vmCvar_t			cg_personalTimerY;
-
 extern vmCvar_t			cg_adminpassword;
+extern vmCvar_t			cg_popupTime;
+extern vmCvar_t			cg_popupStayTime;
+extern vmCvar_t			cg_popupFadeTime;
+extern vmCvar_t			cg_numPopup;
 
 
 //
