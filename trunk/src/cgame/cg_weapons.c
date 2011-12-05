@@ -1552,6 +1552,7 @@ void CG_RegisterWeapon( int weaponNum, qboolean force ) {
 		case WP_AKIMBO_COLT:			filename = "akimbo_colt.weap"; break;
 		case WP_AKIMBO_SILENCEDCOLT:	filename = "akimbo_silenced_colt.weap"; break;
 		case WP_MAPMORTAR:				filename = "mapmortar.weap"; break;	// do we really need this?
+		case WP_PORTAL_GUN:				filename = "portalgun.weap"; break; //Feen: PGM
 		case WP_ARTY:					return;	// to shut the game up
 		default:						CG_Printf( S_COLOR_RED "WARNING: trying to register weapon %i but there is no weapon file entry for it.\n", weaponNum ); return;
 	}
@@ -3348,6 +3349,17 @@ void CG_AltWeapon_f(void)
 		return;
 	}
 
+	////Feen: PGM
+	//if (cg.weaponSelect == WP_PORTAL_GUN) {
+
+	//	CG_Printf("^1Portal Debug: ^7CG_AltWeapon_f() - Event Added (EV_PORTAL2_FIRE)\n");
+	//	//BG_AddPredictableEventToPlayerstate( EV_PORTAL2_FIRE, 0 , &cg.predictedPlayerState);
+	//	BG_AddPredictableEventToPlayerstate( EV_FIRE_WEAPON, 0 , &cg.predictedPlayerState);
+	//	//return maybe?
+	//	return;
+	//}
+
+
 	// Need ground for this
 	if( cg.weaponSelect == WP_MORTAR ) {
 		int contents;
@@ -3409,7 +3421,7 @@ void CG_AltWeapon_f(void)
 				cg.binocZoomTime = cg.time;
 		}
 	}
-
+	
 	// Arnout: don't allow another weapon switch when we're still swapping the gpg40, to prevent animation breaking
 	if( ( cg.snap->ps.weaponstate == WEAPON_RAISING || cg.snap->ps.weaponstate == WEAPON_DROPPING ) &&
 		( (original == WP_GPG40 || num == WP_GPG40 || original == WP_M7 || num == WP_M7) ||

@@ -503,9 +503,16 @@ struct gentity_s {
 
 	//bani
 	int	etpro_misc_1;
+
 	//etjump
 	int ident;
 	int reqident;
+
+	//Feen - PGM
+	gentity_t *portal_blue;
+	gentity_t *portal_red;
+
+	int lastPortalTime; //Last time we teleported using portal
 };
 
 // Ridah
@@ -2668,6 +2675,21 @@ qboolean G_admin_setlevel(gentity_t *ent, int skiparg);
 qboolean G_admin_unban(gentity_t *ent, int skiparg);
 qboolean G_admin_unmute(gentity_t *ent, int skiparg);
 qboolean G_admin_permission(gentity_t *ent, char flag);
+
+//Feen: PGM
+
+//g_portalgun.c
+//gentity_t *fire_portalgun(gentity_t *self, vec3_t start, vec3_t dir);
+
+void Portal_Think(gentity_t *self);
+void Portal_Touch(gentity_t *self, gentity_t *other, trace_t *trace);
+
+//g_weapon.c
+void Weapon_Portal_Fire( gentity_t *ent, int PortalNum ); //TODO add switch for different portals....
+
+
+//Feen: END PGM
+
 
 #ifdef EDITION999
 

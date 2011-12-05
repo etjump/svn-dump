@@ -15,7 +15,7 @@
 #include "cg_public.h"
 #include "../ui/ui_shared.h"
 
-#define TRICKJUMP_VER "ETJump 1.1.0"
+#define TRICKJUMP_VER "ETJump 1.1.1b"
 
 #define MAX_LOCATIONS		256
 #define	POWERUP_BLINKS		5
@@ -1176,6 +1176,7 @@ typedef struct {
 	int				stopTime;
 	qboolean		activeTimer;
 	qboolean		resetmaxspeed;
+
 } cg_t;
 
 #define	NUM_FUNNEL_SPRITES	21
@@ -1743,6 +1744,11 @@ typedef struct {
 
 	qhandle_t		fireteamicons[6];
 	keys_set_t		keys;
+
+	//Feen: PGM - Portal Shaders //NOTE - Maybe add shaders for other player portals as well....
+	qhandle_t		portal_blueShader; //Portal 1
+	qhandle_t		portal_redShader;  //Portal 2
+	
 } cgMedia_t;
 
 typedef struct {
@@ -2521,6 +2527,9 @@ qboolean CG_AddCEntity_Filter( centity_t* cent );
 qboolean CG_AddLinkedEntity( centity_t *cent, qboolean ignoreframe, int atTime );
 void CG_PositionEntityOnTag( refEntity_t *entity, const refEntity_t *parent, const char *tagName, int startIndex, vec3_t *offset);
 void CG_PositionRotatedEntityOnTag( refEntity_t *entity, const refEntity_t *parent, const char *tagName );
+
+//Feen: PGM - CG stuff..
+static void CG_PortalGate( centity_t *cent );
 
 
 //

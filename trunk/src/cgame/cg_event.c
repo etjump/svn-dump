@@ -2037,7 +2037,7 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 			(es->weapon != WP_TRIPMINE) &&
 			(es->weapon != WP_SMOKE_BOMB) &&
 			(es->weapon != WP_AMMO) &&
-			(es->weapon != WP_MEDKIT))
+			(es->weapon != WP_MEDKIT)) //Feen: PGM
 			trap_S_StartSound (NULL, es->number, CHAN_AUTO, cgs.media.noAmmoSound );
 
 		if( es->number == cg.snap->ps.clientNum && (
@@ -2763,6 +2763,12 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 				break;
 		}
 
+		break;
+
+		//Feen: PGM
+	case EV_PORTAL2_FIRE:
+		DEBUGNAME("EV_PORTAL2_FIRE");
+		CG_Printf( "^1Portal Debug: ^7CG_EntityEvent() EV_PORTAL2_FIRE - received\n");
 		break;
 
 	default:

@@ -101,6 +101,8 @@ int weapBanksMultiPlayer[MAX_WEAP_BANKS_MP][MAX_WEAPS_IN_BANK_MP] = {
 	{WP_DYNAMITE,			WP_MEDKIT,				WP_AMMO,			WP_SATCHEL,					WP_SATCHEL_DET,			0,							0,			0,			0,			0,		0,				0			},
 	{WP_LANDMINE,			WP_MEDIC_ADRENALINE,	0,					0,							0,						0,							0,			0,			0,			0,		0,				0			},
 	{WP_BINOCULARS,			0,						0,					0,							0,						0,							0,			0,			0,			0,		0,				0			},
+	//Feen: PGM - Weapon bank 8 in most cases...
+	{WP_PORTAL_GUN,			0,						0,					0,							0,						0,							0,			0,			0,			0,		0,				0			},
 	{0,						0,						0,					0,							0,						0,							0,			0,			0,			0,		0,				0			},
 };
 
@@ -184,7 +186,9 @@ ammotable_t ammoTableMP[WP_NUM_WEAPONS] = {
 	{	999,			0,		1,		0,		0,		1000,	750,			1600,	0,		0,		0						},	// WP_LOCKPICK				// 36 
 	{	48,				1,		8,		48,		8,		2700,	DELAY_PISTOL,	200,	0,		0,		MOD_AKIMBO_COLT			},	// WP_AKIMBO_COLT			// 37
 	{	48,				1,		8,		48,		8,		2700,	DELAY_PISTOL,	200,	0,		0,		MOD_AKIMBO_LUGER		},	// WP_AKIMBO_LUGER			// 38
-	{	4,				1,		1,		4,		1,		3000,	DELAY_LOW,		400,	0,		0,		MOD_GPG40				},	// WP_GPG40					// 39
+	{	999,			0,		999,	0,		0,		0,		50,				200,	0,		0,		MOD_PORTAL_GUN			},	// WP_PORTAL_GUN			// 39 //Feen: Portal Gun Mod
+
+	{	4,				1,		1,		4,		1,		3000,	DELAY_LOW,		400,	0,		0,		MOD_GPG40				},	// WP_GPG40					// 39 //Feen: + 1 from this point on
 
 	{	4,				1,		1,		4,		1,		3000,	DELAY_LOW,		400,	0,		0,		MOD_M7					},	// WP_M7					// 40
 	{	24,				1,		8,		24,		8,		1500,	DELAY_PISTOL,	400,	0,		0,		MOD_SILENCED_COLT		},	// WP_SILENCED_COLT			// 41
@@ -244,7 +248,11 @@ int weapAlts[] = {
 	WP_NONE,			// 37 WP_AKIMBO_COLT
 	WP_NONE,			// 38 WP_AKIMBO_LUGER
 
-	WP_KAR98,			// 39 WP_GPG40
+	//Feen: PGM
+	WP_NONE,			// 39 WP_PORTAL_GUN
+	//END PGM
+
+	WP_KAR98,			// 39 WP_GPG40 //Feen: +1 from this point on...
 	WP_CARBINE,			// 40 WP_M7
 	WP_COLT,			// 41 WP_SILENCED_COLT
 	WP_GARAND,			// 42 WP_GARAND_SCOPE
@@ -2053,6 +2061,35 @@ weapon_medic_heal
 // dhm
 
 
+// Feen: PGM
+/*
+weapon_portal_gun
+*/
+	{
+		"weapon_portal_gun", 
+		"sound/misc/w_pkup.wav",
+		{	
+			"models/weapons2/portalgun.md3", 
+			0, 
+			0
+		},
+
+		"icons/iconw_railgun",	// icon
+		"icons/icona_railgun",			// ammo icon
+		"portalgun",			// pickup
+		50,
+		IT_WEAPON,
+		WP_PORTAL_GUN,
+		WP_PORTAL_GUN,
+		WP_PORTAL_GUN,
+		"",						// precache
+		"",						// sounds
+//		{0,0,0,0,0}
+	},
+// feen
+
+
+
 /*QUAKED ammo_syringe (.3 .3 1) (-16 -16 -16) (16 16 16) SUSPENDED SPIN - RESPAWN
 used by: medic
 
@@ -2824,6 +2861,7 @@ qboolean BG_WeaponInWolfMP( int weapon ) {
 	case WP_AKIMBO_SILENCEDLUGER:
 	case WP_AKIMBO_COLT:
 	case WP_AKIMBO_SILENCEDCOLT:
+	case WP_PORTAL_GUN: //Feen: PGM
 		return qtrue;
 	default:
 		return qfalse;
@@ -3922,6 +3960,7 @@ char *eventnames[] = {
 	"EV_ARTYMESSAGE",
 	"EV_AIRSTRIKEMESSAGE",
 	"EV_MEDIC_CALL",
+	"EV_PORTAL2_FIRE", //Feen: PGM
 	"EV_MAX_EVENTS",
 };
 

@@ -59,7 +59,8 @@ static const weap_ws_convert_t aWeapID[WP_NUM_WEAPONS] = {
 	{ WP_FG42,				WS_FG42 },
 	{ WP_DUMMY_MG42,		WS_MG42 },	// ??
 	{ WP_LOCKPICK,			WS_MAX },
-	
+	{ WP_PORTAL_GUN,		WS_PORTAL_GUN}, //Feen: PGM
+
 	{ WP_GPG40,				WS_GRENADELAUNCHER },
 	{ WP_M7,				WS_GRENADELAUNCHER },
 	{ WP_SILENCED_COLT,		WS_COLT },			// 50

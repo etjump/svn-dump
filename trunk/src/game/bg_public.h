@@ -514,6 +514,10 @@ typedef struct {
 	int			lastRecoilDeltaTime;
 	
 	qboolean	releasedFire;
+
+	//Feen: PGM
+	//qboolean	portalAltFire;
+
 } pmoveExt_t;	// data used both in client and server - store it here
 				// instead of playerstate to prevent different engine versions of playerstate between XP and MP
 
@@ -591,7 +595,7 @@ int Pmove (pmove_t *pmove);
 
 // JPW NERVE
 #define MAX_WEAPS_IN_BANK_MP	12
-#define MAX_WEAP_BANKS_MP		10
+#define MAX_WEAP_BANKS_MP		11 //Feen: PGM - Changed from 10 to 11
 // jpw
 
 //Keys pressed
@@ -830,10 +834,11 @@ typedef enum {
 	WP_LOCKPICK,			// 36	// Mad Doc - TDF lockpick
 	WP_AKIMBO_COLT,			// 37
 	WP_AKIMBO_LUGER,		// 38
+	WP_PORTAL_GUN,			// Feen: Portal Gun Mod (PGM) New 39
 
 // Gordon: ONLY secondaries below this mark, as they are checked >= WP_GPG40 && < WP_NUM_WEAPONS
 
-	WP_GPG40,				// 39
+	WP_GPG40,				// 39 //Feen: + 1 from this point on....
 
 	WP_M7,					// 40
 	WP_SILENCED_COLT,		// 41
@@ -1084,6 +1089,7 @@ typedef enum {
 	EV_ARTYMESSAGE,
 	EV_AIRSTRIKEMESSAGE,
 	EV_MEDIC_CALL,
+	EV_PORTAL2_FIRE, //Feen: PGM - Portal Gun Events - NOTE: EV_PORTAL1_FIRE event is covered by EV_FIRE_WEAPON event...
 	EV_MAX_EVENTS	// just added as an 'endcap'
 } entity_event_t;
 
@@ -1387,6 +1393,7 @@ typedef enum extWeaponStats_s
 	WS_MG42,				// 19
 	WS_GARAND,				// 20 // Gordon: (carbine and garand)
 	WS_K43,					// 21 // Gordon: (kar98 and k43)
+	WS_PORTAL_GUN,			//Feen: PGM
 
 	WS_MAX
 } extWeaponStats_t;
@@ -1478,6 +1485,9 @@ typedef enum {
 	MOD_AKIMBO_SILENCEDLUGER,
 
 	MOD_SMOKEGRENADE,
+
+	//Feen: PGM
+	MOD_PORTAL_GUN,
 
 	// RF
 	MOD_SWAP_PLACES,

@@ -621,6 +621,9 @@ static float PM_CmdScale( usercmd_t *cmd ) {
 
 	} // if (gametype == GT_SINGLE_PLAYER)...
 
+	//Feen: PGM - TEST
+
+
 	return scale;
 }
 
@@ -2297,6 +2300,11 @@ static void PM_BeginWeaponReload( int weapon ) {
 		return;	// Gordon: no reloading of the carbine until clip is empty
 	}
 
+	//Feen: PGM - We don't reload the portal gun...
+	if(weapon == WP_PORTAL_GUN)
+		return;
+	//END PGM
+
 	if((weapon <= WP_NONE || weapon > WP_DYNAMITE) && !(weapon >= WP_KAR98 && weapon < WP_NUM_WEAPONS))
 		return;
 
@@ -2804,7 +2812,7 @@ void PM_CheckForReload( int weapon ) {
 		return;
 
 	// GPG40 and M7 don't reload
-	if( weapon == WP_GPG40 || weapon == WP_M7 )
+	if( weapon == WP_GPG40 || weapon == WP_M7 || weapon == WP_PORTAL_GUN ) //Feen: PGM - Modified 
 		return;
 
 	// user is forcing a reload (manual reload)
@@ -3187,6 +3195,69 @@ static void PM_Weapon( void ) {
 	static int weaponstate_last = -1;
 #endif
 
+	//Feen Weapon Dbug
+#ifdef GAMEDLL
+
+	//PGM Test...
+	if (pm->cmd.wbuttons & WBUTTON_ATTACK2) {
+		if (pm->cmd.weapon == WP_PORTAL_GUN)
+			PM_AddEvent(EV_PORTAL2_FIRE);
+			Com_Printf("FWD: EV_PORTAL2_FIRE Added...\n");
+	}
+
+#ifdef FEEN_WPN_DBG
+	//REGULAR BUTTONS
+	if (pm->cmd.buttons & BUTTON_ATTACK)
+		Com_Printf("FWD: BUTTON_ATTACK\n");
+
+	//if (pm->cmd.buttons & BUTTON_TALK)
+	//	Com_Printf("FWD: BUTTON_TALK\n");
+
+	if (pm->cmd.buttons & BUTTON_USE_HOLDABLE)
+		Com_Printf("FWD: BUTTON_USE_HOLDABLE\n");
+
+	if (pm->cmd.buttons & BUTTON_GESTURE)
+		Com_Printf("FWD: BUTTON_GESTURE\n");
+
+	if (pm->cmd.buttons & BUTTON_SPRINT)
+		Com_Printf("FWD: BUTTON_SPRINT\n");
+
+
+	if (pm->cmd.buttons & BUTTON_ACTIVATE)
+		Com_Printf("FWD: BUTTON_ACTIVATE\n");
+
+	if (pm->cmd.buttons & BUTTON_ANY)
+		Com_Printf("FWD: BUTTON_ANY\n");
+
+	//REGULAR BUTTONS
+	if (pm->cmd.wbuttons & WBUTTON_ATTACK2)
+		Com_Printf("FWD: WBUTTON_ATTACK2\n");
+
+	if (pm->cmd.wbuttons & WBUTTON_ZOOM)
+		Com_Printf("FWD: WBUTTON_ZOOM\n");
+
+	if (pm->cmd.wbuttons & WBUTTON_RELOAD)
+		Com_Printf("FWD: WBUTTON_RELOAD\n");
+
+	if (pm->cmd.wbuttons & WBUTTON_LEANLEFT)
+		Com_Printf("FWD: WBUTTON_LEANLEFT\n");
+
+	if (pm->cmd.wbuttons & WBUTTON_LEANRIGHT)
+		Com_Printf("FWD: WBUTTON_LEANRIGHT\n");
+
+
+	if (pm->cmd.buttons & WBUTTON_DROP)
+		Com_Printf("FWD: BUTTON_DROP\n");
+
+	if (pm->cmd.buttons & WBUTTON_PRONE)
+		Com_Printf("FWD: WBUTTON_PRONE\n");
+#endif
+
+
+#endif
+	//END FEEN TEST
+
+
 	// don't allow attack until all buttons are up
 	if ( pm->ps->pm_flags & PMF_RESPAWNED ) {
 		return;
@@ -3242,7 +3313,7 @@ static void PM_Weapon( void ) {
 				} else {
 					pm->ps->weapHeat[WP_DUMMY_MG42] += MG42_RATE_OF_FIRE_MP;
 				}
-
+				
 				PM_AddEvent( EV_FIRE_WEAPON_MG42 );
 
 				if(PM_IsSinglePlayerGame()) {
@@ -3551,7 +3622,7 @@ static void PM_Weapon( void ) {
 	if( pm->ps->weaponstate == WEAPON_RELOADING ) {
 		PM_FinishWeaponReload();
 	}
-
+	
 	// change weapon if time
 	if( pm->ps->weaponstate == WEAPON_DROPPING || pm->ps->weaponstate == WEAPON_DROPPING_TORELOAD ) {
 		PM_FinishWeaponChange();
@@ -3751,6 +3822,8 @@ static void PM_Weapon( void ) {
 		return;
 	}
 
+
+
 #ifdef SAVEGAME_SUPPORT
 	if( pm->reloading ) {
 		return;
@@ -3768,7 +3841,7 @@ static void PM_Weapon( void ) {
 #endif
 		return;
 	}
-
+	
 	// player is underwater - no fire
 	if(pm->waterlevel == 3) {
 		if(	pm->ps->weapon != WP_KNIFE &&
@@ -3777,7 +3850,8 @@ static void PM_Weapon( void ) {
 			pm->ps->weapon != WP_DYNAMITE &&
 			pm->ps->weapon != WP_LANDMINE &&
 			pm->ps->weapon != WP_TRIPMINE &&
-			pm->ps->weapon != WP_SMOKE_BOMB ) {
+			pm->ps->weapon != WP_SMOKE_BOMB &&
+			pm->ps->weapon != WP_PORTAL_GUN) { //Feen: PGM - We don't want user's firing under water - NOTE: Maybe change later
 				PM_AddEvent(EV_NOFIRE_UNDERWATER);	// event for underwater 'click' for nofire
 				pm->ps->weaponTime	= 500;
 				pm->ps->weaponDelay	= 0;			// avoid insta-fire after water exit on delayed weapon attacks
@@ -3888,6 +3962,8 @@ static void PM_Weapon( void ) {
 			}
 			break;
 
+		//Feen: PGM - NOTE: Possibly add animation handlers later
+
 		// throw
 		case WP_DYNAMITE:
 		case WP_GRENADE_LAUNCHER:
@@ -3947,6 +4023,13 @@ static void PM_Weapon( void ) {
 	}
 
 	pm->ps->weaponstate = WEAPON_FIRING;
+
+	//Feen: PGM cmd test...
+	if(pm->cmd.wbuttons & WBUTTON_ATTACK2 && pm->ps->weapon == WP_PORTAL_GUN) {
+		PM_AddEvent(EV_PORTAL2_FIRE);
+		Com_Printf("^7Portal Debug: bg_pmove.c -> Event Added\n");
+		//return; //Maybe not return?
+	}
 
 	// Gordon: reset player disguise on firing
 //	if( pm->ps->weapon != WP_SMOKE_BOMB && pm->ps->weapon != WP_SATCHEL && pm->ps->weapon != WP_SATCHEL_DET ) {	// Arnout: not for these weapons
@@ -4102,6 +4185,8 @@ static void PM_Weapon( void ) {
 			PM_StartWeaponAnim(weapattackanim);
 			break;
 
+			//Feen: PGM NOTE: Add this later. Possibly with WP_MORTAR_SET...
+
 		case WP_MP40:
 		case WP_THOMPSON:
 		case WP_STEN:
@@ -4116,6 +4201,7 @@ static void PM_Weapon( void ) {
 			break;
 
 		case WP_MORTAR_SET:
+		case WP_PORTAL_GUN: //Feen: PGM - TEST
 			break;	// no animation
 
 		default:
@@ -4181,6 +4267,7 @@ static void PM_Weapon( void ) {
 	case WP_TRIPMINE:
 	case WP_SMOKE_BOMB:
 	case WP_MORTAR_SET:
+	case WP_PORTAL_GUN: //Feen: PGM
 		addTime = GetAmmoTableData(pm->ps->weapon)->nextShotTime;
 		break;
 
@@ -4354,6 +4441,7 @@ static void PM_Weapon( void ) {
 	case WP_SILENCED_COLT:
 	case WP_AKIMBO_COLT:
 	case WP_AKIMBO_SILENCEDCOLT:
+	//case WP_PORTAL_GUN: //Feen: PGM - The recoil of the pistols is good enough for this... //Then again... nah...
 		pm->pmext->weapRecoilTime = pm->cmd.serverTime;
 		pm->pmext->weapRecoilDuration = pm->skill[SK_LIGHT_WEAPONS] >= 3 ? 70 : 100;
 		pm->pmext->weapRecoilYaw = 0.f;//crandom() * .1f;
@@ -4394,6 +4482,16 @@ static void PM_Weapon( void ) {
 	pm->ps->weaponTime += addTime;
 
 	PM_SwitchIfEmpty();
+
+
+	////Feen: PGM - blegh....
+	//if(pm->pmext->portalAltFire == qtrue){
+	//	PM_AddEvent(EV_PORTAL2_FIRE);
+	//	pm->pmext->portalAltFire = qfalse;
+	//}
+
+
+
 }
 
 
@@ -5625,6 +5723,7 @@ int Pmove (pmove_t *pmove) {
 		pmove->ps->curWeapHeat = 0;
 
 	//PM_CheckStuck();
+
 
 	if ( (pm->ps->stats[STAT_HEALTH] <= 0 || pm->ps->pm_type == PM_DEAD ) && pml.groundTrace.surfaceFlags & SURF_MONSTERSLICK )
 		return (pml.groundTrace.surfaceFlags);

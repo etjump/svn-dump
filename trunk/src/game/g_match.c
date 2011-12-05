@@ -348,6 +348,8 @@ static const weap_ws_convert_t aWeapMOD[MOD_NUM_MODS] = {
 
 	{ MOD_MORTAR,				WS_MORTAR },
 
+	{ MOD_PORTAL_GUN,			WS_PORTAL_GUN },
+
 	{ MOD_SWAP_PLACES,			WS_MAX },
 
 	{ MOD_SWITCHTEAM,			WS_MAX }

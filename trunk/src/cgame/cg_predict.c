@@ -471,7 +471,7 @@ static void CG_TouchItem( centity_t *cent ) {
 	if ( cent->miscTime == cg.time ) {
 		return;
 	}
-
+	
 	if ( !BG_CanItemBeGrabbed( &cent->currentState, &cg.predictedPlayerState, cgs.clientinfo[cg.snap->ps.clientNum].skill, cgs.clientinfo[cg.snap->ps.clientNum].team ) ) {
 		return;		// can't hold it
 	}

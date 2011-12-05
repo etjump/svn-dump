@@ -3330,6 +3330,251 @@ qboolean Bullet_Fire_Extended(gentity_t *source, gentity_t *attacker, vec3_t sta
 }
 
 
+/*
+======================================================================
+
+Portal Gun
+
+  Portal Gun Fire/Think/Touch Event(s)
+  NOTE: Will move think/touch event(s) to g_portal.c at
+        a future date - Feen 11/23/11
+
+======================================================================
+*/
+
+
+void Weapon_Portal_Fire( gentity_t *ent, int PortalNumber ) {
+
+
+	gentity_t *portal, *tent;
+	vec3_t t_endpos;
+
+	#define PORTAL_GUN_DIST 5000 //Feen: Iunno about this value, we'll 
+								 //      just have to play around with it... 
+								 //      and move it to g_local.h...
+
+	//From knife...
+	trace_t		tr;
+
+	vec3_t		end;
+
+
+		CP(va("print \"^1Portal Debug:^7 Weaon_Portal_Fire called....\n\"")); //Debug...
+
+	AngleVectors (ent->client->ps.viewangles, forward, right, up);
+	CalcMuzzlePoint ( ent, ent->s.weapon, forward, right, up, muzzleTrace );
+	VectorMA (muzzleTrace, PORTAL_GUN_DIST, forward, end);
+	G_HistoricalTrace(ent, &tr, muzzleTrace, NULL, NULL, end, ent->s.number, MASK_SHOT);
+
+	//CP(va("print \"^1Portal Debug:^7 Trace Completed....\n\"")); //Debug...
+	
+	if ( tr.surfaceFlags & SURF_NOIMPACT ){
+	    //CP(va("print \"^1Portal Debug:^7 didn't hit anything....\n\""));
+		return;
+	}
+
+	// no contact
+	if(tr.fraction == 1.0f) {
+		//CP(va("print \"^1Portal Debug:^7 didn't hit anything....\n\""));
+		return;
+
+	}
+
+		//CP(va("print \"^1Portal Debug:^7 Start rail creation....\n\"")); //Debug...
+
+		//DEBUG - RailTrail... 
+		tent = G_TempEntity( muzzleTrace, EV_RAILTRAIL );
+		//CP(va("print \"^1Portal Debug:^7 Temp rail ent created....\n\"")); //Debug...
+
+		SnapVectorTowards(tr.endpos, muzzleTrace);
+		VectorCopy(tr.endpos, tent->s.origin2);
+		tent->s.otherEntityNum2 = ent->s.number; //test...
+		//CP(va("print \"^1Portal Debug:^7 rail created....\n\""));
+
+
+	//Free any previous instances of each portal if any
+	if(PortalNumber == 1 && ent->portal_blue){
+
+		G_FreeEntity(ent->portal_blue);
+		ent->portal_blue = NULL;
+
+	}else if (PortalNumber == 2 && ent->portal_red){
+
+		G_FreeEntity(ent->portal_red);
+		ent->portal_red = NULL;
+
+	}
+
+
+
+	portal = G_Spawn(); 
+	CP(va("print \"^1Portal Debug:^7 entity created....\n\"")); //Debug...
+	
+	portal->classname = "portal_gate";
+
+
+	//Assign ent to player as well as the portal type..
+	if(PortalNumber == 1){
+
+		portal->s.eType = ET_PORTAL_BLUE; //Portal 1
+
+
+		//Assign to client
+		ent->portal_blue = portal;
+
+	}else{
+
+		portal->s.eType = ET_PORTAL_RED; //Portal 2
+		
+		//Assign to client
+		ent->portal_red = portal;
+
+	}
+
+
+	
+	
+	//Bounding box..... (hopefully....)
+	VectorSet(portal->r.mins, -ITEM_RADIUS, -ITEM_RADIUS, 0 );
+	VectorSet(portal->r.maxs, ITEM_RADIUS, ITEM_RADIUS, 2*ITEM_RADIUS );
+	portal->r.contents = CONTENTS_TRIGGER | CONTENTS_ITEM;
+	portal->clipmask = CONTENTS_SOLID | CONTENTS_MISSILECLIP;
+	portal->touch = Portal_Touch;
+
+	portal->think = Portal_Think;
+	portal->nextthink = level.time + 10000; //.5 sec til next think. May need to play around with this....
+	
+	//CP(va("print \"^1Portal Debug:^7 think/touch set....\n\""));
+
+	portal->r.svFlags = SVF_BROADCAST; //NOTE: Probably need to tweak this....
+
+	portal->r.ownerNum = ent->s.number;
+	portal->parent = ent;
+
+	//portal->s.eType = ET_PORTAL_BLUE; //Moved up - 11/28/11
+	//portal->s.eventParm = 1; //Portal number 1. May not need this. Probably just use the eType....
+	portal->s.pos.trType = TR_STATIONARY;
+
+	//Set Location of entity - NOTE: May need to move slightly away from surface
+	
+	/*VectorCopy(tr.endpos, portal->s.origin);
+	VectorCopy(tr.endpos, portal->r.currentOrigin);
+	VectorCopy(tr.endpos, portal->s.pos.trBase);*/
+
+	//Test - Origin...
+	VectorMA (tr.endpos, 15, tr.plane.normal, t_endpos); //Push origin out 15 units from trace position along the planes normal.
+
+	VectorCopy(t_endpos, portal->s.origin);
+	VectorCopy(t_endpos, portal->r.currentOrigin);
+	VectorCopy(t_endpos, portal->s.pos.trBase);
+
+
+	//Set angle of entity based on normal of plane....
+	//VectorCopy(tr.plane.normal, portal->r.currentAngles);
+	vectoangles(tr.plane.normal, portal->s.angles);
+
+
+	//portal->r.currentAngles
+
+	//New stuff to try
+	//G_SetOrigin(portal, tr.endpos); //NOTE NOTE NOTE NOTE: Temporarily disabled!
+	G_SetOrigin(portal, t_endpos);
+
+	trap_LinkEntity(portal);
+
+	//DEBUG
+	CP(va("print \"^1Portal Debug:^7 supposedly the entity is there....\n\""));
+
+}
+
+
+void Portal_Think(gentity_t *self){
+
+		gentity_t *ent;
+
+
+	//If owner is dead, get rid of the portals...
+	if (self->parent->client->ps.pm_type == PM_DEAD)  {
+
+		G_FreeEntity(self);
+		
+		//DEBUG
+		//CP(va("print \"^1Portal Protection:^7 Portal is thinkin' bout stuff...\n\""));
+
+		return;
+	}
+
+
+	self->nextthink = level.time + 100;
+
+	ent = self->parent;
+
+	//G_FreeEntity(self);
+	//trap_SendServerCommand(ent-g_entities, va("print \"^1Portal Protection:^7 Portal thinking....\n\""));
+	
+	//Nothing else to do...
+
+
+}
+
+
+void Portal_Touch(gentity_t *self, gentity_t *other, trace_t *trace){
+
+	//If not the owner of this portal, ignore...
+	//if (self->r.ownerNumber != other->s.number) return;
+	
+	//TODO: Add events
+	
+	//DEBUG
+	//CP(va("print \"^1Portal Protection:^7 Portal naughty bits touched.... oh lah lah...\n\""));
+	
+	//trap_SendServerCommand(other-g_entities, va("print \"^1Portal Protection:^7 Portal naughty bits touched.... oh lah lah...\n\""));
+		
+
+	//Testing...
+	gentity_t	*dest;
+
+	if ( !other->client ) { //If this is not a player, then don't teleport it. //NOTE: We'll probably want items to be transferred through portal eventually...
+		return;
+	}
+
+	if ( other->client->ps.pm_type == PM_DEAD ) {
+		return;
+	}
+
+	//Check last time we portal'd
+	if (!(level.time > other->lastPortalTime))
+		return;
+
+	if (self->s.eType == ET_PORTAL_BLUE) {
+		//Check that the 'other' portal exists and set it as dest
+		if (other->portal_red != NULL)
+			dest = other->portal_red;
+
+	}else{
+		//Check that the 'other' portal exists and set it as dest
+		if (other->portal_blue != NULL)
+			dest = other->portal_blue;
+
+	}
+
+
+	if (!dest) {
+		G_Printf ("Couldn't find teleporter destination\n");
+		return;
+	}
+
+	//set next time we can teleport... portal cooldown essentially...
+	other->lastPortalTime = level.time + 1000; //1 second cooldown - maybe too much
+
+
+	TeleportPlayer( other, dest->s.origin, dest->s.angles );
+
+	return;
+
+}
+
+
 
 /*
 ======================================================================
@@ -4151,10 +4396,18 @@ void FireWeapon( gentity_t *ent ) {
 	case WP_FLAMETHROWER:
 		// RF, this is done client-side only now
 		// Gordon: um, no it isnt?
-		Weapon_FlamethrowerFire( ent );
+		Weapon_FlamethrowerFire( ent ); 
 		break;
 	case WP_MAPMORTAR:
 		break;
+
+	//Feen: PGM
+	case WP_PORTAL_GUN:
+		// Feen: This is only a test, we'll add the weapon functions later.....
+		//CP(va("print \"^1Portal Debug:^7 Calling Weapon_Portal_Fire\n\""));
+		Weapon_Portal_Fire( ent, 1 ); //Feen: '1' indicates blue portal, red portal calls will be made from weapaltfire calls
+		break;
+	
 	default:
 		break;
 	}

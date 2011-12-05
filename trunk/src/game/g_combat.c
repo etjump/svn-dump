@@ -324,6 +324,9 @@ char *modNames[] =
 
 	"MOD_SMOKEGRENADE",
 
+	//Feen: PGM
+	"MOD_PORTAL_GUN",
+
 	// RF
 	"MOD_SWAP_PLACES",
 

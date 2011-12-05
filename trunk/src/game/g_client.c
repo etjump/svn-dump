@@ -832,6 +832,9 @@ void SetWolfSpawnWeapons( gclient_t *client )
 
 	AddWeaponToPlayer( client, WP_KNIFE, 1, 0, qtrue );
 
+	//Feen: PSM -TEST
+	AddWeaponToPlayer( client, WP_PORTAL_GUN, 1, 0, qtrue );
+
 	client->ps.weaponstate = WEAPON_READY;
 
 	// Engineer gets dynamite

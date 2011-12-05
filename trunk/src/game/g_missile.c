@@ -286,7 +286,7 @@ void M_think (gentity_t *ent)
 		tent->s.angles2[0] = 24;
 	tent->s.angles2[1] = 96;
 	tent->s.angles2[2] = 50;
-
+	
 	ent->nextthink = level.time + FRAMETIME;
 
 }

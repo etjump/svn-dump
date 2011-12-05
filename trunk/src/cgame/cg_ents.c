@@ -2361,6 +2361,14 @@ static void CG_ProcessEntity( centity_t *cent ) {
 	case ET_SMOKER:
 		CG_Smoker( cent );
 		break;
+
+	//Feen: PGM - Portal Ent types
+	case ET_PORTAL_BLUE:
+	case ET_PORTAL_RED:
+		//CG_Printf("Portal entity found.....\n");
+		CG_PortalGate( cent );
+		break;
+	
 	}
 }
 
@@ -2795,4 +2803,68 @@ void CG_AttachBitsToTank( centity_t* tank, refEntity_t* mg42base, refEntity_t* m
 	CGTagToRefEntity( mg42gun,		&tank->mountedMG42			);
 	CGTagToRefEntity( player,		&tank->mountedMG42Player	);
 	CGTagToRefEntity( flash,		&tank->mountedMG42Flash		);
+}
+
+
+
+//Feen: PGM - Drawing the portals....
+static void CG_PortalGate( centity_t *cent ){
+
+	/*	refEntity_t			ent;
+
+
+	// create the render entity
+	memset (&ent, 0, sizeof(ent));
+	VectorCopy( cent->lerpOrigin, ent.origin);
+	VectorCopy( cent->lerpOrigin, ent.oldorigin);
+
+
+		ent.reType = RT_SPRITE;
+		ent.radius = 64;
+		ent.rotation = 0;
+		ent.customShader = cgs.media.portal_blueShader;
+		trap_R_AddRefEntityToScene( &ent );
+		*/
+
+
+		//TEST!
+		
+		localEntity_t	*le;
+		refEntity_t		*re;
+
+		le = CG_AllocLocalEntity();
+		le->leFlags = LEF_PUFF_DONT_SCALE;
+		le->leType = LE_MOVE_SCALE_FADE;
+		le->startTime = cg.time;
+		le->endTime = cg.time + 1000 + random() * 250;
+		le->lifeRate = 1.0 / ( le->endTime - le->startTime );
+
+		re = &le->refEntity;
+		re->shaderTime = cg.time / 1000.0f;
+
+		re->reType = RT_SPRITE;
+		re->rotation = 0;
+//		re->radius = 3;	
+		re->radius = 64;
+
+		if(cent->currentState.eType == ET_PORTAL_BLUE)
+			re->customShader = cgs.media.portal_blueShader;
+		else //If it's not blue, it's red... hopefully....
+			re->customShader = cgs.media.portal_redShader;
+		
+		
+		re->shaderRGBA[0] = 0xff;
+		re->shaderRGBA[1] = 0xff;
+		re->shaderRGBA[2] = 0xff;
+		re->shaderRGBA[3] = 0xff;
+	
+		VectorCopy(cent->currentState.origin, re->origin); //Set origin of thing...
+		VectorCopy(cent->currentState.origin, re->oldorigin); //Set origin of thing...
+		
+
+		
+
+		trap_R_AddRefEntityToScene( &le->refEntity );
+		
+
 }

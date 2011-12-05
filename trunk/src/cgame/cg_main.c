@@ -1906,6 +1906,7 @@ static void CG_RegisterGraphics( void ) {
 	cgs.media.bulletMarkShaderWood =	trap_R_RegisterShaderNoMip( "gfx/damage/wood_mrk" );
 	cgs.media.bulletMarkShaderGlass =	trap_R_RegisterShaderNoMip( "gfx/damage/glass_mrk" );
 
+
 	for ( i = 0 ; i < 5 ; i++ ) {
 		char	name[32];
 		//Com_sprintf( name, sizeof(name), "textures/decals/blood%i", i+1 );
@@ -2147,6 +2148,11 @@ static void CG_RegisterGraphics( void ) {
 	= trap_R_RegisterShaderNoMip("gfx/keyset/key_prone_pressed");
 	cgs.media.keys.ProneNotPressedShader
 	= trap_R_RegisterShaderNoMip("gfx/keyset/key_prone_not_pressed");
+
+
+	//Feen: PGM - Register shaders...
+	cgs.media.portal_blueShader =		trap_R_RegisterShader( "gfx/misc/portal_blueShader"); //trap_R_RegisterShader( "gfx/misc/electricity_portal2" );
+	cgs.media.portal_redShader =		trap_R_RegisterShader( "gfx/misc/portal_redShader"); //Change to red later...
 
 	CG_LoadingString( " - game media done" );
 }

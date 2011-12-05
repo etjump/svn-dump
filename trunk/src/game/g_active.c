@@ -777,7 +777,14 @@ void ClientEvents( gentity_t *ent, int oldEventSequence ) {
 			FireWeapon( ent );
 			break;
 
+		//Feen: PGM - 
+		case EV_PORTAL2_FIRE:
+			//CP("print \"Portal Debug: EV_PORTAL2_FIRE event received on server..\n\""); //PGM DEBUG
+			Weapon_Portal_Fire(ent, 2); //Red Portal
+			break;
+
 		default:
+			//CP(va("print \"Portal Debug: UNKNOWN EVENT - %d\n\"",event)); //PGM DEBUG
 			break;
 		}
 	}
