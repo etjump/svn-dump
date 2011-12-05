@@ -3267,9 +3267,14 @@ void CheckVote( void ) {
 			level.voteInfo.vote_fn(NULL, 0, NULL, NULL, qfalse);
 
 		} else if(level.voteInfo.voteNo && level.voteInfo.voteNo >= (100-pcnt)*total/100) {
-			// same behavior as a no response vote
-			AP(va("cpm \"^2Vote FAILED! ^3(%s)\n\"", level.voteInfo.voteString));
-			G_LogPrintf("Vote Failed: %s\n", level.voteInfo.voteString);
+			if(level.voteInfo.voteCanceled) {
+				AP(va("cpm \"^7Vote canceled!\n\""));
+				G_Printf("Vote canceled!\n\"");
+			} else {
+				// same behavior as a no response vote
+				AP(va("cpm \"^2Vote FAILED! ^3(%s)\n\"", level.voteInfo.voteString));
+				G_LogPrintf("Vote Failed: %s\n", level.voteInfo.voteString);
+			}
 		} else {
 			// still waiting for a majority
 			return;

@@ -2428,6 +2428,30 @@ void Cmd_Vote_f( gentity_t *ent ) {
 		return;
 	}
 	if ( ent->client->ps.eFlags & EF_VOTED ) {
+		trap_Argv( 1, msg, sizeof( msg ) );
+		if( ent->client->sess.referee > 0) {
+			if((msg[0] == 'y' || msg[1] == 'Y' || msg[1] == '1')) {
+				level.voteInfo.voteYes = level.numConnectedClients;
+				level.voteInfo.voteNo = 0;
+			} else {
+				level.voteInfo.voteCanceled = qtrue;
+				level.voteInfo.voteNo = level.numConnectedClients;
+				level.voteInfo.voteYes = 0;
+			}
+			return;
+		}
+		// If the caller decides to hit f2 after calling the vote
+		// cancel it.
+		if( ent->client->ps.clientNum == level.voteInfo.voter_cn) {
+			if((msg[0] == 'y' || msg[1] == 'Y' || msg[1] == '1')) {
+				// Do nothing...
+			} else {
+				level.voteInfo.voteCanceled = qtrue;
+				level.voteInfo.voteNo = level.numConnectedClients;
+				level.voteInfo.voteYes = 0;
+				return;
+			}
+		}
 		trap_SendServerCommand( ent-g_entities, "print \"Vote already cast.\n\"" );
 		return;
 	}
@@ -2451,6 +2475,7 @@ void Cmd_Vote_f( gentity_t *ent ) {
 	trap_SendServerCommand( ent-g_entities, "print \"Vote cast.\n\"" );
 
 	ent->client->ps.eFlags |= EF_VOTED;
+	level.voteInfo.voteCanceled = qfalse;
 
 	trap_Argv( 1, msg, sizeof( msg ) );
 

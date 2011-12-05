@@ -984,6 +984,7 @@ typedef struct voteInfo_s {
 	char		vote_value[VOTE_MAXSTRING];	// Desired vote item setting.
 	char		voter_team;
 	int			voter_cn;
+	qboolean	voteCanceled;
 } voteInfo_t;
 
 typedef struct {
