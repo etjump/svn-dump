@@ -2850,6 +2850,7 @@ static void DrawLine(float x1, float y1, float x2, float y2, vec4_t color)
 #define CGAZ3_ANG 20
 
 
+
 static void CG_DrawCGazHUD(void)
 {
 	float vel_angle; // absolute velocity angle
@@ -3002,7 +3003,98 @@ static void CG_DrawCGazHUD(void)
 				 SCREEN_CENTER_Y - vel_size * cos(vel_relang - per_angle), colorRed);
 		return;
 	}
+
+
+	//Feen: CGaz stuff pulled from TJMod
+	// another setup's one
+	if (cg_drawCGaz.integer == 3) {
+		float accel_angle;
+
+		accel_angle = atan2(-right, forward);
+		accel_angle = AngleNormalize180(ps->viewangles[YAW] + RAD2DEG(accel_angle));
+
+		CG_FillRect(SCREEN_CENTER_X - w / 2, y, 1, h, colorWhite);
+		CG_FillRect(SCREEN_CENTER_X        , y, 1, h, colorWhite);
+		CG_FillRect(SCREEN_CENTER_X + w / 2, y, 1, h, colorWhite);
+
+		if (vel_size < ps->speed * scale)
+			return;
+
+		// first case (consider left strafe)
+		ang = AngleNormalize180(vel_angle + per_angle - accel_angle);
+		if (ang > -CGAZ3_ANG && ang < CGAZ3_ANG) {
+			// acceleration "should be on the left side" from velocity
+			if (ang < 0) {
+				VectorCopy(colorGreen, color);
+				CG_FillRect(SCREEN_CENTER_X + w * ang / (2 * CGAZ3_ANG), y,
+					-w * ang / (2 * CGAZ3_ANG), h, color);
+			}
+			else {
+				VectorCopy(colorRed, color);
+				CG_FillRect(SCREEN_CENTER_X, y,
+					w * ang / (2 * CGAZ3_ANG), h, color);
+			}
+			return;
+		}
+		// second case (consider right strafe)
+		ang = AngleNormalize180(vel_angle - per_angle - accel_angle);
+		if (ang > -CGAZ3_ANG && ang < CGAZ3_ANG) {
+			// acceleration "should be on the right side" from velocity
+			if (ang > 0) {
+				VectorCopy(colorGreen, color);
+				CG_FillRect(SCREEN_CENTER_X, y,
+					w * ang / (2 * CGAZ3_ANG), h, color);
+			}
+			else {
+				VectorCopy(colorRed, color);
+				CG_FillRect(SCREEN_CENTER_X + w * ang / (2 * CGAZ3_ANG), y,
+					-w * ang / (2 * CGAZ3_ANG), h, color);
+			}
+			return;
+		}
+		return;
+	}
+
+	// corpus of original defrag one
+	if (cg_drawCGaz.integer == 4) {
+		float accel_angle;
+
+		accel_angle = atan2(-right, forward);
+		accel_angle = AngleNormalize180(ps->viewangles[YAW] + RAD2DEG(accel_angle));
+
+		if (vel_size < ps->speed * scale)
+			return;
+
+		VectorCopy(colorGreen, color);
+
+		// Speed direction
+		// FIXME: Shows @side of screen when going backward
+		//CG_FillRect(SCREEN_CENTER_X + w * vel_relang / 180, y+20, 1, h/2, colorCyan);
+		CG_DrawPic(SCREEN_CENTER_X + w * vel_relang / 180, y + h, 16, 16, cgs.media.CGazArrow);
+
+		// FIXME show proper outside border where you stop accelerating
+		// first case (consider left strafe)
+		ang = AngleNormalize180(vel_angle + per_angle - accel_angle);
+		if (ang < 90 && ang > -90) {
+			// acceleration "should be on the left side" from velocity
+			CG_FillRect(SCREEN_CENTER_X + w * ang / 180, y, w / 2, h, color);
+			CG_FillRect(SCREEN_CENTER_X + w * ang / 180, y, 1, h, colorGreen);
+			return;
+
+		}
+		// second case (consider right strafe)
+		ang = AngleNormalize180(vel_angle - per_angle - accel_angle);
+		if (ang < 90 && ang > -90) {
+			// acceleration "should be on the right side" from velocity
+			CG_FillRect(SCREEN_CENTER_X + w * ang / 180 - w / 2, y, w / 2, h, color);
+			CG_FillRect(SCREEN_CENTER_X + w * ang / 180, y, 1, h, colorGreen);
+			return;
+		}
+		return;
+	}
+
 }
+
 
 /*
 =========

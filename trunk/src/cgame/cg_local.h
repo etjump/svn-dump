@@ -1748,6 +1748,9 @@ typedef struct {
 	//Feen: PGM - Portal Shaders //NOTE - Maybe add shaders for other player portals as well....
 	qhandle_t		portal_blueShader; //Portal 1
 	qhandle_t		portal_redShader;  //Portal 2
+
+	//Feen: CGaz Shader
+	qhandle_t		CGazArrow;
 	
 } cgMedia_t;
 

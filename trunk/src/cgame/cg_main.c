@@ -2149,6 +2149,9 @@ static void CG_RegisterGraphics( void ) {
 	cgs.media.keys.ProneNotPressedShader
 	= trap_R_RegisterShaderNoMip("gfx/keyset/key_prone_not_pressed");
 
+	//Feen: CGaz - Register Shader
+	cgs.media.CGazArrow		=		trap_R_RegisterShaderNoMip( "gfx/2d/cgaz_arrow" );
+
 
 	//Feen: PGM - Register shaders...
 	cgs.media.portal_blueShader =		trap_R_RegisterShader( "gfx/misc/portal_blueShader"); //trap_R_RegisterShader( "gfx/misc/electricity_portal2" );
