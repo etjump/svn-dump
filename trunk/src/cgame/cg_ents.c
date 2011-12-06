@@ -2827,6 +2827,8 @@ static void CG_PortalGate( centity_t *cent ){
 		*/
 
 
+		//NOTE: Re-enable if CG_ImpactMark implementation doesn't work....
+		
 		//TEST!
 		
 		localEntity_t	*le;
@@ -2862,9 +2864,26 @@ static void CG_PortalGate( centity_t *cent ){
 		VectorCopy(cent->currentState.origin, re->oldorigin); //Set origin of thing...
 		
 
-		
-
 		trap_R_AddRefEntityToScene( &le->refEntity );
 		
+		//END - Re-enable
+
+		/*
+		//CG_ImpactMark - TEST!!!!!
+		vec4_t projection;
+		vec3_t angleNorm;
+
+
+		VectorNormalize2(cent->currentState.angles, angleNorm);
+
+		VectorCopy(projection, angleNorm);
+		//VectorSet(projection,cent->currentState.angles[0], cent->currentState.angles[1], cent->currentState.angles[2]);
+		//projection[3] = 1.0f; //Check this maybe?
+
+		//VectorSet( projection, 0, 0, -1 );
+		projection[ 3 ] = 30.0f;
+
+		CG_ImpactMark(cgs.media.portal_blueShader, cent->currentState.origin, projection, 64.0f, -1.0f, 1.0f, 1.0f, 1.0f, 1.0f, cg.time + 2000);
+		*/
 
 }

@@ -132,6 +132,48 @@ void TeleportPlayer( gentity_t *player, vec3_t origin, vec3_t angles ) {
 }
 
 
+
+/*
+=================================================================================
+
+Portal Gun Mod: Teleport Method
+
+=================================================================================
+*/
+void PortalTeleport( gentity_t *player, vec3_t origin, vec3_t angles ) {
+
+	vec_t velocityLength;
+
+	velocityLength = VectorLength(player->client->ps.velocity);
+
+	VectorCopy ( origin, player->client->ps.origin );
+	player->client->ps.origin[2] += 1;
+
+	// spit the player out
+	AngleVectors( angles, player->client->ps.velocity, NULL, NULL );
+	
+	//Scale new vector back to old velocity
+	VectorScale(player->client->ps.velocity, velocityLength, player->client->ps.velocity);
+
+	// toggle the teleport bit so the client knows to not lerp
+	player->client->ps.eFlags ^= EF_TELEPORT_BIT;
+
+	// set angles
+	SetClientViewAngle( player, angles );
+
+
+	// save results of pmove
+	BG_PlayerStateToEntityState( &player->client->ps, &player->s, qtrue );
+
+	// use the precise origin for linking
+	VectorCopy( player->client->ps.origin, player->r.currentOrigin );
+
+	if ( player->client->sess.sessionTeam != TEAM_SPECTATOR ) {
+		trap_LinkEntity (player);
+	}
+}
+
+
 /*QUAKED misc_teleporter_dest (1 0 0) (-32 -32 -24) (32 32 -16)
 Point teleporters at these.
 Now that we don't have teleport destination pads, this is just

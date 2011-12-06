@@ -3462,7 +3462,7 @@ void Weapon_Portal_Fire( gentity_t *ent, int PortalNumber ) {
 	VectorCopy(tr.endpos, portal->s.pos.trBase);*/
 
 	//Test - Origin...
-	VectorMA (tr.endpos, 15, tr.plane.normal, t_endpos); //Push origin out 15 units from trace position along the planes normal.
+	VectorMA (tr.endpos, 32, tr.plane.normal, t_endpos); //Push origin out 15 units from trace position along the planes normal.
 
 	VectorCopy(t_endpos, portal->s.origin);
 	VectorCopy(t_endpos, portal->r.currentOrigin);
@@ -3471,8 +3471,9 @@ void Weapon_Portal_Fire( gentity_t *ent, int PortalNumber ) {
 
 	//Set angle of entity based on normal of plane....
 	//VectorCopy(tr.plane.normal, portal->r.currentAngles);
-	vectoangles(tr.plane.normal, portal->s.angles);
-
+	//VectorCopy(tr.plane.normal, portal->s.angles);
+	vectoangles(tr.plane.normal, portal->s.angles); //NOTE: RE-Enable angles...
+	vectoangles(tr.plane.normal, portal->r.currentAngles);
 
 	//portal->r.currentAngles
 
@@ -3520,6 +3521,7 @@ void Portal_Think(gentity_t *self){
 
 void Portal_Touch(gentity_t *self, gentity_t *other, trace_t *trace){
 
+
 	//If not the owner of this portal, ignore...
 	//if (self->r.ownerNumber != other->s.number) return;
 	
@@ -3533,6 +3535,7 @@ void Portal_Touch(gentity_t *self, gentity_t *other, trace_t *trace){
 
 	//Testing...
 	gentity_t	*dest;
+	vec3_t newVelocity; 
 
 	if ( !other->client ) { //If this is not a player, then don't teleport it. //NOTE: We'll probably want items to be transferred through portal eventually...
 		return;
@@ -3568,7 +3571,19 @@ void Portal_Touch(gentity_t *self, gentity_t *other, trace_t *trace){
 	other->lastPortalTime = level.time + 1000; //1 second cooldown - maybe too much
 
 
-	TeleportPlayer( other, dest->s.origin, dest->s.angles );
+	//TeleportPlayer( other, dest->s.origin, dest->s.angles );
+	PortalTeleport(other, dest->s.origin, dest->s.angles );
+
+	/*
+	float t_angleBetween = sAngleBetweenVectors(dest->s.angles, other->client->ps.velocity);
+
+	vec3_t matrix[3];
+
+	BG_CreateRotationMatrix(
+
+
+	other->client->ps.velocity
+	*/
 
 	return;
 
