@@ -186,7 +186,7 @@ ammotable_t ammoTableMP[WP_NUM_WEAPONS] = {
 	{	999,			0,		1,		0,		0,		1000,	750,			1600,	0,		0,		0						},	// WP_LOCKPICK				// 36 
 	{	48,				1,		8,		48,		8,		2700,	DELAY_PISTOL,	200,	0,		0,		MOD_AKIMBO_COLT			},	// WP_AKIMBO_COLT			// 37
 	{	48,				1,		8,		48,		8,		2700,	DELAY_PISTOL,	200,	0,		0,		MOD_AKIMBO_LUGER		},	// WP_AKIMBO_LUGER			// 38
-	{	999,			0,		999,	0,		0,		0,		50,				200,	0,		0,		MOD_PORTAL_GUN			},	// WP_PORTAL_GUN			// 39 //Feen: Portal Gun Mod
+	{	999,			0,		999,	0,		0,		0,		50,				500,	0,		0,		MOD_PORTAL_GUN			},	// WP_PORTAL_GUN			// 39 //Feen: Portal Gun Mod
 
 	{	4,				1,		1,		4,		1,		3000,	DELAY_LOW,		400,	0,		0,		MOD_GPG40				},	// WP_GPG40					// 39 //Feen: + 1 from this point on
 

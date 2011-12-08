@@ -3359,7 +3359,7 @@ void Weapon_Portal_Fire( gentity_t *ent, int PortalNumber ) {
 	vec3_t		end;
 
 
-		CP(va("print \"^1Portal Debug:^7 Weaon_Portal_Fire called....\n\"")); //Debug...
+		//CP(va("print \"^1Portal Debug:^7 Weaon_Portal_Fire called....\n\"")); //Debug...
 
 	AngleVectors (ent->client->ps.viewangles, forward, right, up);
 	CalcMuzzlePoint ( ent, ent->s.weapon, forward, right, up, muzzleTrace );
@@ -3408,7 +3408,7 @@ void Weapon_Portal_Fire( gentity_t *ent, int PortalNumber ) {
 
 
 	portal = G_Spawn(); 
-	CP(va("print \"^1Portal Debug:^7 entity created....\n\"")); //Debug...
+	//CP(va("print \"^1Portal Debug:^7 entity created....\n\"")); //Debug...
 	
 	portal->classname = "portal_gate";
 
@@ -3484,23 +3484,20 @@ void Weapon_Portal_Fire( gentity_t *ent, int PortalNumber ) {
 	trap_LinkEntity(portal);
 
 	//DEBUG
-	CP(va("print \"^1Portal Debug:^7 supposedly the entity is there....\n\""));
+	//CP(va("print \"^1Portal Debug:^7 supposedly the entity is there....\n\""));
 
 }
 
 
 void Portal_Think(gentity_t *self){
 
-		gentity_t *ent;
+	//gentity_t *ent;
 
 
 	//If owner is dead, get rid of the portals...
 	if (self->parent->client->ps.pm_type == PM_DEAD)  {
 
 		G_FreeEntity(self);
-		
-		//DEBUG
-		//CP(va("print \"^1Portal Protection:^7 Portal is thinkin' bout stuff...\n\""));
 
 		return;
 	}
@@ -3508,7 +3505,7 @@ void Portal_Think(gentity_t *self){
 
 	self->nextthink = level.time + 100;
 
-	ent = self->parent;
+	//ent = self->parent;
 
 	//G_FreeEntity(self);
 	//trap_SendServerCommand(ent-g_entities, va("print \"^1Portal Protection:^7 Portal thinking....\n\""));
@@ -3521,21 +3518,14 @@ void Portal_Think(gentity_t *self){
 
 void Portal_Touch(gentity_t *self, gentity_t *other, trace_t *trace){
 
-
-	//If not the owner of this portal, ignore...
-	//if (self->r.ownerNumber != other->s.number) return;
-	
 	//TODO: Add events
-	
-	//DEBUG
-	//CP(va("print \"^1Portal Protection:^7 Portal naughty bits touched.... oh lah lah...\n\""));
-	
-	//trap_SendServerCommand(other-g_entities, va("print \"^1Portal Protection:^7 Portal naughty bits touched.... oh lah lah...\n\""));
 		
 
-	//Testing...
 	gentity_t	*dest;
-	vec3_t newVelocity; 
+
+	//If not the owner of this portal, ignore...
+	if (self->r.ownerNum != other->s.number) 
+		return;
 
 	if ( !other->client ) { //If this is not a player, then don't teleport it. //NOTE: We'll probably want items to be transferred through portal eventually...
 		return;
@@ -3563,28 +3553,18 @@ void Portal_Touch(gentity_t *self, gentity_t *other, trace_t *trace){
 
 
 	if (!dest) {
-		G_Printf ("Couldn't find teleporter destination\n");
+		G_Printf ("Couldn't find portal gate destination...\n");
 		return;
 	}
 
 	//set next time we can teleport... portal cooldown essentially...
-	other->lastPortalTime = level.time + 1000; //1 second cooldown - maybe too much
+	other->lastPortalTime = level.time + 500; //1 second cooldown - maybe too much //NOTE - Replace with constant
 
 
 	//TeleportPlayer( other, dest->s.origin, dest->s.angles );
 	PortalTeleport(other, dest->s.origin, dest->s.angles );
 
-	/*
-	float t_angleBetween = sAngleBetweenVectors(dest->s.angles, other->client->ps.velocity);
-
-	vec3_t matrix[3];
-
-	BG_CreateRotationMatrix(
-
-
-	other->client->ps.velocity
-	*/
-
+	
 	return;
 
 }

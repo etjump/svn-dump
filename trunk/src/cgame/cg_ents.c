@@ -2828,9 +2828,8 @@ static void CG_PortalGate( centity_t *cent ){
 
 
 		//NOTE: Re-enable if CG_ImpactMark implementation doesn't work....
-		
+		/*
 		//TEST!
-		
 		localEntity_t	*le;
 		refEntity_t		*re;
 
@@ -2848,7 +2847,7 @@ static void CG_PortalGate( centity_t *cent ){
 		re->rotation = 0;
 //		re->radius = 3;	
 		re->radius = 64;
-
+		
 		if(cent->currentState.eType == ET_PORTAL_BLUE)
 			re->customShader = cgs.media.portal_blueShader;
 		else //If it's not blue, it's red... hopefully....
@@ -2863,27 +2862,89 @@ static void CG_PortalGate( centity_t *cent ){
 		VectorCopy(cent->currentState.origin, re->origin); //Set origin of thing...
 		VectorCopy(cent->currentState.origin, re->oldorigin); //Set origin of thing...
 		
-
-		trap_R_AddRefEntityToScene( &le->refEntity );
 		
+		trap_R_AddRefEntityToScene( &le->refEntity );
+		*/
 		//END - Re-enable
 
-		/*
-		//CG_ImpactMark - TEST!!!!!
-		vec4_t projection;
-		vec3_t angleNorm;
+		
+
+		//POLY TEST
+		
+		polyVert_t POLYverts[4];
+		vec3_t verts[4];
+		vec3_t pointDiff, pushedOrigin, angleInverse;
+		vec3_t axis[3];
+		float radius = 64.0f;
+		int i;
+
+		VectorCopy(cent->currentState.angles, angleInverse);
+		//VectorInverse(angleInverse);
+
+		AnglesToAxis(angleInverse, axis);
+
+		//start- poly test stuff
+
+	/* make rotated polygon axis */
+	//VectorCopy( projection, axis[ 0 ] );
+	
+		//PerpendicularVector( axis[ 1 ], axis[ 0 ] );
+	//RotatePointAroundVector( axis[ 2 ], axis[ 0 ], axis[ 1 ], 1.0f );
+	//CrossProduct( axis[ 0 ], axis[ 2 ], axis[ 1 ] );
+	
+	/* push the origin out a bit */
+	//VectorMA( cent->currentState.origin, -1.0f, axis[ 0 ], pushedOrigin );
+	VectorMA( cent->currentState.origin, -32.0f, axis[ 0 ], pushedOrigin ); //Feen: Note 32 is the offset of the ent from the trace.endpos, so let's undo that for the gfx
+	
+	/* create the full polygon */
+	for( i = 0; i < 3; i++ )
+	{
+
+		
+		/* new */
+		verts[ 0 ][ i ] = pushedOrigin[ i ] - radius * axis[ 1 ][ i ] - radius * axis[ 2 ][ i ];
+		verts[ 1 ][ i ] = pushedOrigin[ i ] - radius * axis[ 1 ][ i ] + radius * axis[ 2 ][ i ];
+		verts[ 2 ][ i ] = pushedOrigin[ i ] + radius * axis[ 1 ][ i ] + radius * axis[ 2 ][ i ];
+		verts[ 3 ][ i ] = pushedOrigin[ i ] + radius * axis[ 1 ][ i ] - radius * axis[ 2 ][ i ];
+	}
+	
+		VectorCopy(verts[0], POLYverts[0].xyz);
+		VectorCopy(verts[1], POLYverts[1].xyz);
+		VectorCopy(verts[2], POLYverts[2].xyz);
+		VectorCopy(verts[3], POLYverts[3].xyz);
+	
+	//end poly test stuff
 
 
-		VectorNormalize2(cent->currentState.angles, angleNorm);
 
-		VectorCopy(projection, angleNorm);
-		//VectorSet(projection,cent->currentState.angles[0], cent->currentState.angles[1], cent->currentState.angles[2]);
-		//projection[3] = 1.0f; //Check this maybe?
+		//Top Left
+		//VectorSet(pointDiff, -32, 0, 32);
+		//VectorAdd(cent->currentState.origin, pointDiff, verts[0].xyz);
+		POLYverts[0].st[0] = 1;
+		POLYverts[0].st[1] = 0;
 
-		//VectorSet( projection, 0, 0, -1 );
-		projection[ 3 ] = 30.0f;
+		//Top Right
+		//VectorSet(pointDiff, 32, 0, 32);
+		//VectorAdd(cent->currentState.origin, pointDiff, verts[1].xyz);
+		POLYverts[1].st[0] = 0;
+		POLYverts[1].st[1] = 0;
 
-		CG_ImpactMark(cgs.media.portal_blueShader, cent->currentState.origin, projection, 64.0f, -1.0f, 1.0f, 1.0f, 1.0f, 1.0f, cg.time + 2000);
-		*/
+		//Bottom Right
+		//VectorSet(pointDiff, 32, 0, -32);
+		//VectorAdd(cent->currentState.origin, pointDiff, verts[2].xyz);
+		POLYverts[2].st[0] = 0;
+		POLYverts[2].st[1] = 1;
 
+		//Bottom Left
+		//VectorSet(pointDiff, -32, 0, -32);
+		//VectorAdd(cent->currentState.origin, pointDiff, verts[3].xyz);
+		POLYverts[3].st[0] = 1;
+		POLYverts[3].st[1] = 1;
+
+		if(cent->currentState.eType == ET_PORTAL_BLUE)
+			trap_R_AddPolyToScene(cgs.media.portal_blueShader, 4, POLYverts);
+
+		if(cent->currentState.eType == ET_PORTAL_RED)
+			trap_R_AddPolyToScene(cgs.media.portal_redShader, 4, POLYverts);
+		
 }

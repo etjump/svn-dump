@@ -3200,9 +3200,21 @@ static void PM_Weapon( void ) {
 
 	//PGM Test...
 	if (pm->cmd.wbuttons & WBUTTON_ATTACK2) {
+		
+		if (pm->ps->weaponTime > 0){
+			pm->ps->weaponTime -= pml.msec;
+
+			if (pm->ps->weaponTime <= 0 )
+				pm->ps->weaponTime = 0;
+
+		}else{
+		
 		if (pm->cmd.weapon == WP_PORTAL_GUN)
 			PM_AddEvent(EV_PORTAL2_FIRE);
-			Com_Printf("FWD: EV_PORTAL2_FIRE Added...\n");
+			//Com_Printf("FWD: EV_PORTAL2_FIRE Added...\n");
+			pm->ps->weaponTime += 1000; //Feen: This equates to about .5 seconds
+
+		}
 	}
 
 #ifdef FEEN_WPN_DBG
@@ -4024,12 +4036,13 @@ static void PM_Weapon( void ) {
 
 	pm->ps->weaponstate = WEAPON_FIRING;
 
-	//Feen: PGM cmd test...
+	//Feen: PGM - TODO House keeping...
+	/*
 	if(pm->cmd.wbuttons & WBUTTON_ATTACK2 && pm->ps->weapon == WP_PORTAL_GUN) {
 		PM_AddEvent(EV_PORTAL2_FIRE);
-		Com_Printf("^7Portal Debug: bg_pmove.c -> Event Added\n");
+		//Com_Printf("^7Portal Debug: bg_pmove.c -> Event Added\n");
 		//return; //Maybe not return?
-	}
+	}*/
 
 	// Gordon: reset player disguise on firing
 //	if( pm->ps->weapon != WP_SMOKE_BOMB && pm->ps->weapon != WP_SATCHEL && pm->ps->weapon != WP_SATCHEL_DET ) {	// Arnout: not for these weapons

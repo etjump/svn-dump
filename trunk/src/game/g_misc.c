@@ -140,6 +140,8 @@ Portal Gun Mod: Teleport Method
 
 =================================================================================
 */
+#define PORTAL_NUDGE 20.0f //Feen: Extra little boost coming out of a portal...
+
 void PortalTeleport( gentity_t *player, vec3_t origin, vec3_t angles ) {
 
 	vec_t velocityLength;
@@ -153,7 +155,7 @@ void PortalTeleport( gentity_t *player, vec3_t origin, vec3_t angles ) {
 	AngleVectors( angles, player->client->ps.velocity, NULL, NULL );
 	
 	//Scale new vector back to old velocity
-	VectorScale(player->client->ps.velocity, velocityLength, player->client->ps.velocity);
+	VectorScale(player->client->ps.velocity, velocityLength + PORTAL_NUDGE, player->client->ps.velocity);
 
 	// toggle the teleport bit so the client knows to not lerp
 	player->client->ps.eFlags ^= EF_TELEPORT_BIT;

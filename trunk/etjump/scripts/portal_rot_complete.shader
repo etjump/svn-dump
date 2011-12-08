@@ -3,7 +3,7 @@ gfx/misc/portal_blueShader
 	deformVertexes wave 128 sin 0 1 2 1 
 	{
 		map gfx/misc/electricity.tga
-		blendfunc add
+		//blendfunc add
 		tcMod rotate 24
 	}
 	{
@@ -15,7 +15,7 @@ gfx/misc/portal_blueShader
 	{
 		map gfx/misc/electricity_mask.tga
 		//blendfunc filter
-		blendfunc filter
+		blendfunc GL_DST_COLOR GL_SRC_COLOR
 	}
 }
 
@@ -24,7 +24,7 @@ gfx/misc/portal_redShader
 	deformVertexes wave 128 sin 0 1 2 1 
 	{
 		map gfx/misc/electricity_red.tga
-		blendfunc add
+		//blendfunc add
 		tcMod rotate 24
 	}
 	{
@@ -36,7 +36,7 @@ gfx/misc/portal_redShader
 	{
 		map gfx/misc/electricity_mask.tga
 		//blendfunc filter
-		blendfunc filter
+		blendfunc GL_DST_COLOR GL_SRC_COLOR
 	}
 }
 

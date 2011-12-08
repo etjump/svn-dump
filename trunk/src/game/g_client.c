@@ -1621,9 +1621,16 @@ char *ClientConnect( int clientNum, qboolean firstTime, qboolean isBot ) {
 		client->sess.need_greeting = qtrue;
 		client->pers.initialSpawn = qtrue;				// DHM - Nerve
 		client->sess.goto_allowed = qtrue;
-		client->sess.save_allowed = qfalse;
+		client->sess.save_allowed = qtrue;  //qfalse	//Feen: Why was this set to false?
 	} else {
 		client->sess.need_greeting = qfalse;
+
+		client->sess.goto_allowed = qtrue;				//Feen: TEMP FIX! - Also added these two here as well.
+		client->sess.save_allowed = qtrue;				//		They are not being red in G_ReadSessionData, so they
+														//		default to qfalse/NULL.
+														//Feen: TODO - Make sure sess vars are in InfoString and read
+														//             properly in G_ReadSessionData()
+
 	}
 
 	// read or initialize the session data

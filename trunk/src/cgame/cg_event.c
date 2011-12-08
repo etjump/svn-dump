@@ -2768,12 +2768,11 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 		//Feen: PGM
 	case EV_PORTAL2_FIRE:
 		DEBUGNAME("EV_PORTAL2_FIRE");
-		CG_Printf( "^1Portal Debug: ^7CG_EntityEvent() EV_PORTAL2_FIRE - received\n");
+		//CG_Printf( "^1Portal Debug: ^7CG_EntityEvent() EV_PORTAL2_FIRE - received\n");
 		break;
 
 	default:
 		DEBUGNAME("UNKNOWN");
-		CG_Error( "Unknown event: %i", event );
 		break;
 	}
 

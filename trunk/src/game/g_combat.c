@@ -643,6 +643,20 @@ void player_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int
 		nogib = qfalse;
 	}
 
+
+	//Feen: PGM - Remove old portal ents (if any)
+	if (self->portal_blue) {
+		G_FreeEntity(self->portal_blue);
+		self->portal_blue = NULL;
+	}
+
+	if (self->portal_red) {
+		G_FreeEntity(self->portal_red);
+		self->portal_red = NULL;
+	}
+
+
+
 	if(nogib){
 		// normal death
 		// for the no-blood option, we need to prevent the health
