@@ -341,12 +341,13 @@ void G_admin_readconfig_float(char **cnf, float *v)
 // FIXME: error does not work properly for some reason.
 // G_MatchOnePlayer does work properly but in the function calling
 // this one the error will be 3 chars long no matter what.
-gentity_t *getPlayerForName(char *name, char *err) {
+// Feen: (For Nolla) Fixed?
+gentity_t *getPlayerForName(char *name, char *err, int size) {
 	int pids[MAX_CLIENTS];
 	gentity_t *player;
 
 	if(ClientNumbersFromString(name, pids) != 1) {
-		G_MatchOnePlayer(pids, err, sizeof(err));
+		G_MatchOnePlayer(pids, err, size);
 		return NULL;
 	}
 
@@ -1637,7 +1638,7 @@ qboolean G_admin_remove_saves(gentity_t *ent, int skiparg) {
 	}
 
 	Q_SayArgv(1 + skiparg, name, sizeof(name));
-	if(!(target = getPlayerForName(name, err))) {
+	if(!(target = getPlayerForName(name, err, sizeof(err)))) {
 		AIP(ent, va("^3!rmsaves: ^7%s", err));
 		return qfalse;
 	}
@@ -1666,7 +1667,7 @@ qboolean G_admin_disable_goto(gentity_t *ent, int skiparg) {
 
 	Q_SayArgv(1 + skiparg, name, sizeof(name));
 	
-	if(!(target = getPlayerForName(name, err))) {
+	if(!(target = getPlayerForName(name, err, sizeof(err)))) {
 		AIP(ent, va("^3!nogoto: ^7%s", err));
 		return qfalse;
 	}
@@ -1693,7 +1694,7 @@ qboolean G_admin_disable_save(gentity_t *ent, int skiparg) {
 
 	Q_SayArgv(1 + skiparg, name, sizeof(name));
 	
-	if(!(target = getPlayerForName(name, err))) {
+	if(!(target = getPlayerForName(name, err, sizeof(err)))) {
 		AIP(ent, va("^3!nosave: ^7%s", err));
 		return qfalse;
 	}

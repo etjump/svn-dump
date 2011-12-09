@@ -2894,7 +2894,7 @@ static void CG_PortalGate( centity_t *cent ){
 	
 	/* push the origin out a bit */
 	//VectorMA( cent->currentState.origin, -1.0f, axis[ 0 ], pushedOrigin );
-	VectorMA( cent->currentState.origin, -32.0f, axis[ 0 ], pushedOrigin ); //Feen: Note 32 is the offset of the ent from the trace.endpos, so let's undo that for the gfx
+	VectorMA( cent->currentState.origin, (-32.0f + 1), axis[ 0 ], pushedOrigin ); //Feen: Note 32 is the offset of the ent from the trace.endpos, so let's undo that for the gfx
 	
 	/* create the full polygon */
 	for( i = 0; i < 3; i++ )
@@ -2916,30 +2916,51 @@ static void CG_PortalGate( centity_t *cent ){
 	//end poly test stuff
 
 
-
+		//Texture Coordinates
 		//Top Left
-		//VectorSet(pointDiff, -32, 0, 32);
-		//VectorAdd(cent->currentState.origin, pointDiff, verts[0].xyz);
 		POLYverts[0].st[0] = 1;
 		POLYverts[0].st[1] = 0;
 
 		//Top Right
-		//VectorSet(pointDiff, 32, 0, 32);
-		//VectorAdd(cent->currentState.origin, pointDiff, verts[1].xyz);
 		POLYverts[1].st[0] = 0;
 		POLYverts[1].st[1] = 0;
 
 		//Bottom Right
-		//VectorSet(pointDiff, 32, 0, -32);
-		//VectorAdd(cent->currentState.origin, pointDiff, verts[2].xyz);
 		POLYverts[2].st[0] = 0;
 		POLYverts[2].st[1] = 1;
 
 		//Bottom Left
-		//VectorSet(pointDiff, -32, 0, -32);
-		//VectorAdd(cent->currentState.origin, pointDiff, verts[3].xyz);
 		POLYverts[3].st[0] = 1;
 		POLYverts[3].st[1] = 1;
+
+		/*  - temporarily disabled
+		//Color
+		//Top Left
+		POLYverts[0].modulate[0] = 0;	//R
+		POLYverts[0].modulate[1] = 255; //G
+		POLYverts[0].modulate[2] = 0; //B
+		POLYverts[0].modulate[3] = 255; //A
+
+		//Top Right
+		POLYverts[1].modulate[0] = 0;	//R
+		POLYverts[1].modulate[1] = 255; //G
+		POLYverts[1].modulate[2] = 0; //B
+		POLYverts[1].modulate[3] = 255; //A
+
+		//Bottom Right
+		POLYverts[2].modulate[0] = 0;	//R
+		POLYverts[2].modulate[1] = 255; //G
+		POLYverts[2].modulate[2] = 0; //B
+		POLYverts[2].modulate[3] = 255; //A
+
+		//Bottom Left
+		POLYverts[3].modulate[0] = 0;	//R
+		POLYverts[3].modulate[1] = 255; //G
+		POLYverts[3].modulate[2] = 0; //B
+		POLYverts[3].modulate[3] = 255; //A
+		*/
+
+
 
 		if(cent->currentState.eType == ET_PORTAL_BLUE)
 			trap_R_AddPolyToScene(cgs.media.portal_blueShader, 4, POLYverts);

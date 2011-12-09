@@ -5,12 +5,14 @@ gfx/misc/portal_blueShader
 		map gfx/misc/electricity.tga
 		//blendfunc add
 		tcMod rotate 24
+		rgbGen entity
 	}
 	{
 		map gfx/misc/electricity.tga
 		//blendfunc filter
 		blendfunc add
 		tcMod rotate 25
+		rgbGen entity
 	}
 	{
 		map gfx/misc/electricity_mask.tga
@@ -26,12 +28,14 @@ gfx/misc/portal_redShader
 		map gfx/misc/electricity_red.tga
 		//blendfunc add
 		tcMod rotate 24
+		rgbGen oneMinusEntity
 	}
 	{
 		map gfx/misc/electricity_red.tga
 		//blendfunc filter
 		blendfunc add
 		tcMod rotate 25
+		rgbGen oneMinusEntity
 	}
 	{
 		map gfx/misc/electricity_mask.tga

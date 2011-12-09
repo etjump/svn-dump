@@ -140,7 +140,7 @@ Portal Gun Mod: Teleport Method
 
 =================================================================================
 */
-#define PORTAL_NUDGE 20.0f //Feen: Extra little boost coming out of a portal...
+#define PORTAL_NUDGE 50.0f //Feen: Extra little boost coming out of a portal...
 
 void PortalTeleport( gentity_t *player, vec3_t origin, vec3_t angles ) {
 
@@ -160,8 +160,34 @@ void PortalTeleport( gentity_t *player, vec3_t origin, vec3_t angles ) {
 	// toggle the teleport bit so the client knows to not lerp
 	player->client->ps.eFlags ^= EF_TELEPORT_BIT;
 
-	// set angles
-	SetClientViewAngle( player, angles );
+	// set view angles
+
+	//Adjust view angles so portals don't have you looking straight up or down...
+	if ((angles[PITCH] >= -105 && angles[PITCH] <= -75) || (angles[PITCH] >= -285 && angles[PITCH] <= -255)) {
+		
+		//NOTE: Re-enable to change orientation for vertical portals....
+		/* 
+		vec3_t t_viewAngles;
+
+		//This block will only prevent the 'vertical' view
+		//angle from changing.....
+		t_viewAngles[PITCH] = 0.0f;
+		t_viewAngles[YAW]   = angles[YAW];
+		t_viewAngles[ROLL]  = angles[ROLL];
+
+		SetClientViewAngle( player, t_viewAngles );
+		*/
+
+		//Otherwise, don't change the view angles at all....
+
+	}else{
+
+		SetClientViewAngle( player, angles );
+
+	}
+
+	
+	//SetClientViewAngle( player, angles );
 
 
 	// save results of pmove

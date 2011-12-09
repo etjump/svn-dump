@@ -3475,10 +3475,10 @@ void Weapon_Portal_Fire( gentity_t *ent, int PortalNumber ) {
 	vectoangles(tr.plane.normal, portal->s.angles); //NOTE: RE-Enable angles...
 	vectoangles(tr.plane.normal, portal->r.currentAngles);
 
-	//portal->r.currentAngles
+	//Debug
+	//Com_Printf("Portal Angles -\n\tX: %f\n\tY: %f\n\tZ: %f\n", portal->s.angles[PITCH], portal->s.angles[YAW], portal->s.angles[ROLL]);
 
-	//New stuff to try
-	//G_SetOrigin(portal, tr.endpos); //NOTE NOTE NOTE NOTE: Temporarily disabled!
+	//Set origin (obviously)
 	G_SetOrigin(portal, t_endpos);
 
 	trap_LinkEntity(portal);
