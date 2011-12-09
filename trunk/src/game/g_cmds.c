@@ -3956,15 +3956,6 @@ void Cmd_Class_f(gentity_t *ent)
 
 	G_SetClientWeapons(ent, w, w2, qtrue);
 }
-// adminsystem info
-void Cmd_Info_f (gentity_t *ent) {
-	CP("print \"^3|----------ADMIN SYSTEM---------|\n\"");
-	CP("print \"^3| To set your password, do      |\n\"");
-	CP("print \"^3| cg_adminpassword <password>   |\n\"");
-	CP("print \"^3| The password should be unique |\n\"");
-	CP("print \"^3| and atleast 12 chars long     |\n\"");
-	CP("print \"^3|-------------------------------|\n\"");
-}
 
 /*
 =================
@@ -4059,7 +4050,6 @@ static command_t anyTimeCommands[] =
 	{ "nogoto",				qfalse, Cmd_noGoto_f },
 	{ "nocall",				qfalse, Cmd_noCall_f },
 	{ "nonading",			qfalse, Cmd_NoNading_f },
-	{ "info",				qfalse, Cmd_Info_f },
 };
 
 static command_t noIntermissionCommands[] =

@@ -42,6 +42,8 @@ static const struct g_admin_cmd g_admin_cmds[] = {
 	{"admintest",	G_admin_admintest,	'a',	"displays your current admin level"},
 	{"ban",			G_admin_ban,		'b',	"bans target player"},
 	{"cancelvote",  G_admin_cancelvote, 'C',	"cancels the current vote in progress"},
+	{"nogoto",		G_admin_disable_goto,'T',	"target can not use goto or call"},
+	{"nosave",		G_admin_disable_save,'T',	"target can not use save or load"},
 	{"finger",		G_admin_finger,		'f',	"displays target's admin level"},
 	{"help",		G_admin_help,		'h',	"displays info about commands"},
 	{"listcmds",	G_admin_help,		'h',	"displays info about commands"},
@@ -54,6 +56,7 @@ static const struct g_admin_cmd g_admin_cmds[] = {
 	{"readconfig",	G_admin_readconfig,	'G',	"reads admin config"},
 	{"rename",		G_admin_rename,		'R',	"renames the target player"},
 	{"restart",		G_admin_restart,	'r',	"restarts the map"},
+	{"rmsaves",		G_admin_remove_saves,'T',	"clear saved positions of target"},
 	{"setlevel",	G_admin_setlevel,	's',	"sets target level"},
 	{"unban",		G_admin_unban,		'b',	"unbans #"},
 	{"unmute",		G_admin_unmute,		'm',	"unmutes target player"},
@@ -332,6 +335,23 @@ void G_admin_readconfig_float(char **cnf, float *v)
 			COM_GetCurrentParseLine());
 	}
 	*v = atof(t);
+}
+// Returns pointer to a player if found a single matching player.
+// else returns a nullpointer & error.
+// FIXME: error does not work properly for some reason.
+// G_MatchOnePlayer does work properly but in the function calling
+// this one the error will be 3 chars long no matter what.
+gentity_t *getPlayerForName(char *name, char *err) {
+	int pids[MAX_CLIENTS];
+	gentity_t *player;
+
+	if(ClientNumbersFromString(name, pids) != 1) {
+		G_MatchOnePlayer(pids, err, sizeof(err));
+		return NULL;
+	}
+
+	player = g_entities + pids[0];
+	return player;
 }
 
 
@@ -1094,6 +1114,7 @@ qboolean G_admin_cancelvote(gentity_t *ent, int skiparg) {
 	return qtrue;
 }
 
+// FIXME: renames but the clientside cvar still stays the same.
 
 qboolean G_admin_rename(gentity_t *ent, int skiparg) {
 	int pids[MAX_CLIENTS];
@@ -1602,6 +1623,92 @@ qboolean G_admin_map(gentity_t *ent, int skiparg) {
 	trap_SendConsoleCommand(EXEC_APPEND, va("map %s", map));
 	return qtrue;
 }
+
+// !rmsaves <player>
+qboolean G_admin_remove_saves(gentity_t *ent, int skiparg) {
+	int i, j;
+	gentity_t *target;
+	char name[MAX_TOKEN_CHARS];
+	char err[MAX_STRING_CHARS];
+	save_position_t	*saves[2];
+	if(Q_SayArgc() != 2+skiparg) {
+		AIP(ent, "^3usage:^7 !rmsaves <player>");
+		return qfalse;
+	}
+
+	Q_SayArgv(1 + skiparg, name, sizeof(name));
+	if(!(target = getPlayerForName(name, err))) {
+		AIP(ent, va("^3!rmsaves: ^7%s", err));
+		return qfalse;
+	}
+
+	saves[0] = target->client->sess.allies_save_pos;
+	saves[1] = target->client->sess.axis_save_pos;
+
+	for (i = 0; i < 2; i++)
+		for (j = 0; j < MAX_SAVE_POSITIONS; j++)
+			saves[i][j].isValid = qfalse;
+
+	AIP(target, "^3admin: ^7your saves were removed.");
+	
+	return qtrue;
+}
+// !nogoto <player>
+qboolean G_admin_disable_goto(gentity_t *ent, int skiparg) {
+	char name[MAX_TOKEN_CHARS];
+	char err[MAX_STRING_CHARS];
+	gentity_t *target;
+
+	if(Q_SayArgc() != 2 + skiparg) {
+		AIP(ent, "^3usage:^7 !nogoto <player>");
+		return qfalse;
+	}
+
+	Q_SayArgv(1 + skiparg, name, sizeof(name));
+	
+	if(!(target = getPlayerForName(name, err))) {
+		AIP(ent, va("^3!nogoto: ^7%s", err));
+		return qfalse;
+	}
+
+	if(target->client->sess.goto_allowed) {
+		target->client->sess.goto_allowed = qfalse;
+		AIP(target, "^3admin:^7 you are not allowed to use goto.");
+	} else {
+		target->client->sess.goto_allowed = qtrue;
+		AIP(target, "^3admin:^7 you are now allowed to use goto.");
+	}
+	return qtrue;
+}
+// !nosave <player>
+qboolean G_admin_disable_save(gentity_t *ent, int skiparg) {
+	char name[MAX_TOKEN_CHARS];
+	char err[MAX_STRING_CHARS];
+	gentity_t *target;
+
+	if(Q_SayArgc() != 2 + skiparg) {
+		AIP(ent, "^3usage:^7 !nosave <player>");
+		return qfalse;
+	}
+
+	Q_SayArgv(1 + skiparg, name, sizeof(name));
+	
+	if(!(target = getPlayerForName(name, err))) {
+		AIP(ent, va("^3!nosave: ^7%s", err));
+		return qfalse;
+	}
+
+	if(target->client->sess.save_allowed) {
+		target->client->sess.save_allowed = qfalse;
+		AIP(target, "^3admin:^7 you are not allowed to save position.");
+	} else {
+		target->client->sess.save_allowed = qtrue;
+		AIP(target, "^3admin:^7 you are now allowed to save position.");
+	}
+	return qtrue;
+}
+
+
 
 #ifdef EDITION999
 

@@ -72,6 +72,8 @@ typedef struct {
 
 void G_admin_chat_print(char *string);
 
+// Zero: very informative names for the macros.
+
 #define ACP(x) G_admin_chat_print(x); // admin chat print
 #define AIP(ent, msg) G_admin_personal_info_print(ent, msg); // Admin info print (if ent -> priv else g_printf)
 #define ASP(x) G_admin_print(ent, x) 

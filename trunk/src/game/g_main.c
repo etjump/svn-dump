@@ -227,6 +227,20 @@ vmCvar_t		g_admin;
 vmCvar_t		g_adminLog;
 vmCvar_t		g_logCommands;
 
+// Banner
+vmCvar_t		g_banners;
+vmCvar_t		g_bannerLocation;
+vmCvar_t		g_bannerTime;
+// Zero: FIXME. I couldn't think of a way to have dynamic bannersize
+// other than reading them from a file. I don't think we need it right
+// now. 
+vmCvar_t		g_banner1;
+vmCvar_t		g_banner2;
+vmCvar_t		g_banner3;
+vmCvar_t		g_banner4;
+vmCvar_t		g_banner5;
+
+
 
 cvarTable_t		gameCvarTable[] = {
 	// don't override the cheat state set by the system
@@ -470,6 +484,16 @@ cvarTable_t		gameCvarTable[] = {
 	{ &g_admin, "g_admin", "admins.dat", CVAR_ARCHIVE },
 	{ &g_adminLog, "g_adminLog", "adminsystem.log", CVAR_ARCHIVE },
 	{ &g_logCommands, "g_logCommands", "1", CVAR_ARCHIVE },
+
+	{ &g_banners, "g_banners", "0", CVAR_ARCHIVE },
+	{ &g_bannerLocation, "g_bannerLocation", "0", CVAR_ARCHIVE },
+	{ &g_bannerTime, "g_bannerTime", "60", CVAR_ARCHIVE },
+	// FIXME: dynamic banner count.
+	{ &g_banner1, "g_banner1", "", CVAR_ARCHIVE },
+	{ &g_banner2, "g_banner2", "", CVAR_ARCHIVE },
+	{ &g_banner3, "g_banner3", "", CVAR_ARCHIVE },
+	{ &g_banner4, "g_banner4", "", CVAR_ARCHIVE },
+	{ &g_banner5, "g_banner5", "", CVAR_ARCHIVE },
 };
 
 // bk001129 - made static to avoid aliasing
@@ -3285,6 +3309,8 @@ void CheckVote( void ) {
 	trap_SetConfigstring(CS_VOTE_TIME, "");
 }
 
+void CheckBanner();
+
 #ifdef SAVEGAME_SUPPORT
 /*
 =============
@@ -3923,6 +3949,8 @@ uebrgpiebrpgibqeripgubeqrpigubqifejbgipegbrtibgurepqgbn%i", level.time )
 	// cancel vote if timed out
 	CheckVote();
 
+	CheckBanner();
+
 	// for tracking changes
 	CheckCvars();
 
@@ -3946,4 +3974,69 @@ qboolean G_IsSinglePlayerGame()
 		return qtrue;
 
 	return qfalse;
+}
+
+void CheckBanner() {
+	char msg[MAX_STRING_CHARS];
+	int bannerCount;
+	int bannerLocation = BANNER_BP;
+	int bannerTime = DEFAULT_BANNER_TIME;
+
+	if(g_banners.integer <= 0) {
+		return;
+	}
+
+	if(level.nextBannerTime > level.time) {
+		return;
+	}
+
+	// I don't think anyone needs to see a banner every 5 seconds
+	// or once every 30 minutes. 30seconds - 10minutes.
+	if(g_bannerTime.integer >= 30000 && g_bannerTime.integer <= 600000) {
+		bannerTime = g_bannerTime.integer;
+	}
+	// Maximum of five banners.
+	if(g_banners.integer > 5) {
+		bannerCount = 5;
+	} else {
+		bannerCount = g_banners.integer;
+	}
+
+	if(level.nextBanner == 0) {
+		Q_strncpyz(msg, g_banner1.string, sizeof(msg));
+	} else if(level.nextBanner == 1) {
+		Q_strncpyz(msg, g_banner2.string, sizeof(msg));
+	} else if(level.nextBanner == 2) {
+		Q_strncpyz(msg, g_banner3.string, sizeof(msg));
+	} else if(level.nextBanner == 3) {
+		Q_strncpyz(msg, g_banner4.string, sizeof(msg));
+	} else if(level.nextBanner == 4) {
+		Q_strncpyz(msg, g_banner5.string, sizeof(msg));
+	}
+
+	if( g_bannerLocation.integer != BANNER_CP &&
+		g_bannerLocation.integer != BANNER_BP ) {
+			bannerLocation = BANNER_BP;
+	} else {
+		bannerLocation = g_bannerLocation.integer;
+	}
+
+	if(bannerLocation == BANNER_CP) {
+		AP(va("cp \"%s\n\"", msg));
+	} else if(bannerLocation == BANNER_BP) {
+		AP(va("cpm \"%s\n\"", msg));
+	} else if(bannerLocation == BANNER_SAY) {
+		AP(va("chat \"%s\n\"", msg));
+	} else {
+		AP(va("cpm \"%s\n\"", msg));
+	}
+
+
+	if(level.nextBanner < g_banners.integer - 1) {
+		level.nextBanner++;
+	} else {
+		level.nextBanner = 0;
+	}
+
+	level.nextBannerTime = level.time + bannerTime;
 }

@@ -1187,6 +1187,9 @@ typedef struct {
 	qboolean	noGoto;
 
 	int			mapCount;
+	
+	int			nextBannerTime;
+	int			nextBanner;
 
 } level_locals_t;
 
@@ -1925,6 +1928,15 @@ extern vmCvar_t	g_admin;
 extern vmCvar_t	g_adminLog;
 extern vmCvar_t	g_logCommands;
 
+extern vmCvar_t	g_banners;
+extern vmCvar_t	g_bannerLocation;
+extern vmCvar_t	g_bannerTime;
+extern vmCvar_t g_banner1;
+extern vmCvar_t g_banner2;
+extern vmCvar_t g_banner3;
+extern vmCvar_t g_banner4;
+extern vmCvar_t g_banner5;
+
 void	trap_Printf( const char *fmt );
 void	trap_Error( const char *fmt );
 int		trap_Milliseconds( void );
@@ -2658,10 +2670,15 @@ void G_admin_identify_all();
 void G_admin_login(gentity_t *ent);
 void G_admin_register_client(gentity_t *ent);
 
+// Zero: had a problem with these. For some unknown reason I couldn't compile if
+// these were in g_admin.h. Will keep them here till figured out.
+
 qboolean G_admin_admintest(gentity_t *ent, int skiparg);
 qboolean G_admin_ban_check(char *userinfo, char *reason);
 qboolean G_admin_ban(gentity_t *ent, int skiparg);
 qboolean G_admin_cancelvote(gentity_t *ent, int skiparg);
+qboolean G_admin_disable_goto(gentity_t *ent, int skiparg);
+qboolean G_admin_disable_save(gentity_t *ent, int skiparg);
 qboolean G_admin_finger(gentity_t *ent, int skiparg);
 qboolean G_admin_help(gentity_t *ent, int skiparg);
 qboolean G_admin_kick(gentity_t *ent, int skiparg);
@@ -2673,6 +2690,7 @@ qboolean G_admin_putteam(gentity_t *ent, int skiparg);
 qboolean G_admin_readconfig(gentity_t *ent, int skiparg);
 qboolean G_admin_rename(gentity_t *ent, int skiparg);
 qboolean G_admin_restart(gentity_t *ent, int skiparg);
+qboolean G_admin_remove_saves(gentity_t *ent, int skiparg);
 qboolean G_admin_setlevel(gentity_t *ent, int skiparg);
 qboolean G_admin_unban(gentity_t *ent, int skiparg);
 qboolean G_admin_unmute(gentity_t *ent, int skiparg);
@@ -2692,6 +2710,11 @@ void Weapon_Portal_Fire( gentity_t *ent, int PortalNum ); //TODO add switch for 
 
 //Feen: END PGM
 
+// Banner locations
+#define BANNER_CP 0
+#define BANNER_BP 1
+#define BANNER_SAY 2
+#define DEFAULT_BANNER_TIME 60000
 
 #ifdef EDITION999
 

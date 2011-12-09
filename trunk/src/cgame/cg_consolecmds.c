@@ -917,6 +917,14 @@ void CG_StopTimer ( void ) {
 	cg.activeTimer = qfalse;
 	cg.stopTime = cg.time;
 }
+// Prints instructions to set up adminpassword
+void CG_Info_f ( void ) {
+	CG_Printf("ETJump admin system client information\n");
+	CG_Printf("Setting a password: to set a password type\n");
+	CG_Printf("cg_adminpassword <password>. \n\nPassword should");
+	CG_Printf("be ^1unique ^7and atleast ^112 ^7characters long.\n");
+	CG_Printf("Having a shorter password compromises security.\n");
+}
 
 typedef struct {
 	char	*cmd;
@@ -1022,6 +1030,7 @@ static consoleCommand_t	commands[] =
 	{ "resetmaxspeed", CG_ResetMaxSpeed_f },
 	{ "startTimer",	CG_StartTimer },
 	{ "stopTimer", CG_StopTimer },
+	{ "info",	CG_Info_f },
 };
 
 
