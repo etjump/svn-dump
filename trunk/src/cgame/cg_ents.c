@@ -2810,80 +2810,31 @@ void CG_AttachBitsToTank( centity_t* tank, refEntity_t* mg42base, refEntity_t* m
 //Feen: PGM - Drawing the portals....
 static void CG_PortalGate( centity_t *cent ){
 
-	/*	refEntity_t			ent;
-
-
-	// create the render entity
-	memset (&ent, 0, sizeof(ent));
-	VectorCopy( cent->lerpOrigin, ent.origin);
-	VectorCopy( cent->lerpOrigin, ent.oldorigin);
-
-
-		ent.reType = RT_SPRITE;
-		ent.radius = 64;
-		ent.rotation = 0;
-		ent.customShader = cgs.media.portal_blueShader;
-		trap_R_AddRefEntityToScene( &ent );
-		*/
-
-
-		//NOTE: Re-enable if CG_ImpactMark implementation doesn't work....
-		/*
-		//TEST!
-		localEntity_t	*le;
-		refEntity_t		*re;
-
-		le = CG_AllocLocalEntity();
-		le->leFlags = LEF_PUFF_DONT_SCALE;
-		le->leType = LE_MOVE_SCALE_FADE;
-		le->startTime = cg.time;
-		le->endTime = cg.time + 1000 + random() * 250;
-		le->lifeRate = 1.0 / ( le->endTime - le->startTime );
-
-		re = &le->refEntity;
-		re->shaderTime = cg.time / 1000.0f;
-
-		re->reType = RT_SPRITE;
-		re->rotation = 0;
-//		re->radius = 3;	
-		re->radius = 64;
 		
-		if(cent->currentState.eType == ET_PORTAL_BLUE)
-			re->customShader = cgs.media.portal_blueShader;
-		else //If it's not blue, it's red... hopefully....
-			re->customShader = cgs.media.portal_redShader;
-		
-		
-		re->shaderRGBA[0] = 0xff;
-		re->shaderRGBA[1] = 0xff;
-		re->shaderRGBA[2] = 0xff;
-		re->shaderRGBA[3] = 0xff;
-	
-		VectorCopy(cent->currentState.origin, re->origin); //Set origin of thing...
-		VectorCopy(cent->currentState.origin, re->oldorigin); //Set origin of thing...
-		
-		
-		trap_R_AddRefEntityToScene( &le->refEntity );
-		*/
-		//END - Re-enable
+	polyVert_t POLYverts[4];
+	vec3_t verts[4];
+	vec3_t pointDiff, pushedOrigin, angleInverse;
+	vec3_t axis[3];
+	float radius = 64.0f; // TODO: Use #define instead
+	int i;
 
-		
 
-		//POLY TEST
-		
-		polyVert_t POLYverts[4];
-		vec3_t verts[4];
-		vec3_t pointDiff, pushedOrigin, angleInverse;
-		vec3_t axis[3];
-		float radius = 64.0f;
-		int i;
+	//Check if player wants to see other player portals
+	if (!cg_viewPlayerPortals.integer){
+		//We don't want to see other player portals
+		//so let's only render our portal...
 
-		VectorCopy(cent->currentState.angles, angleInverse);
-		//VectorInverse(angleInverse);
+		if (cent->currentState.otherEntityNum != cg.clientNum)
+			return; //Not our portal - Don't draw it...
+	}
 
-		AnglesToAxis(angleInverse, axis);
 
-		//start- poly test stuff
+
+	VectorCopy(cent->currentState.angles, angleInverse);
+
+	AnglesToAxis(angleInverse, axis);
+
+	//start- poly test stuff
 
 	/* make rotated polygon axis */
 	//VectorCopy( projection, axis[ 0 ] );
@@ -2894,7 +2845,7 @@ static void CG_PortalGate( centity_t *cent ){
 	
 	/* push the origin out a bit */
 	//VectorMA( cent->currentState.origin, -1.0f, axis[ 0 ], pushedOrigin );
-	VectorMA( cent->currentState.origin, (-32.0f + 1), axis[ 0 ], pushedOrigin ); //Feen: Note 32 is the offset of the ent from the trace.endpos, so let's undo that for the gfx
+	VectorMA( cent->currentState.origin, (-32.0f + 1), axis[ 0 ], pushedOrigin ); //Feen: Note 32 is the offset of the ent from the trace.endpos, so let's undo that for the gfx //TODO: Use #define instead
 	
 	/* create the full polygon */
 	for( i = 0; i < 3; i++ )
@@ -2932,6 +2883,9 @@ static void CG_PortalGate( centity_t *cent ){
 		//Bottom Left
 		POLYverts[3].st[0] = 1;
 		POLYverts[3].st[1] = 1;
+
+
+		//TODO: Call color functions for custom client portal colors
 
 		/*  - temporarily disabled
 		//Color

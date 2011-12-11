@@ -1518,6 +1518,7 @@ BG_AnimScriptEvent
   returns the duration in milliseconds that this model should be paused. -1 if no event found
 ================
 */
+//#define DBGANIMEVENTS //Feen: PGM TEst
 int	BG_AnimScriptEvent( playerState_t *ps, animModelInfo_t *animModelInfo, scriptAnimEventTypes_t event, qboolean isContinue, qboolean force )
 {
 	animScript_t		*script;

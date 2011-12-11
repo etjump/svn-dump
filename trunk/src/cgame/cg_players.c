@@ -2782,6 +2782,7 @@ weaponType_t weaponTypes[] = {
 	{ WP_SILENCER,				"LUGER",		},
 	{ WP_AKIMBO_SILENCEDCOLT,	"AKIMBO COLTS",	},
 	{ WP_AKIMBO_SILENCEDLUGER,	"AKIMBO LUGERS",},
+	{ WP_PORTAL_GUN,			"PORTAL GUN",	}, //Feen: PGM
 	{ WP_NONE,					NULL,			},
 	{ -1,						NULL,			},
 };

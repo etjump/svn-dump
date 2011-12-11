@@ -1,46 +1,44 @@
 gfx/misc/portal_blueShader
 {
-	deformVertexes wave 128 sin 0 1 2 1 
+	surfaceparm nolightmap
+	surfaceparm trans
+	surfaceparm nonsolid
+	surfaceparm nomarks
+	nomipmaps
 	{
-		map gfx/misc/electricity.tga
-		//blendfunc add
-		tcMod rotate 24
-		rgbGen entity
+		clampMap gfx/misc/teleporter_swirl4.tga
+		blendFunc ADD
+		tcMod rotate 45
+		rgbGen wave sin 0.8 .15 .2 0.05
 	}
 	{
-		map gfx/misc/electricity.tga
-		//blendfunc filter
-		blendfunc add
-		tcMod rotate 25
-		rgbGen entity
-	}
-	{
-		map gfx/misc/electricity_mask.tga
-		//blendfunc filter
-		blendfunc GL_DST_COLOR GL_SRC_COLOR
+		clampMap gfx/misc/teleporter_swirl1.tga
+		blendFunc ADD
+		tcMod rotate 180
+		rgbGen vertex
+          	tcMod stretch sin 0.9 0.1 0 .5
 	}
 }
 
 gfx/misc/portal_redShader
 {
-	deformVertexes wave 128 sin 0 1 2 1 
+	surfaceparm nolightmap
+	surfaceparm trans
+	surfaceparm nonsolid
+	surfaceparm nomarks
+	nomipmaps
 	{
-		map gfx/misc/electricity_red.tga
-		//blendfunc add
-		tcMod rotate 24
-		rgbGen oneMinusEntity
+		clampMap gfx/misc/teleporter_swirl4_red.tga
+		blendFunc ADD
+		tcMod rotate -45
+		rgbGen wave sin 0.8 .15 .2 0.05
 	}
 	{
-		map gfx/misc/electricity_red.tga
-		//blendfunc filter
-		blendfunc add
-		tcMod rotate 25
-		rgbGen oneMinusEntity
-	}
-	{
-		map gfx/misc/electricity_mask.tga
-		//blendfunc filter
-		blendfunc GL_DST_COLOR GL_SRC_COLOR
+		clampMap gfx/misc/teleporter_swirl1_red.tga
+		blendFunc ADD
+		tcMod rotate -180
+		rgbGen vertex
+          	tcMod stretch sin 0.9 0.1 0 .5
 	}
 }
 

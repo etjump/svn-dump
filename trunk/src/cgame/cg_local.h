@@ -2317,6 +2317,9 @@ extern vmCvar_t			cg_popupStayTime;
 extern vmCvar_t			cg_popupFadeTime;
 extern vmCvar_t			cg_numPopup;
 
+//Feen: PGM client cvars
+extern vmCvar_t			cg_viewPlayerPortals; //Enable/Disable viewing other player portals
+
 
 //
 // cg_main.c

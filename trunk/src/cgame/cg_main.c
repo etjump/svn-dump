@@ -349,6 +349,11 @@ vmCvar_t	cg_popupStayTime;
 vmCvar_t	cg_popupFadeTime;
 vmCvar_t	cg_numPopup;
 
+
+//Feen: PGM client cvars
+vmCvar_t			cg_viewPlayerPortals; //Enable/Disable viewing other player portals
+
+
 typedef struct {
 	vmCvar_t	*vmCvar;
 	char		*cvarName;
@@ -624,6 +629,8 @@ cvarTable_t		cvarTable[] = {
 	{ &cg_popupStayTime, "cg_popupStayTime", "2000", CVAR_ARCHIVE },
 	{ &cg_popupFadeTime, "cg_popupFadeTime", "2500", CVAR_ARCHIVE },
 	{ &cg_numPopup, "cg_numPopup", "5", CVAR_ARCHIVE },
+	{ &cg_viewPlayerPortals, "cg_viewPlayerPortals", "1", CVAR_ARCHIVE }, //Feen: PGM - View other player portals
+	
 
 
 };

@@ -3196,7 +3196,7 @@ static void PM_Weapon( void ) {
 #endif
 
 	//Feen Weapon Dbug
-#ifdef GAMEDLL
+//#ifdef GAMEDLL
 
 	//PGM Test...
 	if (pm->cmd.wbuttons & WBUTTON_ATTACK2) {
@@ -3213,6 +3213,8 @@ static void PM_Weapon( void ) {
 			PM_AddEvent(EV_PORTAL2_FIRE);
 			//Com_Printf("FWD: EV_PORTAL2_FIRE Added...\n");
 			pm->ps->weaponTime += 1000; //Feen: This equates to about .5 seconds
+
+			BG_AnimScriptEvent( pm->ps, pm->character->animModelInfo, ANIM_ET_FIREWEAPON, qfalse, qtrue ); //TEST
 
 		}
 	}
@@ -3266,7 +3268,7 @@ static void PM_Weapon( void ) {
 #endif
 
 
-#endif
+//#endif
 	//END FEEN TEST
 
 
@@ -4195,6 +4197,7 @@ static void PM_Weapon( void ) {
 		case WP_LANDMINE:
 		case WP_TRIPMINE:
 		case WP_SMOKE_BOMB:
+		case WP_PORTAL_GUN: //Feen: PGM
 			PM_StartWeaponAnim(weapattackanim);
 			break;
 
@@ -4214,7 +4217,7 @@ static void PM_Weapon( void ) {
 			break;
 
 		case WP_MORTAR_SET:
-		case WP_PORTAL_GUN: //Feen: PGM - TEST
+		//case WP_PORTAL_GUN: //Feen: PGM - TEST //Let fall into default...
 			break;	// no animation
 
 		default:

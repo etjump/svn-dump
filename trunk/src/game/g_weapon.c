@@ -3349,6 +3349,10 @@ void Weapon_Portal_Fire( gentity_t *ent, int PortalNumber ) {
 	gentity_t *portal, *tent;
 	vec3_t t_endpos;
 
+	//BBox info
+	vec3_t t_portalAngles; //Could be used for all angles conversions...
+	float P_DEPTH, P_HEIGHT, P_WIDTH;
+
 	#define PORTAL_GUN_DIST 5000 //Feen: Iunno about this value, we'll 
 								 //      just have to play around with it... 
 								 //      and move it to g_local.h...
@@ -3434,15 +3438,68 @@ void Weapon_Portal_Fire( gentity_t *ent, int PortalNumber ) {
 
 	
 	
-	//Bounding box..... (hopefully....)
+	//Bounding box
+
+	//Old
+	/*
 	VectorSet(portal->r.mins, -ITEM_RADIUS, -ITEM_RADIUS, 0 );
 	VectorSet(portal->r.maxs, ITEM_RADIUS, ITEM_RADIUS, 2*ITEM_RADIUS );
+	*/
+
+	//New bbox code... 12/10/11
+	//vec3_t t_portalAngles; //Moved up top..
+	//float P_DEPTH, P_HEIGHT, P_WIDTH;
+
+	vectoangles(tr.plane.normal, t_portalAngles);
+
+	//if ((t_portalAngles[PITCH] >= -105 && t_portalAngles[PITCH] <= -75) || (t_portalAngles[PITCH] >= -285 && t_portalAngles[PITCH] <= -255)) { //Horizontal portal (floor/ceiling)
+	if ((t_portalAngles[PITCH] >= -135 && t_portalAngles[PITCH] <= -45) || (t_portalAngles[PITCH] >= -315 && t_portalAngles[PITCH] <= -225)) { //Horizontal portal (floor/ceiling)
+
+		P_DEPTH = P_WIDTH = 30.0f;
+		P_HEIGHT = 5.0f;
+
+		VectorSet(portal->r.mins, -P_DEPTH, -P_WIDTH, -P_HEIGHT ); //(P_DEPTH, P_WIDTH, P_HEIGHT)
+		VectorSet(portal->r.maxs, P_DEPTH, P_WIDTH, P_HEIGHT );
+
+
+	}else if(t_portalAngles[PITCH] == -0){ //Vertical Portals (On walls)
+
+		P_DEPTH = 5.0f;
+		P_HEIGHT = P_WIDTH = 30.0f;
+
+		if ((t_portalAngles[YAW] >= 45 && t_portalAngles[YAW] <= 135) || (t_portalAngles[YAW] >= 225 && t_portalAngles[YAW] <= 315)){
+
+			VectorSet(portal->r.mins, -P_HEIGHT, -P_DEPTH, -P_WIDTH ); //(P_HEIGHT, P_DEPTH, P_WIDTH)
+			VectorSet(portal->r.maxs, P_HEIGHT, P_DEPTH, P_WIDTH );
+	
+		}else{
+
+			VectorSet(portal->r.mins, -P_DEPTH, -P_HEIGHT, -P_WIDTH ); //(P_HEIGHT, P_WIDTH, P_DEPTH)
+			VectorSet(portal->r.maxs, P_DEPTH, P_HEIGHT, P_WIDTH );
+
+		}
+
+
+	}else{ //Slanted (not quite vertical) portals get the largest bbox...
+
+		P_DEPTH = P_WIDTH = 30.0f;
+		P_HEIGHT = 15.0f;
+
+		VectorSet(portal->r.mins, -P_DEPTH, -P_WIDTH, -P_HEIGHT ); //(P_DEPTH, P_WIDTH, P_HEIGHT)
+		VectorSet(portal->r.maxs, P_DEPTH, P_WIDTH, P_HEIGHT );
+
+
+	}
+
+	//end new bbox code
+
+
 	portal->r.contents = CONTENTS_TRIGGER | CONTENTS_ITEM;
 	portal->clipmask = CONTENTS_SOLID | CONTENTS_MISSILECLIP;
 	portal->touch = Portal_Touch;
 
 	portal->think = Portal_Think;
-	portal->nextthink = level.time + 10000; //.5 sec til next think. May need to play around with this....
+	portal->nextthink = level.time + 100; //.5 sec til next think. May need to play around with this....
 	
 	//CP(va("print \"^1Portal Debug:^7 think/touch set....\n\""));
 
@@ -3454,6 +3511,7 @@ void Weapon_Portal_Fire( gentity_t *ent, int PortalNumber ) {
 	//portal->s.eType = ET_PORTAL_BLUE; //Moved up - 11/28/11
 	//portal->s.eventParm = 1; //Portal number 1. May not need this. Probably just use the eType....
 	portal->s.pos.trType = TR_STATIONARY;
+	portal->s.otherEntityNum = ent->s.clientNum; //HACK: Using this for render checks.....
 
 	//Set Location of entity - NOTE: May need to move slightly away from surface
 	
@@ -3489,12 +3547,17 @@ void Weapon_Portal_Fire( gentity_t *ent, int PortalNumber ) {
 }
 
 
+
+//#define PORTAL_BBOX_DEBUG //Display portal bounding box
 void Portal_Think(gentity_t *self){
+
+	gentity_t *bboxEnt;	//Put here to make the compiler happy...
+	vec3_t b1, b2;
 
 	//gentity_t *ent;
 
 
-	//If owner is dead, get rid of the portals...
+	//If owner is dead, get rid of the portals... //NOTE: This never seems to catch since respawn is so fast...
 	if (self->parent->client->ps.pm_type == PM_DEAD)  {
 
 		G_FreeEntity(self);
@@ -3503,15 +3566,27 @@ void Portal_Think(gentity_t *self){
 	}
 
 
+#ifdef PORTAL_BBOX_DEBUG
+
+	//gentity_t *bboxEnt;	//Moved to make the compiler happy...
+	//vec3_t b1, b2;
+	
+	VectorCopy(self->r.currentOrigin, b1);
+	VectorCopy(self->r.currentOrigin, b2);
+	VectorAdd(b1, self->r.mins, b1);
+	VectorAdd(b2, self->r.maxs, b2);
+	bboxEnt = G_TempEntity( b1, EV_RAILTRAIL );
+	VectorCopy(b2, bboxEnt->s.origin2);
+	bboxEnt->s.dmgFlags = 1; //CG_RailTrail type. Indicates bounding box draw
+
+	self->nextthink = level.time + 500;
+
+
+#else
+
 	self->nextthink = level.time + 100;
 
-	//ent = self->parent;
-
-	//G_FreeEntity(self);
-	//trap_SendServerCommand(ent-g_entities, va("print \"^1Portal Protection:^7 Portal thinking....\n\""));
-	
-	//Nothing else to do...
-
+#endif
 
 }
 

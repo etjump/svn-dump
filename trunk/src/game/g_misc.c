@@ -146,10 +146,12 @@ void PortalTeleport( gentity_t *player, vec3_t origin, vec3_t angles ) {
 
 	vec_t velocityLength;
 
-	velocityLength = VectorLength(player->client->ps.velocity);
+	velocityLength = VectorLength(player->client->ps.velocity); //Speed...
 
 	VectorCopy ( origin, player->client->ps.origin );
-	player->client->ps.origin[2] += 1;
+	//player->client->ps.origin[2] += 1;
+
+	
 
 	// spit the player out
 	AngleVectors( angles, player->client->ps.velocity, NULL, NULL );
@@ -165,6 +167,9 @@ void PortalTeleport( gentity_t *player, vec3_t origin, vec3_t angles ) {
 	//Adjust view angles so portals don't have you looking straight up or down...
 	if ((angles[PITCH] >= -105 && angles[PITCH] <= -75) || (angles[PITCH] >= -285 && angles[PITCH] <= -255)) {
 		
+		//NOTE: The concensus at this point is that we leave the viewangles
+		//		alone when going through portals with vertical angles.
+
 		//NOTE: Re-enable to change orientation for vertical portals....
 		/* 
 		vec3_t t_viewAngles;
@@ -180,14 +185,21 @@ void PortalTeleport( gentity_t *player, vec3_t origin, vec3_t angles ) {
 
 		//Otherwise, don't change the view angles at all....
 
+
+		//HACK: Fixes bug where players would get stuck in ceiling
+		//		when coming through portal on ceiling....
+		//      Essentially, the player origin is pushed out from
+		//		the portal origin even more..
+
+		if (angles[PITCH] >= -285 && angles[PITCH] <= -255) //portal on the ceiling
+			player->client->ps.origin[2] -= 32.0f; //Bleh.....
+
 	}else{
 
 		SetClientViewAngle( player, angles );
 
 	}
 
-	
-	//SetClientViewAngle( player, angles );
 
 
 	// save results of pmove
