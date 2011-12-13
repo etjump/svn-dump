@@ -3346,54 +3346,94 @@ Portal Gun
 void Weapon_Portal_Fire( gentity_t *ent, int PortalNumber ) {
 
 
+	#define PORTAL_GUN_RANGE 5000 //Feen: Iunno about this value, we'll 
+								  //      just have to play around with it... 
+								  //      and move it to g_local.h...
+
+	#define PORTAL_MIN_DIST 75.0f //Arbitrary, but it works...
+
+
 	gentity_t *portal, *tent;
 	vec3_t t_endpos;
+
+	//trace vars
+	vec3_t		start;			//Muzzle location
+	vec3_t		trace_start;	//Actual trace start
+	vec3_t		trace_end;		//trace end point
+	trace_t 	tr;				//trace results..
+
+	//portal distance...
+	float portalDistance;		//Distance between the origin of the two portals...
 
 	//BBox info
 	vec3_t t_portalAngles; //Could be used for all angles conversions...
 	float P_DEPTH, P_HEIGHT, P_WIDTH;
 
-	#define PORTAL_GUN_DIST 5000 //Feen: Iunno about this value, we'll 
-								 //      just have to play around with it... 
-								 //      and move it to g_local.h...
 
 	//From knife...
+	/*
 	trace_t		tr;
 
 	vec3_t		end;
 
-
-		//CP(va("print \"^1Portal Debug:^7 Weaon_Portal_Fire called....\n\"")); //Debug...
-
 	AngleVectors (ent->client->ps.viewangles, forward, right, up);
 	CalcMuzzlePoint ( ent, ent->s.weapon, forward, right, up, muzzleTrace );
 	VectorMA (muzzleTrace, PORTAL_GUN_DIST, forward, end);
-	G_HistoricalTrace(ent, &tr, muzzleTrace, NULL, NULL, end, ent->s.number, MASK_SHOT);
+	G_HistoricalTrace(ent, &tr, muzzleTrace, NULL, NULL, end, ent->s.number, MASK_PORTAL);
+	*/
 
-	//CP(va("print \"^1Portal Debug:^7 Trace Completed....\n\"")); //Debug...
+	//NOTE: NEW trace setup.... pulled from flamethrower
+	AngleVectors (ent->client->ps.viewangles, forward, right, up); //NOTE: Need this for +attack2 call...
+
+	VectorCopy( ent->r.currentOrigin, start );
+	start[2] += ent->client->ps.viewheight;
+	VectorCopy( start, trace_start );
+
+	//Muzzle position
+	VectorMA( start, -4, forward, start );
+	VectorMA( start, 6, right, start );
+	VectorMA( start, -4, up, start );
+
+	//End pos
+	VectorMA (trace_start, PORTAL_GUN_RANGE, forward, trace_end);
 	
-	if ( tr.surfaceFlags & SURF_NOIMPACT ){
-	    //CP(va("print \"^1Portal Debug:^7 didn't hit anything....\n\""));
+	//Trace
+	G_HistoricalTrace(ent, &tr, trace_start, NULL, NULL, trace_end, ent->s.number, MASK_PORTAL);
+
+	
+	if ( tr.surfaceFlags & SURF_NOIMPACT )
 		return;
-	}
 
 	// no contact
-	if(tr.fraction == 1.0f) {
-		//CP(va("print \"^1Portal Debug:^7 didn't hit anything....\n\""));
+	if(tr.fraction == 1.0f)
 		return;
 
+	//emancipation grid
+	if ( tr.contents & CONTENTS_NOPORTAL )
+		return;
+
+
+
+	//Go ahead and calc new endpos just in case....
+	VectorMA(tr.endpos, 32, tr.plane.normal, t_endpos);
+
+
+	//check that portals aren't overlapping..
+	if ((ent->portal_blue) || (ent->portal_red)) {
+
+		if (PortalNumber == 1 && ent->portal_red){
+
+			if (Distance(t_endpos, ent->portal_red->s.origin) < PORTAL_MIN_DIST)
+				return;
+
+		}else if (PortalNumber == 2 && ent->portal_blue){
+
+			if (Distance(t_endpos, ent->portal_blue->s.origin) < PORTAL_MIN_DIST)
+				return;
+
+		}
+
 	}
-
-		//CP(va("print \"^1Portal Debug:^7 Start rail creation....\n\"")); //Debug...
-
-		//DEBUG - RailTrail... 
-		tent = G_TempEntity( muzzleTrace, EV_RAILTRAIL );
-		//CP(va("print \"^1Portal Debug:^7 Temp rail ent created....\n\"")); //Debug...
-
-		SnapVectorTowards(tr.endpos, muzzleTrace);
-		VectorCopy(tr.endpos, tent->s.origin2);
-		tent->s.otherEntityNum2 = ent->s.number; //test...
-		//CP(va("print \"^1Portal Debug:^7 rail created....\n\""));
 
 
 	//Free any previous instances of each portal if any
@@ -3411,9 +3451,21 @@ void Weapon_Portal_Fire( gentity_t *ent, int PortalNumber ) {
 
 
 
-	portal = G_Spawn(); 
-	//CP(va("print \"^1Portal Debug:^7 entity created....\n\"")); //Debug...
+
 	
+	//DEBUG - RailTrail... 
+	//tent = G_TempEntity( muzzleTrace, EV_RAILTRAIL );
+	tent = G_TempEntity( start, EV_RAILTRAIL );
+
+	SnapVectorTowards(tr.endpos, start);
+	VectorCopy(tr.endpos, tent->s.origin2);
+	tent->s.otherEntityNum2 = ent->s.number; 
+	//END - Rail
+
+
+
+
+	portal = G_Spawn(); 
 	portal->classname = "portal_gate";
 
 
@@ -3421,7 +3473,6 @@ void Weapon_Portal_Fire( gentity_t *ent, int PortalNumber ) {
 	if(PortalNumber == 1){
 
 		portal->s.eType = ET_PORTAL_BLUE; //Portal 1
-
 
 		//Assign to client
 		ent->portal_blue = portal;
@@ -3440,15 +3491,7 @@ void Weapon_Portal_Fire( gentity_t *ent, int PortalNumber ) {
 	
 	//Bounding box
 
-	//Old
-	/*
-	VectorSet(portal->r.mins, -ITEM_RADIUS, -ITEM_RADIUS, 0 );
-	VectorSet(portal->r.maxs, ITEM_RADIUS, ITEM_RADIUS, 2*ITEM_RADIUS );
-	*/
-
 	//New bbox code... 12/10/11
-	//vec3_t t_portalAngles; //Moved up top..
-	//float P_DEPTH, P_HEIGHT, P_WIDTH;
 
 	vectoangles(tr.plane.normal, t_portalAngles);
 
@@ -3490,7 +3533,7 @@ void Weapon_Portal_Fire( gentity_t *ent, int PortalNumber ) {
 
 
 	}
-
+	
 	//end new bbox code
 
 
@@ -3499,104 +3542,71 @@ void Weapon_Portal_Fire( gentity_t *ent, int PortalNumber ) {
 	portal->touch = Portal_Touch;
 
 	portal->think = Portal_Think;
-	portal->nextthink = level.time + 100; //.5 sec til next think. May need to play around with this....
-	
-	//CP(va("print \"^1Portal Debug:^7 think/touch set....\n\""));
+	portal->nextthink = level.time + 100; //.1 sec til next think - mainly used for bbox dbug
 
-	portal->r.svFlags = SVF_BROADCAST; //NOTE: Probably need to tweak this....
+	portal->r.svFlags = SVF_BROADCAST; //broadcast ent to all players
 
 	portal->r.ownerNum = ent->s.number;
 	portal->parent = ent;
 
-	//portal->s.eType = ET_PORTAL_BLUE; //Moved up - 11/28/11
-	//portal->s.eventParm = 1; //Portal number 1. May not need this. Probably just use the eType....
 	portal->s.pos.trType = TR_STATIONARY;
 	portal->s.otherEntityNum = ent->s.clientNum; //HACK: Using this for render checks.....
 
-	//Set Location of entity - NOTE: May need to move slightly away from surface
-	
-	/*VectorCopy(tr.endpos, portal->s.origin);
-	VectorCopy(tr.endpos, portal->r.currentOrigin);
-	VectorCopy(tr.endpos, portal->s.pos.trBase);*/
 
-	//Test - Origin...
-	VectorMA (tr.endpos, 32, tr.plane.normal, t_endpos); //Push origin out 15 units from trace position along the planes normal.
+	//Set origin (obviously)
+	G_SetOrigin(portal, t_endpos); 
 
 	VectorCopy(t_endpos, portal->s.origin);
-	VectorCopy(t_endpos, portal->r.currentOrigin);
-	VectorCopy(t_endpos, portal->s.pos.trBase);
 
 
 	//Set angle of entity based on normal of plane....
-	//VectorCopy(tr.plane.normal, portal->r.currentAngles);
-	//VectorCopy(tr.plane.normal, portal->s.angles);
 	vectoangles(tr.plane.normal, portal->s.angles); //NOTE: RE-Enable angles...
 	vectoangles(tr.plane.normal, portal->r.currentAngles);
 
-	//Debug
-	//Com_Printf("Portal Angles -\n\tX: %f\n\tY: %f\n\tZ: %f\n", portal->s.angles[PITCH], portal->s.angles[YAW], portal->s.angles[ROLL]);
-
-	//Set origin (obviously)
-	G_SetOrigin(portal, t_endpos);
 
 	trap_LinkEntity(portal);
 
-	//DEBUG
-	//CP(va("print \"^1Portal Debug:^7 supposedly the entity is there....\n\""));
 
 }
 
 
-
-//#define PORTAL_BBOX_DEBUG //Display portal bounding box
+//Feen: Can't think of a good use for _think event
+//		other than for displaying bounding boxes..
+//		
 void Portal_Think(gentity_t *self){
 
-	gentity_t *bboxEnt;	//Put here to make the compiler happy...
+	gentity_t *bboxEnt;
 	vec3_t b1, b2;
 
-	//gentity_t *ent;
 
 
-	//If owner is dead, get rid of the portals... //NOTE: This never seems to catch since respawn is so fast...
-	if (self->parent->client->ps.pm_type == PM_DEAD)  {
-
-		G_FreeEntity(self);
-
-		return;
-	}
-
-
-#ifdef PORTAL_BBOX_DEBUG
-
-	//gentity_t *bboxEnt;	//Moved to make the compiler happy...
-	//vec3_t b1, b2;
+	if (g_portalDebug.integer) {
 	
-	VectorCopy(self->r.currentOrigin, b1);
-	VectorCopy(self->r.currentOrigin, b2);
-	VectorAdd(b1, self->r.mins, b1);
-	VectorAdd(b2, self->r.maxs, b2);
-	bboxEnt = G_TempEntity( b1, EV_RAILTRAIL );
-	VectorCopy(b2, bboxEnt->s.origin2);
-	bboxEnt->s.dmgFlags = 1; //CG_RailTrail type. Indicates bounding box draw
+		VectorCopy(self->r.currentOrigin, b1);
+		VectorCopy(self->r.currentOrigin, b2);
+		VectorAdd(b1, self->r.mins, b1);
+		VectorAdd(b2, self->r.maxs, b2);
+		bboxEnt = G_TempEntity( b1, EV_RAILTRAIL );
+		VectorCopy(b2, bboxEnt->s.origin2);
+		bboxEnt->s.dmgFlags = 1; //CG_RailTrail type. Indicates bounding box draw
 
-	self->nextthink = level.time + 500;
+		self->nextthink = level.time + 500;
 
+	} else {
 
-#else
+		self->nextthink = level.time + 100; //
 
-	self->nextthink = level.time + 100;
-
-#endif
+	}
 
 }
 
 
 void Portal_Touch(gentity_t *self, gentity_t *other, trace_t *trace){
 
-	//TODO: Add events
+	//TODO: Add ability to teleport missles...
 		
 
-	gentity_t	*dest;
+	gentity_t	*dest = NULL;
 
 	//If not the owner of this portal, ignore...
 	if (self->r.ownerNum != other->s.number) 
@@ -3619,21 +3629,24 @@ void Portal_Touch(gentity_t *self, gentity_t *other, trace_t *trace){
 		if (other->portal_red != NULL)
 			dest = other->portal_red;
 
-	}else{
+	}else if (self->s.eType == ET_PORTAL_RED) {
 		//Check that the 'other' portal exists and set it as dest
 		if (other->portal_blue != NULL)
 			dest = other->portal_blue;
 
+	}else{
+		//Not quite sure what the hell we hit here...
+		return;
 	}
 
 
 	if (!dest) {
-		G_Printf ("Couldn't find portal gate destination...\n");
+		//G_Printf ("Couldn't find portal gate destination...\n");
 		return;
 	}
 
 	//set next time we can teleport... portal cooldown essentially...
-	other->lastPortalTime = level.time + 500; //1 second cooldown - maybe too much //NOTE - Replace with constant
+	other->lastPortalTime = level.time + 500; // .5 second cooldown - maybe too much //NOTE - Replace with constant
 
 
 	//TeleportPlayer( other, dest->s.origin, dest->s.angles );
@@ -4473,8 +4486,6 @@ void FireWeapon( gentity_t *ent ) {
 
 	//Feen: PGM
 	case WP_PORTAL_GUN:
-		// Feen: This is only a test, we'll add the weapon functions later.....
-		//CP(va("print \"^1Portal Debug:^7 Calling Weapon_Portal_Fire\n\""));
 		Weapon_Portal_Fire( ent, 1 ); //Feen: '1' indicates blue portal, red portal calls will be made from weapaltfire calls
 		break;
 	

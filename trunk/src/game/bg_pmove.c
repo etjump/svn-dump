@@ -621,8 +621,6 @@ static float PM_CmdScale( usercmd_t *cmd ) {
 
 	} // if (gametype == GT_SINGLE_PLAYER)...
 
-	//Feen: PGM - TEST
-
 
 	return scale;
 }
@@ -3976,7 +3974,6 @@ static void PM_Weapon( void ) {
 			}
 			break;
 
-		//Feen: PGM - NOTE: Possibly add animation handlers later
 
 		// throw
 		case WP_DYNAMITE:
@@ -4038,13 +4035,6 @@ static void PM_Weapon( void ) {
 
 	pm->ps->weaponstate = WEAPON_FIRING;
 
-	//Feen: PGM - TODO House keeping...
-	/*
-	if(pm->cmd.wbuttons & WBUTTON_ATTACK2 && pm->ps->weapon == WP_PORTAL_GUN) {
-		PM_AddEvent(EV_PORTAL2_FIRE);
-		//Com_Printf("^7Portal Debug: bg_pmove.c -> Event Added\n");
-		//return; //Maybe not return?
-	}*/
 
 	// Gordon: reset player disguise on firing
 //	if( pm->ps->weapon != WP_SMOKE_BOMB && pm->ps->weapon != WP_SATCHEL && pm->ps->weapon != WP_SATCHEL_DET ) {	// Arnout: not for these weapons
@@ -4201,7 +4191,6 @@ static void PM_Weapon( void ) {
 			PM_StartWeaponAnim(weapattackanim);
 			break;
 
-			//Feen: PGM NOTE: Add this later. Possibly with WP_MORTAR_SET...
 
 		case WP_MP40:
 		case WP_THOMPSON:
@@ -4457,7 +4446,6 @@ static void PM_Weapon( void ) {
 	case WP_SILENCED_COLT:
 	case WP_AKIMBO_COLT:
 	case WP_AKIMBO_SILENCEDCOLT:
-	//case WP_PORTAL_GUN: //Feen: PGM - The recoil of the pistols is good enough for this... //Then again... nah...
 		pm->pmext->weapRecoilTime = pm->cmd.serverTime;
 		pm->pmext->weapRecoilDuration = pm->skill[SK_LIGHT_WEAPONS] >= 3 ? 70 : 100;
 		pm->pmext->weapRecoilYaw = 0.f;//crandom() * .1f;
@@ -4498,13 +4486,6 @@ static void PM_Weapon( void ) {
 	pm->ps->weaponTime += addTime;
 
 	PM_SwitchIfEmpty();
-
-
-	////Feen: PGM - blegh....
-	//if(pm->pmext->portalAltFire == qtrue){
-	//	PM_AddEvent(EV_PORTAL2_FIRE);
-	//	pm->pmext->portalAltFire = qfalse;
-	//}
 
 
 

@@ -2818,6 +2818,18 @@ static void CG_PortalGate( centity_t *cent ){
 	float radius = 64.0f; // TODO: Use #define instead
 	int i;
 
+	//NOTE: just a test...
+	vec4_t temp_Color, temp_Color2;
+
+
+	//Predefined colors
+	byte clrBlue[4] = { 0x00, 0x01, 0xff, 0xff };
+	byte clrOrange[4] = { 0xff, 0x7e, 0x00, 0xff };
+	byte clrGreen[4] = { 0x0b, 0xd6, 0x43, 0xff };
+	byte clrRed[4] = { 0xf3, 0x32, 0x27, 0xff };
+	byte clrLBlue[4] = { 0x27, 0x82, 0xf4, 0xff }; //This is the red complement
+	
+
 
 	//Check if player wants to see other player portals
 	if (!cg_viewPlayerPortals.integer){
@@ -2836,7 +2848,7 @@ static void CG_PortalGate( centity_t *cent ){
 
 	//start- poly test stuff
 
-	/* make rotated polygon axis */
+	/* make rotated polygon axis */ //Feen: Don't need to. ent angles are perfect
 	//VectorCopy( projection, axis[ 0 ] );
 	
 		//PerpendicularVector( axis[ 1 ], axis[ 0 ] );
@@ -2885,7 +2897,108 @@ static void CG_PortalGate( centity_t *cent ){
 		POLYverts[3].st[1] = 1;
 
 
-		//TODO: Call color functions for custom client portal colors
+		
+		//Assign color portals based on ownership
+		if (cent->currentState.otherEntityNum == cg.clientNum) { //Our Portal
+		
+			if(cent->currentState.eType == ET_PORTAL_BLUE) {
+				
+				POLYverts[0].modulate[0] = clrBlue[0];	//R
+				POLYverts[0].modulate[1] = clrBlue[1]; //G
+				POLYverts[0].modulate[2] = clrBlue[2]; //B
+				POLYverts[0].modulate[3] = clrBlue[3]; //A
+
+				POLYverts[1].modulate[0] = clrBlue[0];	//R
+				POLYverts[1].modulate[1] = clrBlue[1]; //G
+				POLYverts[1].modulate[2] = clrBlue[2]; //B
+				POLYverts[1].modulate[3] = clrBlue[3]; //A
+
+				POLYverts[2].modulate[0] = clrBlue[0];	//R
+				POLYverts[2].modulate[1] = clrBlue[1]; //G
+				POLYverts[2].modulate[2] = clrBlue[2]; //B
+				POLYverts[2].modulate[3] = clrBlue[3]; //A
+
+				POLYverts[3].modulate[0] = clrBlue[0];	//R
+				POLYverts[3].modulate[1] = clrBlue[1]; //G
+				POLYverts[3].modulate[2] = clrBlue[2]; //B
+				POLYverts[3].modulate[3] = clrBlue[3]; //A
+
+			}else{
+
+				POLYverts[0].modulate[0] = clrRed[0];	//R
+				POLYverts[0].modulate[1] = clrRed[1]; //G
+				POLYverts[0].modulate[2] = clrRed[2]; //B
+				POLYverts[0].modulate[3] = clrRed[3]; //A
+
+				POLYverts[1].modulate[0] = clrRed[0];	//R
+				POLYverts[1].modulate[1] = clrRed[1]; //G
+				POLYverts[1].modulate[2] = clrRed[2]; //B
+				POLYverts[1].modulate[3] = clrRed[3]; //A
+
+				POLYverts[2].modulate[0] = clrRed[0];	//R
+				POLYverts[2].modulate[1] = clrRed[1]; //G
+				POLYverts[2].modulate[2] = clrRed[2]; //B
+				POLYverts[2].modulate[3] = clrRed[3]; //A
+
+				POLYverts[3].modulate[0] = clrRed[0];	//R
+				POLYverts[3].modulate[1] = clrRed[1]; //G
+				POLYverts[3].modulate[2] = clrRed[2]; //B
+				POLYverts[3].modulate[3] = clrRed[3]; //A
+
+			}
+
+
+		}else{ //Not our portal
+
+			if(cent->currentState.eType == ET_PORTAL_RED) {
+				
+				POLYverts[0].modulate[0] = clrOrange[0];	//R
+				POLYverts[0].modulate[1] = clrOrange[1]; //G
+				POLYverts[0].modulate[2] = clrOrange[2]; //B
+				POLYverts[0].modulate[3] = clrOrange[3]; //A
+
+				POLYverts[1].modulate[0] = clrOrange[0];	//R
+				POLYverts[1].modulate[1] = clrOrange[1]; //G
+				POLYverts[1].modulate[2] = clrOrange[2]; //B
+				POLYverts[1].modulate[3] = clrOrange[3]; //A
+
+				POLYverts[2].modulate[0] = clrOrange[0];	//R
+				POLYverts[2].modulate[1] = clrOrange[1]; //G
+				POLYverts[2].modulate[2] = clrOrange[2]; //B
+				POLYverts[2].modulate[3] = clrOrange[3]; //A
+
+				POLYverts[3].modulate[0] = clrOrange[0];	//R
+				POLYverts[3].modulate[1] = clrOrange[1]; //G
+				POLYverts[3].modulate[2] = clrOrange[2]; //B
+				POLYverts[3].modulate[3] = clrOrange[3]; //A
+
+			}else{
+
+				POLYverts[0].modulate[0] = clrLBlue[0];	//R
+				POLYverts[0].modulate[1] = clrLBlue[1]; //G
+				POLYverts[0].modulate[2] = clrLBlue[2]; //B
+				POLYverts[0].modulate[3] = clrLBlue[3]; //A
+
+				POLYverts[1].modulate[0] = clrLBlue[0];	//R
+				POLYverts[1].modulate[1] = clrLBlue[1]; //G
+				POLYverts[1].modulate[2] = clrLBlue[2]; //B
+				POLYverts[1].modulate[3] = clrLBlue[3]; //A
+
+				POLYverts[2].modulate[0] = clrLBlue[0];	//R
+				POLYverts[2].modulate[1] = clrLBlue[1]; //G
+				POLYverts[2].modulate[2] = clrLBlue[2]; //B
+				POLYverts[2].modulate[3] = clrLBlue[3]; //A
+
+				POLYverts[3].modulate[0] = clrLBlue[0];	//R
+				POLYverts[3].modulate[1] = clrLBlue[1]; //G
+				POLYverts[3].modulate[2] = clrLBlue[2]; //B
+				POLYverts[3].modulate[3] = clrLBlue[3]; //A
+
+			}
+
+
+		}
+
 
 		/*  - temporarily disabled
 		//Color
@@ -2913,6 +3026,8 @@ static void CG_PortalGate( centity_t *cent ){
 		POLYverts[3].modulate[2] = 0; //B
 		POLYverts[3].modulate[3] = 255; //A
 		*/
+
+
 
 
 

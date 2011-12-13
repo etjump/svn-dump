@@ -2319,6 +2319,8 @@ extern vmCvar_t			cg_numPopup;
 
 //Feen: PGM client cvars
 extern vmCvar_t			cg_viewPlayerPortals; //Enable/Disable viewing other player portals
+//TODO: May add cvars to allow players to override portal colors
+//		when cg_viewPlayerPortals is set to 0 (disabled)
 
 
 //

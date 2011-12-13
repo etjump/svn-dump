@@ -241,6 +241,10 @@ vmCvar_t		g_banner4;
 vmCvar_t		g_banner5;
 
 
+// Feen: PGM 
+vmCvar_t		g_portalDebug; //View Portal BBoxes
+vmCvar_t		g_portalMode;  //Defines portal mode.
+							   //0 = Freestyle, 1 = Standard,  2 = team (possible future)
 
 cvarTable_t		gameCvarTable[] = {
 	// don't override the cheat state set by the system
@@ -494,6 +498,10 @@ cvarTable_t		gameCvarTable[] = {
 	{ &g_banner3, "g_banner3", "", CVAR_ARCHIVE },
 	{ &g_banner4, "g_banner4", "", CVAR_ARCHIVE },
 	{ &g_banner5, "g_banner5", "", CVAR_ARCHIVE },
+
+	//Feen: PGM
+	{ &g_portalDebug, "g_portalDebug", "0", CVAR_ARCHIVE },
+	{ &g_portalMode, "g_portalMode", "0", CVAR_ARCHIVE }, //NOTE: Default 0 is only temporary! (freestyle mode)
 };
 
 // bk001129 - made static to avoid aliasing

@@ -1257,7 +1257,7 @@ animScriptItem_t *BG_FirstValidItem( int client, animScript_t *script )
 	animScriptItem_t **ppScriptItem;
 
 	int i;
-
+	
 	for (i=0, ppScriptItem = script->items; i<script->numItems; i++, ppScriptItem++)
 	{
 		if (BG_EvaluateConditions( client, *ppScriptItem ))
@@ -1518,7 +1518,6 @@ BG_AnimScriptEvent
   returns the duration in milliseconds that this model should be paused. -1 if no event found
 ================
 */
-//#define DBGANIMEVENTS //Feen: PGM TEst
 int	BG_AnimScriptEvent( playerState_t *ps, animModelInfo_t *animModelInfo, scriptAnimEventTypes_t event, qboolean isContinue, qboolean force )
 {
 	animScript_t		*script;

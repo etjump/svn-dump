@@ -1937,6 +1937,10 @@ extern vmCvar_t g_banner3;
 extern vmCvar_t g_banner4;
 extern vmCvar_t g_banner5;
 
+//Feen: PGM
+extern vmCvar_t g_portalDebug;
+extern vmCvar_t g_portalMode;
+
 void	trap_Printf( const char *fmt );
 void	trap_Error( const char *fmt );
 int		trap_Milliseconds( void );

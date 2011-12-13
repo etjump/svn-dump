@@ -546,6 +546,8 @@ int Bot_GetWeaponForClassAndTeam( int classNum, int teamNum, const char *weaponN
 		weapon = WP_SATCHEL;
 	else if ( !Q_stricmp(weaponName, "AMMOKIT") )
 		weapon = WP_AMMO;
+	else if ( !Q_stricmp(weaponName, "PORTAL_GUN") )
+		weapon = WP_PORTAL_GUN;
 
 	else if( !Q_stricmp( weaponName, "NONE" ) )
 		weapon = WP_NONE;

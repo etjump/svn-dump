@@ -28,6 +28,11 @@
 #define _attribute(x)
 #endif
 
+#ifndef _CRT_SECURE_NO_DEPRECATE
+#define _CRT_SECURE_NO_DEPRECATE //Feen: Tired of looking at all the compiler warnings.....
+#endif							 //NOTE: Used _DEPRECATE instead of _WARNINGS for backward
+								 //		 compatibility with compilers.
+
 //#define SAVEGAME_SUPPORT	// uncomment to enable savegames
 							// enabling this requires you to run extractfuncs.bat as well before compiling qagame
 
@@ -515,8 +520,6 @@ typedef struct {
 	
 	qboolean	releasedFire;
 
-	//Feen: PGM
-	//qboolean	portalAltFire;
 
 } pmoveExt_t;	// data used both in client and server - store it here
 				// instead of playerstate to prevent different engine versions of playerstate between XP and MP
@@ -1581,6 +1584,8 @@ qboolean	BG_CanItemBeGrabbed( const entityState_t *ent, const playerState_t *ps,
 #define	MASK_OPAQUE				(CONTENTS_SOLID|CONTENTS_LAVA)		//----(SA)	modified since slime is no longer deadly
 #define	MASK_SHOT				(CONTENTS_SOLID|CONTENTS_BODY|CONTENTS_CORPSE)
 #define	MASK_MISSILESHOT		(MASK_SHOT | CONTENTS_MISSILECLIP)
+//Feen: PGM
+#define MASK_PORTAL				(CONTENTS_SOLID|CONTENTS_NOPORTAL) //Feen: Trace hits solid objects or emancipation grids
 
 //
 // entityState_t->eType
@@ -2430,5 +2435,8 @@ int PM_AltSwitchToForWeapon ( int weapon );
 void PM_TraceLegs( trace_t *trace, float *legsOffset, vec3_t start, vec3_t end, trace_t *bodytrace, vec3_t viewangles, void (tracefunc)( trace_t *results, const vec3_t start, const vec3_t mins, const vec3_t maxs, const vec3_t end, int passEntityNum, int contentMask ), int ignoreent, int tracemask );
 void PM_TraceAllLegs( trace_t *trace, float *legsOffset, vec3_t start, vec3_t end );
 void PM_TraceAll( trace_t *trace, vec3_t start, vec3_t end );
+
+//Feen: Color Methods
+void BG_ColorComplement(const vec4_t in_RGB, vec4_t *out_RGB);
 
 #endif

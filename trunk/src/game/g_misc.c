@@ -196,7 +196,15 @@ void PortalTeleport( gentity_t *player, vec3_t origin, vec3_t angles ) {
 
 	}else{
 
-		SetClientViewAngle( player, angles );
+		//SetClientViewAngle( player, angles ); //Not going to modify PITCH of the viewangles at all anymore...
+		
+		vec3_t t_viewAngles;
+
+		t_viewAngles[PITCH] = player->client->ps.viewangles[PITCH];
+		t_viewAngles[YAW] = angles[YAW];
+		t_viewAngles[ROLL] = angles[ROLL];
+		
+		SetClientViewAngle( player, t_viewAngles );
 
 	}
 

@@ -2550,7 +2550,8 @@ void CG_AddPlayerWeapon( refEntity_t *parent, playerState_t *ps, centity_t *cent
 		weaponNum == WP_TRIPMINE ||
 		weaponNum == WP_SMOKE_BOMB ||
 		weaponNum == WP_MEDIC_SYRINGE ||
-		weaponNum == WP_MEDIC_ADRENALINE
+		weaponNum == WP_MEDIC_ADRENALINE ||
+		weaponNum == WP_PORTAL_GUN //Feen: PGM May need to remove this later for effect.... (Remove || from line above as well!)
 		)
 	{
 		return;
@@ -2847,7 +2848,7 @@ CG_WeaponHasAmmo
 static qboolean CG_WeaponHasAmmo( int i )
 {
 	// ydnar: certain weapons don't have ammo
-	if( i == WP_KNIFE || i == WP_PLIERS )
+	if( i == WP_KNIFE || i == WP_PLIERS || i == WP_PORTAL_GUN) //Feen: PGM - Portal gun = no ammo
 		return qtrue;
 	
 	if (!(cg.predictedPlayerState.ammo[BG_FindAmmoForWeapon(i)]) &&
@@ -3348,16 +3349,6 @@ void CG_AltWeapon_f(void)
 		trap_SendConsoleCommand("followprev\n");
 		return;
 	}
-
-	////Feen: PGM
-	//if (cg.weaponSelect == WP_PORTAL_GUN) {
-
-	//	CG_Printf("^1Portal Debug: ^7CG_AltWeapon_f() - Event Added (EV_PORTAL2_FIRE)\n");
-	//	//BG_AddPredictableEventToPlayerstate( EV_PORTAL2_FIRE, 0 , &cg.predictedPlayerState);
-	//	BG_AddPredictableEventToPlayerstate( EV_FIRE_WEAPON, 0 , &cg.predictedPlayerState);
-	//	//return maybe?
-	//	return;
-	//}
 
 
 	// Need ground for this
