@@ -256,6 +256,11 @@ void weapon_portalgun_touch(gentity_t* self, gentity_t* other, trace_t* trace) {
 
 }
 
+//Just to fix a bug...
+void weapon_portal_think(void) {
+	return;
+}
+
 void SP_weapon_portalgun (gentity_t* ent){
 
 	//TODO: spawn portalgun ent
@@ -282,7 +287,7 @@ void SP_weapon_portalgun (gentity_t* ent){
 
 	ent->touch = weapon_portalgun_touch;
 
-	ent->think = NULL;
+	ent->think = weapon_portal_think;
 	ent->nextthink = level.time + 100;
 	
 	G_SetOrigin (ent, ent->s.origin); 
