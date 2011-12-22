@@ -2239,6 +2239,12 @@ void CalculateRanks( void ) {
 			level.sortedClients[level.numConnectedClients] = i;
 			level.numConnectedClients++;
 
+			if ( team == TEAM_SPECTATOR ) {
+				if( level.clients[i].ps.eFlags & EF_VOTED ) {
+					level.voteInfo.numVotingClients++;
+				}
+			}
+
 			if ( team != TEAM_SPECTATOR ) {
 				level.numNonSpectatorClients++;
 			
