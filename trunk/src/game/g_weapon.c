@@ -3415,7 +3415,7 @@ void Weapon_Portal_Fire( gentity_t *ent, int PortalNumber ) {
 
 
 	//Go ahead and calc new endpos just in case....
-	VectorMA(tr.endpos, 32, tr.plane.normal, t_endpos);
+	VectorMA(tr.endpos, 5, tr.plane.normal, t_endpos); //Changed from 32..
 
 
 	//check that portals aren't overlapping..
@@ -3488,6 +3488,12 @@ void Weapon_Portal_Fire( gentity_t *ent, int PortalNumber ) {
 
 
 	
+	//Set origin (obviously)
+	G_SetOrigin(portal, t_endpos); 
+
+	VectorCopy(t_endpos, portal->s.origin);
+	VectorCopy(t_endpos, portal->r.currentOrigin);
+
 	
 	//Bounding box
 
@@ -3499,10 +3505,11 @@ void Weapon_Portal_Fire( gentity_t *ent, int PortalNumber ) {
 	if ((t_portalAngles[PITCH] >= -135 && t_portalAngles[PITCH] <= -45) || (t_portalAngles[PITCH] >= -315 && t_portalAngles[PITCH] <= -225)) { //Horizontal portal (floor/ceiling)
 
 		P_DEPTH = P_WIDTH = 30.0f;
-		P_HEIGHT = 5.0f;
+		P_HEIGHT = 15.0f;
 
 		VectorSet(portal->r.mins, -P_DEPTH, -P_WIDTH, -P_HEIGHT ); //(P_DEPTH, P_WIDTH, P_HEIGHT)
 		VectorSet(portal->r.maxs, P_DEPTH, P_WIDTH, P_HEIGHT );
+
 
 
 	}else if(t_portalAngles[PITCH] == -0){ //Vertical Portals (On walls)
@@ -3538,7 +3545,8 @@ void Weapon_Portal_Fire( gentity_t *ent, int PortalNumber ) {
 
 
 	portal->r.contents = CONTENTS_TRIGGER | CONTENTS_ITEM;
-	portal->clipmask = CONTENTS_SOLID | CONTENTS_MISSILECLIP;
+	portal->clipmask = CONTENTS_SOLID | CONTENTS_MISSILECLIP; //NOTE: _TELE just a test...
+	portal->surfaceFlags = SURF_PORTALGATE; // Let's try this for detection in Pmove....
 	portal->touch = Portal_Touch;
 
 	portal->think = Portal_Think;
@@ -3553,11 +3561,13 @@ void Weapon_Portal_Fire( gentity_t *ent, int PortalNumber ) {
 	portal->s.otherEntityNum = ent->s.clientNum; //HACK: Using this for render checks.....
 
 
+	//NOTE: Moved up
+	/*
 	//Set origin (obviously)
 	G_SetOrigin(portal, t_endpos); 
 
 	VectorCopy(t_endpos, portal->s.origin);
-
+	*/
 
 	//Set angle of entity based on normal of plane....
 	vectoangles(tr.plane.normal, portal->s.angles); //NOTE: RE-Enable angles...
@@ -3646,7 +3656,7 @@ void Portal_Touch(gentity_t *self, gentity_t *other, trace_t *trace){
 	}
 
 	//set next time we can teleport... portal cooldown essentially...
-	other->lastPortalTime = level.time + 500; // .5 second cooldown - maybe too much //NOTE - Replace with constant
+	other->lastPortalTime = level.time + 100; // .5 second cooldown - maybe too much //NOTE - Replace with constant
 
 
 	//TeleportPlayer( other, dest->s.origin, dest->s.angles );

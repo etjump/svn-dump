@@ -677,6 +677,11 @@ void ClientEvents( gentity_t *ent, int oldEventSequence ) {
 	int			damage;
 	vec3_t		dir;
 
+	//Feen: PGM - CrashLand Fix
+	int			crashEvent = 0;
+	qboolean	portalEvent = qfalse;
+
+
 	client = ent->client;
 
 	if ( oldEventSequence < client->ps.eventSequence - MAX_EVENTS ) {
@@ -686,6 +691,20 @@ void ClientEvents( gentity_t *ent, int oldEventSequence ) {
 		event = client->ps.events[ i & (MAX_EVENTS-1) ];
 
 		switch ( event ) {
+
+		case EV_PORTAL_TELEPORT: //Feen: PGM - CrashLand fix
+
+			//TODO: Add visuals for portaling..
+			//Com_Printf("PGM: EV_PORTAL_TELEPORT detected\n");
+
+			if (crashEvent > 0)
+				crashEvent = 0;
+
+			portalEvent = qtrue;
+
+			break;
+
+
 		case EV_FALL_NDIE:
 		//case EV_FALL_SHORT:
 		case EV_FALL_DMG_10:
@@ -695,9 +714,14 @@ void ClientEvents( gentity_t *ent, int oldEventSequence ) {
 		case EV_FALL_DMG_50:
 		//case EV_FALL_DMG_75:
 		
+			crashEvent = event; //Feen: Store for processing after event loop
+			
 			// rain - VectorClear() used to be done here whenever falling
 			// damage occured, but I moved it to bg_pmove where it belongs.
 			
+			//Feen: Moved outside of event loop - CrashLand Fix
+			/*
+
 			if ( ent->s.eType != ET_PLAYER ) {
 				break;		// not in the player model
 			}
@@ -734,6 +758,10 @@ void ClientEvents( gentity_t *ent, int oldEventSequence ) {
 			VectorSet (dir, 0, 0, 1);
 			ent->pain_debounce_time = level.time + 200;	// no normal pain sound
 			G_Damage (ent, NULL, NULL, NULL, NULL, damage, 0, MOD_FALLING);
+			break;
+
+			*/
+
 			break;
 
 		case EV_FIRE_WEAPON_MG42:
@@ -779,15 +807,73 @@ void ClientEvents( gentity_t *ent, int oldEventSequence ) {
 
 		//Feen: PGM - 
 		case EV_PORTAL2_FIRE:
-			//CP("print \"Portal Debug: EV_PORTAL2_FIRE event received on server..\n\""); //PGM DEBUG
 			Weapon_Portal_Fire(ent, 2); //Red Portal
 			break;
 
 		default:
-			//CP(va("print \"Portal Debug: UNKNOWN EVENT - %d\n\"",event)); //PGM DEBUG
 			break;
+		} //switch case
+	} //event loop
+
+	//Feen: CrashLand fix
+
+	if (crashEvent > 0) {
+
+			
+		if ( ent->s.eType != ET_PLAYER ) {
+			return;		// not in the player model
 		}
-	}
+
+
+		if (!portalEvent) {
+		
+			// rain - VectorClear() used to be done here whenever falling
+			// damage occured, but I moved it to bg_pmove where it belongs.
+
+			//un-fixed rain's fix...
+			VectorClear(ent->client->ps.velocity);
+			
+			
+			if ( crashEvent == EV_FALL_NDIE ) 
+			{
+				damage = 9999;
+			}
+			else if (crashEvent == EV_FALL_DMG_50)
+			{
+				damage = 50;
+				ent->client->ps.pm_time = 1000;
+				ent->client->ps.pm_flags |= PMF_TIME_KNOCKBACK;
+			}
+			else if (crashEvent == EV_FALL_DMG_25)
+			{
+				damage = 25;
+				ent->client->ps.pm_time = 250;
+				ent->client->ps.pm_flags |= PMF_TIME_KNOCKBACK;
+			}
+			else if (crashEvent == EV_FALL_DMG_15)
+			{
+				damage = 15;
+				ent->client->ps.pm_time = 1000;
+				ent->client->ps.pm_flags |= PMF_TIME_KNOCKBACK;
+			}
+			else if (crashEvent == EV_FALL_DMG_10)
+			{
+				damage = 10;
+				ent->client->ps.pm_time = 1000;
+				ent->client->ps.pm_flags |= PMF_TIME_KNOCKBACK;
+			}
+			else
+				damage = 5; // never used
+			VectorSet (dir, 0, 0, 1);
+			ent->pain_debounce_time = level.time + 200;	// no normal pain sound
+			G_Damage (ent, NULL, NULL, NULL, NULL, damage, 0, MOD_FALLING);
+
+
+		}
+		
+	}//Feen: End CrashLand Fix
+
+	
 
 }
 
@@ -1221,9 +1307,9 @@ void ClientThink_real( gentity_t *ent ) {
 	ent->watertype = pm.watertype;
 
 	// execute client events
-	if(level.match_pause == PAUSE_NONE) {
+	/*if(level.match_pause == PAUSE_NONE) {
 		ClientEvents( ent, oldEventSequence );
-	}
+	}*/
 
 	// link entity now, after any personal teleporters have been used
 	trap_LinkEntity (ent);
@@ -1231,11 +1317,19 @@ void ClientThink_real( gentity_t *ent ) {
 		G_TouchTriggers( ent );
 	}
 
+
+		// execute client events
+	if(level.match_pause == PAUSE_NONE) {
+		ClientEvents( ent, oldEventSequence );
+	} //FEEN: TEST
+
+
 	// NOTE: now copy the exact origin over otherwise clients can be snapped into solid
 	VectorCopy( ent->client->ps.origin, ent->r.currentOrigin );
 
 	// touch other objects
 	ClientImpacts( ent, &pm );
+
 
 	// save results of triggers and client events
 	if (ent->client->ps.eventSequence != oldEventSequence) {

@@ -2857,8 +2857,8 @@ static void CG_PortalGate( centity_t *cent ){
 	
 	/* push the origin out a bit */
 	//VectorMA( cent->currentState.origin, -1.0f, axis[ 0 ], pushedOrigin );
-	VectorMA( cent->currentState.origin, (-32.0f + 1), axis[ 0 ], pushedOrigin ); //Feen: Note 32 is the offset of the ent from the trace.endpos, so let's undo that for the gfx //TODO: Use #define instead
-	
+	VectorMA( cent->currentState.origin, (-5.0f + 1.0f) /*(-12.0f + 1)*/, axis[ 0 ], pushedOrigin ); //Feen: Note 32 is the offset of the ent from the trace.endpos, so let's undo that for the gfx //TODO: Use #define instead
+																				  //NOTE: Changed back to 15
 	/* create the full polygon */
 	for( i = 0; i < 3; i++ )
 	{

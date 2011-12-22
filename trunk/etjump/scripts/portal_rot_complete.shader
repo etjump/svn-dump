@@ -2,7 +2,8 @@ gfx/misc/portal_blueShader
 {
 	surfaceparm nolightmap
 	surfaceparm trans
-	surfaceparm nonsolid
+	//surfaceparm nonsolid
+	surfaceparm nodamage
 	surfaceparm nomarks
 	nomipmaps
 	{
@@ -31,7 +32,8 @@ gfx/misc/portal_redShader
 {
 	surfaceparm nolightmap
 	surfaceparm trans
-	surfaceparm nonsolid
+	//surfaceparm nonsolid
+	surfaceparm nodamage
 	surfaceparm nomarks
 	nomipmaps
 	{

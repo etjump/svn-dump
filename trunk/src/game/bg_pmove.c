@@ -1203,6 +1203,94 @@ static void PM_FlyMove( void ) {
 	PM_StepSlideMove( qfalse );
 }
 
+//Feen: PGM PM_CheckPortal
+//		Checks for whether or not the player is touching
+//		or will be touching a portal in the near future
+//		this is an extra trace implemented to take care
+//		of the damned PM_CrashLand issues we're having....
+
+void PM_CheckPortal (void) {
+	vec3_t	spot;
+	vec3_t	straightdown;
+	trace_t	trace;
+	vec3_t	newOrigin; //Let's do a broader trace..
+
+	#define	TRACE_PORTAL_DIST	64.0
+
+	
+	if (pm->ps->pm_time)
+		return;
+
+	if (pm->ps->pm_flags & PM_DEAD)
+		return;
+
+
+	straightdown[0] = 0;
+	straightdown[1] = 0;
+	straightdown[2] = pml.forward[2]; 
+	VectorNormalize (straightdown);
+	
+	VectorMA(pm->ps->origin, 32.0f, straightdown, newOrigin); //About at the head...
+	VectorClear(straightdown); //May not need this..
+
+	// check for portal below us
+	straightdown[0] = 0;
+	straightdown[1] = 0;
+	straightdown[2] = -pml.forward[2];
+	VectorNormalize (straightdown);
+	
+	VectorMA (pm->ps->origin, TRACE_PORTAL_DIST, straightdown, spot);
+	pm->trace (&trace, newOrigin /*pm->ps->origin*/, pm->ps->mins, pm->ps->maxs, spot, pm->ps->clientNum, (CONTENTS_TRIGGER | CONTENTS_ITEM | CONTENTS_TELEPORTER | CONTENTS_SOLID));
+	//trap_Trace( &trace, pm->ps->origin, pm->mins, pm->maxs, spot, pm->ps->clientNum, CONTENTS_TRIGGER );
+	
+
+	if (trace.fraction < 1){
+
+#if GAMEDLL
+		Com_Printf("PGM: Well, we hit something...\n");	//Debug..
+		
+
+#if 1
+
+		Com_Printf("PGM: _CheckPortal trace results.....\n CONTENTS:  ");
+
+		if (trace.contents & CONTENTS_SOLID)
+			Com_Printf("_SOLID ->");
+
+		if (trace.contents & CONTENTS_TRIGGER)
+			Com_Printf("  _TRIGGER ->");
+
+		if (trace.contents & CONTENTS_ITEM)
+			Com_Printf("  _ITEM ->");
+
+		if (trace.contents & CONTENTS_TELEPORTER)
+			Com_Printf("  _TELEPORTER");
+
+
+		Com_Printf("\nPGM: END _CheckPortal trace results.....\n");
+
+#endif
+
+
+
+		if (trace.surfaceFlags & SURF_PORTALGATE) {
+			Com_Printf("PGM: Well, we detected a portal...\n");	//Debug..
+			pml.previous_teleport = qtrue;
+			PM_AddEvent(EV_PORTAL_TELEPORT);
+		}else{
+			Com_Printf("PGM: Iunno what we found....\n");
+		}
+
+#endif //GAMEDLL
+
+	}
+}
+
+//Feen: PGM End PM_CheckPortal
+
+
+
+
 
 /*
 ===================
@@ -1275,6 +1363,7 @@ static void PM_AirMove( void ) {
 #endif
 
 	PM_StepSlideMove ( qtrue );
+
 
 // Ridah, moved this down, so we use the actual movement direction
 	// set the movementDir so clients can rotate the legs for strafing
@@ -1626,11 +1715,21 @@ static void PM_CrashLand( void ) {
 		return;
 	}
 
+	//Feen: PGM Test
+	if (pml.previous_teleport == qtrue) { //If we teleported on the last frame just leave... (damn crunch sound..)
+		Com_Printf("PGM: Crash land aborted. pml.previous_teleport\n");
+		return;
+	}
+	//NOTE: We're just gonna have to do a trace i guess. This ^ eliminated the problem
+	//		half of the time, but it's still not quite good enough...
+
+	//End PGM Test
+
 	// create a local entity event to play the sound
 
 	// SURF_NODAMAGE is used for bounce pads where you don't ever
 	// want to take damage or play a crunch sound
-	if ( !(pml.groundTrace.surfaceFlags & SURF_NODAMAGE) )  
+	if ( !(pml.groundTrace.surfaceFlags & SURF_NODAMAGE ))  
 	{
 		if ( pm->debugLevel )
 			Com_Printf ("delta: %5.2f\n", delta);
@@ -1690,8 +1789,10 @@ static void PM_CrashLand( void ) {
 			PM_AddEventExt( EV_FALL_SHORT, PM_FootstepForSurface() );
 		} 
 
-		if (delta > 38.75)
-		VectorClear(pm->ps->velocity);
+		//Feen: Below is handled in g_active.c again.. CrashLand Fix
+		//if (delta > 38.75)
+		//VectorClear(pm->ps->velocity); 
+
 	}
 	else {
 			PM_AddEventExt( EV_FOOTSTEP, PM_FootstepForSurface() );
@@ -1790,6 +1891,10 @@ static void PM_GroundTraceMissed( void ) {
 	} // if (pm->ps->groundEntityNum != -1)...
 	pml.groundPlane = qfalse;
 	pml.walking = qfalse;
+
+	//Feen: PGM Test
+	//PM_CheckPortal();
+
 }
 
 
@@ -1879,6 +1984,9 @@ static void PM_GroundTrace( void ) {
 			Com_Printf("%i:Land\n", c_pmove);
 		}
 		
+		//Feen:
+		PM_CheckPortal();
+
 		PM_CrashLand();
 
 		// don't do landing time if we were just going down a slope
@@ -5305,7 +5413,7 @@ void PmoveSingle (pmove_t *pmove) {
 	pm->numtouch = 0;
 	pm->watertype = 0;
 	pm->waterlevel = 0;
-
+	
 	if ( pm->ps->stats[STAT_HEALTH] <= 0 ) {
 		pm->tracemask &= ~CONTENTS_BODY;	// corpses can fly through bodies
 		pm->ps->eFlags &= ~EF_ZOOMING;
@@ -5441,7 +5549,13 @@ void PmoveSingle (pmove_t *pmove) {
 	// save old velocity for crashlanding
 	VectorCopy (pm->ps->velocity, pml.previous_velocity);
 
+
 	pml.frametime = pml.msec * 0.001;
+
+	//Feen: save last teleportation state for crashlanding...
+	//if (pm->ps->eFlags & EF_TELEPORT_BIT)
+	//	pml.previous_teleport = qtrue;
+
 
 	// update the viewangles
 	if( pm->ps->pm_type != PM_FREEZE )	// Arnout: added PM_FREEZE

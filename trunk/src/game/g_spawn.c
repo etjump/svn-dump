@@ -441,6 +441,9 @@ void SP_target_fireonce (gentity_t *self);
 void SP_func_fakebrush (gentity_t *ent);
 void SP_target_savereset (gentity_t *self);
 
+//Feen: PGM
+void SP_weapon_portalgun (gentity_t *self);
+
 spawn_t	spawns[] = {
 	// info entities don't do anything at all, but provide positional
 	// information for things controlled by other processes
@@ -669,9 +672,11 @@ spawn_t	spawns[] = {
 	{"target_setident",		SP_target_set_ident },
 	{"target_activate",		SP_target_activate },
 	{"target_printname",	SP_target_printname },
-	{"etjump_target_relay",	SP_target_fireonce },
+	/*{"etjump_target_relay",	SP_target_fireonce },*/  //Changed for RC1 - Feen
+	{"etjump2_target_relay",	SP_target_fireonce },
 	{"func_fakebrush",		SP_func_fakebrush },
 	{"target_savereset",	SP_target_savereset },
+	{"weapon_portalgun",	SP_weapon_portalgun }, //Feen: PGM
 
 	{0, 0}
 };

@@ -36,6 +36,11 @@ typedef struct {
 
 	// Ridah, ladders
 	qboolean	ladder;
+
+	//Feen: previous teleport (for crunch sound)
+	qboolean	previous_teleport;
+	int			previous_teleport_time;
+
 } pml_t;
 
 extern	pmove_t		*pm;

@@ -1673,6 +1673,11 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 	static int		footstepcnt = 0;
 	static int		splashfootstepcnt = 0;
 
+	//Feen: PGM
+	qboolean		portalDetected = qfalse;
+	int				crashEvent = 0;
+	int				crashEventParm = 0;
+
 	es = &cent->currentState;
 	event = es->event & ~EV_EVENT_BITS;
 
@@ -1738,6 +1743,13 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 
 	case EV_FALL_DMG_10:
 		DEBUGNAME("EV_FALL_DMG_10");
+		
+		//Feen: CrashLand portal fix test...
+		if (cg.thisFrameTeleport || cg.nextFrameTeleport) {
+			//Com_Printf("PGM Debug: EV_FALL_10 aborted....\n");
+			}else{
+		
+
 		if( es->eventParm != FOOTSTEP_TOTAL ) {
 			if( es->eventParm ) {
 				trap_S_StartSound( NULL, es->number, CHAN_AUTO, cgs.media.landSound[ es->eventParm ] );
@@ -1752,9 +1764,19 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 			cg.landChange = -16;
 			cg.landTime = cg.time;
 		}
+
+
+		}
+
 		break;
 	case EV_FALL_DMG_15:
 		DEBUGNAME("EV_FALL_DMG_15");
+		
+		//Feen: CrashLand portal fix test...
+		if (cg.thisFrameTeleport || cg.nextFrameTeleport) {
+			//Com_Printf("PGM Debug: EV_FALL_15 aborted....\n");
+			}else{
+		
 		if( es->eventParm != FOOTSTEP_TOTAL ) {
 			if( es->eventParm ) {
 				trap_S_StartSound( NULL, es->number, CHAN_AUTO, cgs.media.landSound[ es->eventParm ] );
@@ -1769,9 +1791,19 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 			cg.landChange = -16;
 			cg.landTime = cg.time;
 		}
+
+		
+		}
+
 		break;
 	case EV_FALL_DMG_25:
 		DEBUGNAME("EV_FALL_DMG_25");
+
+		//Feen: CrashLand portal fix test...
+		if (cg.thisFrameTeleport || cg.nextFrameTeleport) {
+			//Com_Printf("PGM Debug: EV_FALL_25 aborted....\n");
+			}else{
+
 		if( es->eventParm != FOOTSTEP_TOTAL ) {
 			if( es->eventParm ) {
 				trap_S_StartSound( NULL, es->number, CHAN_AUTO, cgs.media.landSound[ es->eventParm ] );
@@ -1786,9 +1818,19 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 			cg.landChange = -24;
 			cg.landTime = cg.time;
 		}
+
+		
+		}
+
 		break;
 	case EV_FALL_DMG_50:
 		DEBUGNAME("EV_FALL_DMG_50");
+
+		//Feen: CrashLand portal fix test...
+		if (cg.thisFrameTeleport || cg.nextFrameTeleport) {
+			//Com_Printf("PGM Debug: EV_FALL_50 aborted....\n");
+			}else{
+
 		if( es->eventParm != FOOTSTEP_TOTAL ) {
 			if( es->eventParm ) {
 				trap_S_StartSound( NULL, es->number, CHAN_AUTO, cgs.media.landSound[ es->eventParm ] );
@@ -1803,9 +1845,22 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 			cg.landChange = -24;
 			cg.landTime = cg.time;
 		}
+
+		
+		}
+
+		//end feen test//
+
 		break;
 	case EV_FALL_NDIE:
 		DEBUGNAME("EV_FALL_NDIE");
+
+		//Feen: CrashLand portal fix test...
+		if (cg.thisFrameTeleport || cg.nextFrameTeleport) {
+			//Com_Printf("PGM Debug: EV_FALL_NDIE aborted....\n");
+			}else{
+			
+
 		if( es->eventParm != FOOTSTEP_TOTAL ) {
 			if( es->eventParm ) {
 				trap_S_StartSound( NULL, es->number, CHAN_AUTO, cgs.media.landSound[ es->eventParm ] );
@@ -1816,6 +1871,11 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 		trap_S_StartSound (NULL, es->number, CHAN_AUTO, cgs.media.landHurt );
 		cent->pe.painTime = cg.time;	// don't play a pain sound right after this
 		// splat
+		
+		}
+
+		//end feen test//
+
 		break;
 	
 	case EV_EXERT1:
@@ -2771,12 +2831,123 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 		//CG_Printf( "^1Portal Debug: ^7CG_EntityEvent() EV_PORTAL2_FIRE - received\n");
 		break;
 
+	case EV_PORTAL_TELEPORT:
+		DEBUGNAME("EV_PORTAL_TELEPORT");
+		portalDetected = qtrue; //Used below.....
+		break;
+
 	default:
 		DEBUGNAME("UNKNOWN");
 		break;
 	}
 
 	
+	//Feen: CrashLand Fix - DISABLED
+	/*if (!portalDetected && (crashEvent > 0)) {
+
+		switch (crashEvent){
+
+			case EV_FALL_DMG_10:
+		DEBUGNAME("EV_FALL_DMG_10");
+
+		if( es->eventParm != FOOTSTEP_TOTAL ) {
+			if( es->eventParm ) {
+				trap_S_StartSound( NULL, es->number, CHAN_AUTO, cgs.media.landSound[ es->eventParm ] );
+			} else {
+				trap_S_StartSound( NULL, es->number, CHAN_AUTO, cgs.media.landSound[ character->animModelInfo->footsteps ] );
+			}
+		}
+		trap_S_StartSound (NULL, es->number, CHAN_AUTO, cgs.media.landHurt );
+		cent->pe.painTime = cg.time;	// don't play a pain sound right after this
+		if ( clientNum == cg.predictedPlayerState.clientNum ) {
+			// smooth landing z changes
+			cg.landChange = -16;
+			cg.landTime = cg.time;
+		}
+
+
+		break;
+	case EV_FALL_DMG_15:
+		DEBUGNAME("EV_FALL_DMG_15");
+		
+		if( es->eventParm != FOOTSTEP_TOTAL ) {
+			if( es->eventParm ) {
+				trap_S_StartSound( NULL, es->number, CHAN_AUTO, cgs.media.landSound[ es->eventParm ] );
+			} else {
+				trap_S_StartSound( NULL, es->number, CHAN_AUTO, cgs.media.landSound[ character->animModelInfo->footsteps ] );
+			}
+		}
+		trap_S_StartSound (NULL, es->number, CHAN_AUTO, cgs.media.landHurt );
+		cent->pe.painTime = cg.time;	// don't play a pain sound right after this
+		if ( clientNum == cg.predictedPlayerState.clientNum ) {
+			// smooth landing z changes
+			cg.landChange = -16;
+			cg.landTime = cg.time;
+		}
+
+
+		break;
+	case EV_FALL_DMG_25:
+		DEBUGNAME("EV_FALL_DMG_25");
+
+		if( es->eventParm != FOOTSTEP_TOTAL ) {
+			if( es->eventParm ) {
+				trap_S_StartSound( NULL, es->number, CHAN_AUTO, cgs.media.landSound[ es->eventParm ] );
+			} else {
+				trap_S_StartSound( NULL, es->number, CHAN_AUTO, cgs.media.landSound[ character->animModelInfo->footsteps ] );
+			}
+		}
+		trap_S_StartSound (NULL, es->number, CHAN_AUTO, cgs.media.landHurt );
+		cent->pe.painTime = cg.time;	// don't play a pain sound right after this
+		if ( clientNum == cg.predictedPlayerState.clientNum ) {
+			// smooth landing z changes
+			cg.landChange = -24;
+			cg.landTime = cg.time;
+		}
+
+
+		break;
+	case EV_FALL_DMG_50:
+		DEBUGNAME("EV_FALL_DMG_50");
+		if( es->eventParm != FOOTSTEP_TOTAL ) {
+			if( es->eventParm ) {
+				trap_S_StartSound( NULL, es->number, CHAN_AUTO, cgs.media.landSound[ es->eventParm ] );
+			} else {
+				trap_S_StartSound( NULL, es->number, CHAN_AUTO, cgs.media.landSound[ character->animModelInfo->footsteps ] );
+			}
+		}
+		trap_S_StartSound (NULL, es->number, CHAN_AUTO, cgs.media.landHurt );
+		cent->pe.painTime = cg.time;	// don't play a pain sound right after this
+		if ( clientNum == cg.predictedPlayerState.clientNum ) {
+			// smooth landing z changes
+			cg.landChange = -24;
+			cg.landTime = cg.time;
+		
+		}
+
+		//end feen test//
+
+		break;
+	case EV_FALL_NDIE:
+		DEBUGNAME("EV_FALL_NDIE");
+
+		if( es->eventParm != FOOTSTEP_TOTAL ) {
+			if( es->eventParm ) {
+				trap_S_StartSound( NULL, es->number, CHAN_AUTO, cgs.media.landSound[ es->eventParm ] );
+			} else {
+				trap_S_StartSound( NULL, es->number, CHAN_AUTO, cgs.media.landSound[ character->animModelInfo->footsteps ] );
+			}
+		}
+		trap_S_StartSound (NULL, es->number, CHAN_AUTO, cgs.media.landHurt );
+		cent->pe.painTime = cg.time;	// don't play a pain sound right after this
+		// splat
+
+		}
+
+	}*/
+	//end CrashLand Fix
+
+
 	{
 		int	rval;
 

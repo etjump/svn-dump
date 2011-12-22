@@ -148,7 +148,10 @@ void PortalTeleport( gentity_t *player, vec3_t origin, vec3_t angles ) {
 
 	velocityLength = VectorLength(player->client->ps.velocity); //Speed...
 
-	VectorCopy ( origin, player->client->ps.origin );
+	//VectorCopy ( origin, player->client->ps.origin ); //Changed to...
+	//VectorMA(origin, 32.0f, angles, player->client->ps.origin); moved down....
+
+
 	//player->client->ps.origin[2] += 1;
 
 	
@@ -156,6 +159,9 @@ void PortalTeleport( gentity_t *player, vec3_t origin, vec3_t angles ) {
 	// spit the player out
 	AngleVectors( angles, player->client->ps.velocity, NULL, NULL );
 	
+	//new origin method
+	VectorMA(origin, 32.0f, player->client->ps.velocity, player->client->ps.origin);
+
 	//Scale new vector back to old velocity
 	VectorScale(player->client->ps.velocity, velocityLength + PORTAL_NUDGE, player->client->ps.velocity);
 
@@ -209,6 +215,10 @@ void PortalTeleport( gentity_t *player, vec3_t origin, vec3_t angles ) {
 	}
 
 
+	//Feen: Added new event to prevent crashland
+	G_AddEvent(player, EV_PORTAL_TELEPORT, 0);
+	//Com_Printf("PGM: PortalTeleport occured..\n"); //Debug
+
 
 	// save results of pmove
 	BG_PlayerStateToEntityState( &player->client->ps, &player->s, qtrue );
@@ -221,6 +231,20 @@ void PortalTeleport( gentity_t *player, vec3_t origin, vec3_t angles ) {
 	}
 }
 
+
+void SP_weapon_portalgun (gentity_t* ent){
+
+
+}
+
+
+
+
+/*
+
+END PGM STUFF...
+
+*/
 
 /*QUAKED misc_teleporter_dest (1 0 0) (-32 -32 -24) (32 32 -16)
 Point teleporters at these.

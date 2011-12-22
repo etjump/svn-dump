@@ -22,7 +22,7 @@
 #define	CONTENTS_AREAPORTAL			0x00008000
 #define	CONTENTS_PLAYERCLIP			0x00010000
 #define	CONTENTS_MONSTERCLIP		0x00020000
-#define	CONTENTS_TELEPORTER			0x00040000
+#define	CONTENTS_TELEPORTER			0x00040000  //NOT USED EITHER....
 #define	CONTENTS_NOPORTAL			0x00080000  // Feen: PGM - Contents formerly known as CONTENTS_JUMPPAD - Used for 'emancipation grid'
 #define CONTENTS_NOSAVE				0x00100000	// CONTENTS_NOSAVE
 #define CONTENTS_NOSAVERESET		0x00200000	
@@ -64,10 +64,19 @@
 #define	SURF_RUBBLE				0x01000000
 #define	SURF_CARPET				0x02000000
 #define SURF_MONSTERSLICK		0x04000000	// slick surf that only affects ai's
+/*
 #define SURF_MONSLICK_W			0x08000000  //Feen: MONSLICK_W -> MONSLICK_S don't appear to be in use..
 #define SURF_MONSLICK_N			0x10000000  //		However, MONSTERSLICK does...
 #define SURF_MONSLICK_E			0x20000000
 #define SURF_MONSLICK_S			0x40000000
+*/
+
+//Feen: New ETJump Surfaces...
+#define SURF_PORTALGATE			0x08000000  //Feen: I hereby declare these's SURF's in the name of ETJump!
+#define SURF_MONSLICK_N			0x10000000  
+#define SURF_MONSLICK_E			0x20000000
+#define SURF_MONSLICK_S			0x40000000
+//END New ETJump Surfaces
 
 #define SURF_LANDMINE			0x80000000	// ydnar: ok to place landmines on this surface
 
