@@ -500,8 +500,8 @@ cvarTable_t		gameCvarTable[] = {
 	{ &g_banner5, "g_banner5", "", CVAR_ARCHIVE },
 
 	//Feen: PGM
-	{ &g_portalDebug, "g_portalDebug", "0", CVAR_ARCHIVE },
-	{ &g_portalMode, "g_portalMode", "0", CVAR_ARCHIVE }, //NOTE: Default 0 is only temporary! (freestyle mode)
+	{ &g_portalDebug, "g_portalDebug", "0", CVAR_CHEAT | CVAR_ARCHIVE },
+	{ &g_portalMode, "g_portalMode", "1", CVAR_ARCHIVE }, //0 - freestyle, 1 - restricted
 };
 
 // bk001129 - made static to avoid aliasing

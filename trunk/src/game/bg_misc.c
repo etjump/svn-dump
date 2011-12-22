@@ -2063,7 +2063,9 @@ weapon_medic_heal
 
 
 //Feen: PGM Test 2 //NOTE: Overridden by portalgun.weap
-/*model="models/weapons2/flamethrower/flamethrower.md3"
+/*QUAKED weapon_portalgun (.3 .3 1) (-16 -16 -16) (16 16 16) suspended
+-------- MODEL FOR RADIANT ONLY - DO NOT SET THIS AS A KEY --------
+model="models/weapons2/tesla/pu_tesla.md3"
 */
 	{
 		"weapon_portal_gun", 

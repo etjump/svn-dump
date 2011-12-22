@@ -232,8 +232,63 @@ void PortalTeleport( gentity_t *player, vec3_t origin, vec3_t angles ) {
 }
 
 
+void weapon_portalgun_touch(gentity_t* self, gentity_t* other, trace_t* trace) {
+	
+	qboolean alreadyHave = qfalse;
+
+	if (!other->client)
+		return;
+
+	// check if player already had the weapon
+	alreadyHave = COM_BitCheck( other->client->ps.weapons, self->item->giTag );
+
+	if (alreadyHave)
+		return;
+
+	//Add the gun...
+	COM_BitSet(other->client->ps.weapons, WP_PORTAL_GUN);
+
+	other->client->ps.ammoclip[BG_FindClipForWeapon(WP_PORTAL_GUN)] = 0;
+	other->client->ps.ammo[BG_FindAmmoForWeapon(WP_PORTAL_GUN)] = 1;
+	
+	other->client->ps.weapon = WP_PORTAL_GUN;
+
+
+}
+
 void SP_weapon_portalgun (gentity_t* ent){
 
+	//TODO: spawn portalgun ent
+	//gentity_t*  ent;
+	gitem_t*	item;
+
+	vec3_t		mins,maxs;
+
+	item = BG_FindItemForWeapon(WP_PORTAL_GUN);
+
+	//ent = G_Spawn();
+
+	ent->s.eType = ET_ITEM;
+	ent->s.modelindex = item - bg_itemlist;	// store item number in modelindex
+	ent->s.otherEntityNum2 = 1;	// DHM - Nerve :: this is taking modelindex2's place for a dropped item
+
+	ent->classname = item->classname;
+	ent->item = item;
+	VectorSet( ent->r.mins, -ITEM_RADIUS, -ITEM_RADIUS, 0 );			//----(SA)	so items sit on the ground
+	VectorSet( ent->r.maxs, ITEM_RADIUS, ITEM_RADIUS, 2*ITEM_RADIUS );	//----(SA)	so items sit on the ground
+	ent->r.contents = CONTENTS_TRIGGER|CONTENTS_ITEM;
+
+	ent->clipmask = CONTENTS_SOLID | CONTENTS_MISSILECLIP;		// NERVE - SMF - fix for items falling through grates
+
+	ent->touch = weapon_portalgun_touch;
+
+	ent->think = NULL;
+	ent->nextthink = level.time + 100;
+	
+	G_SetOrigin (ent, ent->s.origin); 
+	G_SetAngle (ent, ent->s.angles);
+
+	trap_LinkEntity(ent);
 
 }
 

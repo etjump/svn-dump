@@ -1191,6 +1191,8 @@ typedef struct {
 	int			nextBannerTime;
 	int			nextBanner;
 
+	int			portalEnabled; //Feen: PGM - Enabled/Disabled by map key
+
 } level_locals_t;
 
 typedef struct {

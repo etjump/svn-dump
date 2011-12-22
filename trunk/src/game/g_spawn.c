@@ -1027,6 +1027,12 @@ void SP_worldspawn( void ) {
 	if (atoi(s))
 		level.noGoto = qtrue;
 
+	//Feen: PGM - Enable/Disable frivolous use
+	//			  of portal gun....
+	G_SpawnString("portalgun_spawn", "0", &s);
+	if (atoi(s))
+		level.portalEnabled = qtrue;
+
 	level.mapcoordsValid = qfalse;
 	if( G_SpawnVector2D( "mapcoordsmins", "-128 128", level.mapcoordsMins ) &&	// top left
 		G_SpawnVector2D( "mapcoordsmaxs", "128 -128", level.mapcoordsMaxs ) ) {	// bottom right

@@ -13,7 +13,7 @@
 
 #define	GAME_VERSION	"Enemy Territory"
 
-#define MOD_VERSION		"ETJump 1.1.0^1B"
+#define MOD_VERSION		"ETJump 2.0.0RC1"
 
 #if defined(_DEBUG)
 	#define	GAME_VERSION_DATED			GAME_VERSION
