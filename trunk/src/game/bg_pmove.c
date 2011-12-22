@@ -1247,10 +1247,10 @@ void PM_CheckPortal (void) {
 	if (trace.fraction < 1){
 
 #if GAMEDLL
-		Com_Printf("PGM: Well, we hit something...\n");	//Debug..
+		//Com_Printf("PGM: Well, we hit something...\n");	//Debug..
 		
 
-#if 1
+#if 0
 
 		Com_Printf("PGM: _CheckPortal trace results.....\n CONTENTS:  ");
 
@@ -1274,11 +1274,11 @@ void PM_CheckPortal (void) {
 
 
 		if (trace.surfaceFlags & SURF_PORTALGATE) {
-			Com_Printf("PGM: Well, we detected a portal...\n");	//Debug..
+			//Com_Printf("PGM: Well, we detected a portal...\n");	//Debug..
 			pml.previous_teleport = qtrue;
 			PM_AddEvent(EV_PORTAL_TELEPORT);
 		}else{
-			Com_Printf("PGM: Iunno what we found....\n");
+			//Com_Printf("PGM: Iunno what we found....\n");
 		}
 
 #endif //GAMEDLL
