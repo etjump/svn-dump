@@ -2324,6 +2324,7 @@ extern vmCvar_t			cg_viewPlayerPortals; //Enable/Disable viewing other player po
 
 extern vmCvar_t			cg_chatPosX;
 extern vmCvar_t			cg_chatPosY;
+extern vmCvar_t			cg_chatBackgroundAlpha;
 
 //
 // cg_main.c

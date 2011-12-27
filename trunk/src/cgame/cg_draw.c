@@ -832,7 +832,7 @@ static void CG_DrawTeamInfo(void)
 	int i, len;
 	vec4_t		hcolor;
 	int		chatHeight;
-	float	alphapercent;
+	float	alphapercent, chatbgalpha;
 	float	lineHeight = 9.f;
 	qhandle_t	flag;
 
@@ -905,10 +905,17 @@ static void CG_DrawTeamInfo(void)
 				hcolor[2] = 0;
 			}
 
-			hcolor[3] = 0.33f * alphapercent;
+			chatbgalpha = cg_chatBackgroundAlpha.value;
+			if(chatbgalpha > 1.0f) {
+				chatbgalpha = 1.0f;
+			} else if (chatbgalpha < 0) {
+				chatbgalpha = 0;
+			}
+
+			hcolor[3] = chatbgalpha * alphapercent;
 
 			trap_R_SetColor(hcolor);
-			CG_DrawPic(CHATLOC_X, CHATLOC_Y - (cgs.teamChatPos - i)*lineHeight, chatWidth, lineHeight, cgs.media.teamStatusBar);
+			CG_DrawPic(CHATLOC_X + cg_chatPosX.value, CHATLOC_Y + cg_chatPosY.value - (cgs.teamChatPos - i)*lineHeight, chatWidth, lineHeight, cgs.media.teamStatusBar);
 
 			hcolor[0] = hcolor[1] = hcolor[2] = 1.0;
 			hcolor[3] = alphapercent;
@@ -921,10 +928,10 @@ static void CG_DrawTeamInfo(void)
 			else
 				flag = 0;
 			if (flag)
-				CG_DrawPic(CHATLOC_TEXT_X - 14, CHATLOC_Y - (cgs.teamChatPos - i - 1) * lineHeight - 8,
+				CG_DrawPic(CHATLOC_TEXT_X + cg_chatPosX.value - 14, CHATLOC_Y + cg_chatPosY.value - (cgs.teamChatPos - i - 1) * lineHeight - 8,
 						   12, 8, flag);
 
-			CG_Text_Paint_Ext(CHATLOC_TEXT_X, CHATLOC_Y - (cgs.teamChatPos - i - 1) * lineHeight - 1, 0.2f, 0.2f, hcolor, cgs.teamChatMsgs[i % chatHeight], 0, 0, 0, &cgs.media.limboFont2);
+			CG_Text_Paint_Ext(CHATLOC_TEXT_X + cg_chatPosX.value, CHATLOC_Y + cg_chatPosY.value - (cgs.teamChatPos - i - 1) * lineHeight - 1, 0.2f, 0.2f, hcolor, cgs.teamChatMsgs[i % chatHeight], 0, 0, 0, &cgs.media.limboFont2);
 		}
 	}
 }

@@ -355,6 +355,7 @@ vmCvar_t			cg_viewPlayerPortals; //Enable/Disable viewing other player portals
 
 vmCvar_t			cg_chatPosX;
 vmCvar_t			cg_chatPosY;
+vmCvar_t			cg_chatBackgroundAlpha;
 
 
 typedef struct {
@@ -635,6 +636,7 @@ cvarTable_t		cvarTable[] = {
 	{ &cg_viewPlayerPortals, "cg_viewPlayerPortals", "1", CVAR_ARCHIVE }, //Feen: PGM - View other player portals
 	{ &cg_chatPosX, "cg_chatPosX", "0", CVAR_ARCHIVE },
 	{ &cg_chatPosY, "cg_chatPosY", "0", CVAR_ARCHIVE },
+	{ &cg_chatBackgroundAlpha, "cg_chatBackgroundAlpha", "0.33", CVAR_ARCHIVE },
 	
 
 
