@@ -1297,13 +1297,14 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker,  vec3
 	// ydnar: set weapons means less knockback
 	if( client && (client->ps.weapon == WP_MORTAR_SET || client->ps.weapon == WP_MOBILE_MG42_SET) )
 		knockback *= 0.5;
-
+	
 	if(targ->client) {
 		if(targ->client->sess.noNading) {
 			if(attacker->client && attacker->client != targ->client)
 				knockback = 0;
 		}
 	}
+	AP(va("cpm \"DEBUG: knockback: %i\n\"", knockback)); 
 
 	// figure momentum add, even if the damage won't be taken
 	if ( knockback && targ->client ) {		

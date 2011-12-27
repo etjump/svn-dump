@@ -44,9 +44,7 @@ static const cmd_reference_t aCommandInfo[] = {
 	{ "currenttime",	qtrue,	qtrue,	NULL, ":^7 Displays current local time" },
 	{ "follow",			qfalse,	qtrue,	Cmd_Follow_f, " <player_ID|allies|axis>:^7 Spectates a particular player or team" },
 //	{ "invite",			qtrue,	qtrue,	NULL, " <player_ID>:^7 Invites a player to join a team" },
-	{ "lock",			qtrue,	qtrue,	G_lock_cmd, ":^7 Locks a player's team to prevent others from joining" },
 	{ "notready",		qtrue,	qfalse,	G_ready_cmd, ":^7 Sets your status to ^5not ready^7 to start a match" },
-	{ "pause",			qfalse,	qtrue,	G_pause_cmd, ":^7 Allows a team to pause a match" },
 	{ "players",		qtrue,	qtrue,	G_players_cmd, ":^7 Lists all active players and their IDs/information" },
 	{ "ready",			qtrue,	qtrue,	G_ready_cmd, ":^7 Sets your status to ^5ready^7 to start a match" },
 	{ "readyteam",		qfalse,	qtrue,	G_teamready_cmd, ":^7 Sets an entire team's status to ^5ready^7 to start a match" },
@@ -65,11 +63,7 @@ static const cmd_reference_t aCommandInfo[] = {
 	{ "team",			qtrue,	qtrue,	Cmd_Team_f, " <b|r|s|none>:^7 Joins a team (b = allies, r = axis, s = spectator)" },
 //	{ "setclass",		qtrue,	qtrue,	Cmd_SetClass_f, " <classnum>:^7 Selects a class" },
 //	{ "setweapons",		qtrue,	qtrue,	Cmd_SetWeapons_f, " <weapon|weapon2>:^7 Selects your weapon loadout" },
-	{ "timein",			qfalse,	qfalse,	G_pause_cmd, ":^7 Unpauses a match (if initiated by the issuing team)" },
-	{ "timeout",		qfalse,	qtrue,	G_pause_cmd, ":^7 Allows a team to pause a match" },
 	{ "topshots",		qtrue,	qtrue,	G_weaponRankings_cmd, ":^7 Shows BEST player for each weapon. Add ^3<weapon_ID>^7 to show all stats for a weapon" },
-	{ "unlock",			qtrue,	qfalse,	G_lock_cmd, ":^7 Unlocks a player's team, allowing others to join" },
-	{ "unpause",		qfalse,	qfalse,	G_pause_cmd, ":^7 Unpauses a match (if initiated by the issuing team)" },
 	{ "unready",		qtrue,	qfalse,	G_ready_cmd, ":^7 Sets your status to ^5not ready^7 to start a match" },
 	{ "weaponstats",	qtrue,	qfalse,	G_weaponStats_cmd, " [player_ID]:^7 Shows weapon accuracy stats for a player" },
 //	{ "viewcam",		qfalse,	qtrue,	NULL, ":^7 Switches to cinematic camera mode" },
@@ -185,78 +179,6 @@ void G_commands_cmd(gentity_t *ent, unsigned int dwCommand, qboolean fValue)
 	CP("cpm \"\nType: ^3\\command_name ?^7 for more information\n\"");
 }
 
-
-// ************** LOCK / UNLOCK
-//
-// Locks/unlocks a player's team.
-void G_lock_cmd(gentity_t *ent, unsigned int dwCommand, qboolean fLock)
-{
-	int tteam;
-
-	if(team_nocontrols.integer) { G_noTeamControls(ent); return; }
-	if(!G_cmdDebounce(ent, aCommandInfo[dwCommand].pszCommandName)) return;
-
-	tteam = G_teamID(ent);
-	if(tteam == TEAM_AXIS || tteam == TEAM_ALLIES) {
-		if(teamInfo[tteam].team_lock == fLock) CP(va("print \"^3Your team is already %sed!\n\"", lock_status[fLock]));
-		else {
-			char *info = va("\"The %s team is now %sed!\n\"", aTeams[tteam], lock_status[fLock]);
-
-			teamInfo[tteam].team_lock = fLock;
-			AP(va("print %s", info));
-			AP(va("cp %s", info));
-		}
-	} else CP(va("print \"Spectators can't %s a team!\n\"", lock_status[fLock]));
-}
-
-
-// ************** PAUSE / UNPAUSE
-//
-// Pause/unpause a match.
-void G_pause_cmd(gentity_t *ent, unsigned int dwCommand, qboolean fPause)
-{
-	char *status[2] = { "^5UN", "^1" };
-
-	if(team_nocontrols.integer) { G_noTeamControls(ent); return; }
-
-	if((PAUSE_UNPAUSING >= level.match_pause && !fPause) || (PAUSE_NONE != level.match_pause && fPause)) {
-		CP(va("print \"The match is already %sPAUSED^7!\n\"", status[fPause]));
-		return;
-	}
-
-	// Alias for referees
-	if(ent->client->sess.referee) G_refPause_cmd(ent, fPause);
-	else {
-		int tteam = G_teamID(ent);
-
-		if(!G_cmdDebounce(ent, aCommandInfo[dwCommand].pszCommandName)) return;
-
-		// Trigger the auto-handling of pauses
-		if(fPause) {
-			if(0 == teamInfo[tteam].timeouts) {
-				CP("cpm \"^3Your team has no more timeouts remaining!\n\"");
-				return;
-			} else {
-				teamInfo[tteam].timeouts--;
-				level.match_pause = tteam + 128;
-				G_globalSound("sound/misc/referee.wav");
-				G_spawnPrintf(DP_PAUSEINFO, level.time + 15000, NULL);
-				AP(va("print \"^3Match is ^1PAUSED^3!\n^7[%s^7: - %d Timeouts Remaining]\n\"", aTeams[tteam], teamInfo[tteam].timeouts));
-				CP(va("cp \"^3Match is ^1PAUSED^3! (%s^3)\n\"", aTeams[tteam]));
-				level.server_settings |= CV_SVS_PAUSE;
-				trap_SetConfigstring(CS_SERVERTOGGLES, va("%d", level.server_settings));
-			}
-		} else if(tteam + 128 != level.match_pause) {
-			CP("cpm \"^3Your team didn't call the timeout!\n\"");
-			return;
-		} else {
-			AP("print \"\n^3Match is ^5UNPAUSED^3 ... resuming in 10 seconds!\n\n\"");
-			level.match_pause = PAUSE_UNPAUSING;
-			G_globalSound("sound/osp/prepare.wav");
-			G_spawnPrintf(DP_UNPAUSING, level.time + 10, NULL);
-		}
-	}
-}
 
 
 // ************** PLAYERS

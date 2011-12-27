@@ -2443,8 +2443,6 @@ qboolean G_commandCheck(gentity_t *ent, char *cmd, qboolean fDoAnytime);
 qboolean G_commandHelp(gentity_t *ent, char *pszCommand, unsigned int dwCommand);
 qboolean G_cmdDebounce(gentity_t *ent, const char *pszCommand);
 void G_commands_cmd(gentity_t *ent, unsigned int dwCommand, qboolean fValue);
-void G_lock_cmd(gentity_t *ent, unsigned int dwCommand, qboolean state);
-void G_pause_cmd(gentity_t *ent, unsigned int dwCommand, qboolean fValue);
 void G_players_cmd(gentity_t *ent, unsigned int dwCommand, qboolean fDump);
 void G_ready_cmd(gentity_t *ent, unsigned int dwCommand, qboolean fDump);
 void G_say_teamnl_cmd(gentity_t *ent, unsigned int dwCommand, qboolean fValue);
@@ -2514,16 +2512,12 @@ void G_smvUpdateClientCSList(gentity_t *ent);
 // g_referee.c
 //
 void Cmd_AuthRcon_f(gentity_t *ent);
-void G_refAllReady_cmd(gentity_t *ent);
 void G_ref_cmd(gentity_t *ent, unsigned int dwCommand, qboolean fValue);
 qboolean G_refCommandCheck(gentity_t *ent, char *cmd);
 void G_refHelp_cmd(gentity_t *ent);
-void G_refLockTeams_cmd(gentity_t *ent, qboolean fLock);
-void G_refPause_cmd(gentity_t *ent, qboolean fPause);
 void G_refPlayerPut_cmd(gentity_t *ent, int team_id);
 void G_refRemove_cmd(gentity_t *ent);
 void G_refSpeclockTeams_cmd(gentity_t *ent, qboolean fLock);
-void G_refWarmup_cmd(gentity_t* ent);
 void G_refWarning_cmd(gentity_t* ent);
 void G_refMute_cmd(gentity_t *ent, qboolean mute);
 int  G_refClientnumForName(gentity_t *ent, const char *name);

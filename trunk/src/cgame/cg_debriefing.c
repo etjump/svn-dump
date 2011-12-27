@@ -1196,7 +1196,7 @@ void CG_Debriefing_ChatBox_Draw( panel_button_t* button ) {
 				CG_DrawPic( button->rect.x, button->rect.y - (cgs.teamChatPos - i - 1)*lineHeight - 8, 12, 10, cgs.media.axisFlag );
 			} else if( cgs.teamChatMsgTeams[i % chatHeight] == TEAM_ALLIES ) {
 				CG_DrawPic( button->rect.x, button->rect.y - (cgs.teamChatPos - i - 1)*lineHeight - 8, 12, 10, cgs.media.alliedFlag );					
-			}
+			} 
 
 			CG_Text_Paint_Ext( button->rect.x + 12, button->rect.y - (cgs.teamChatPos - i - 1)*lineHeight, 0.2f, 0.2f, colorWhite, cgs.teamChatMsgs[i % chatHeight], 0, 0, 0, &cgs.media.limboFont2 );
 		}

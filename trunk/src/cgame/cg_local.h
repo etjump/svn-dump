@@ -2322,6 +2322,8 @@ extern vmCvar_t			cg_viewPlayerPortals; //Enable/Disable viewing other player po
 //TODO: May add cvars to allow players to override portal colors
 //		when cg_viewPlayerPortals is set to 0 (disabled)
 
+extern vmCvar_t			cg_chatPosX;
+extern vmCvar_t			cg_chatPosY;
 
 //
 // cg_main.c

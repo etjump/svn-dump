@@ -842,40 +842,6 @@ void Svcmd_ForceTeam_f( void ) {
 }
 
 /*
-============
-Svcmd_StartMatch_f
-
-NERVE - SMF - starts match if in tournament mode
-============
-*/
-void Svcmd_StartMatch_f(void)
-{
-/*	if ( !g_noTeamSwitching.integer ) {
-		trap_SendServerCommand( -1, va("print \"g_noTeamSwitching not activated.\n\""));
-		return;
-	}
-*/
-
-	G_refAllReady_cmd(NULL);
-
-/*
-	if ( level.numPlayingClients <= 1 ) {
-		trap_SendServerCommand( -1, va("print \"Not enough playing clients to start match.\n\""));
-		return;
-	}
-
-	if ( g_gamestate.integer == GS_PLAYING ) {
-		trap_SendServerCommand( -1, va("print \"Match is already in progress.\n\""));
-		return;
-	}
-
-	if ( g_gamestate.integer == GS_WARMUP ) {
-		trap_SendConsoleCommand( EXEC_APPEND, va( "map_restart 0 %i\n", GS_PLAYING ) );
-	}
-*/
-}
-
-/*
 ==================
 Svcmd_ResetMatch_f
 
@@ -899,115 +865,6 @@ void Svcmd_ResetMatch_f(qboolean fDoReset, qboolean fDoRestart)
 		trap_SendConsoleCommand(EXEC_APPEND, va("map_restart 0 %i\n", ((g_gamestate.integer != GS_PLAYING) ? GS_RESET : GS_WARMUP)));
 	}
 }
-
-/*
-============
-Svcmd_SwapTeams_f
-
-NERVE - SMF - swaps all clients to opposite team
-============
-*/
-void Svcmd_SwapTeams_f(void)
-{
-	G_resetRoundState();
-
-	if ( (g_gamestate.integer == GS_INITIALIZE) ||
-		 (g_gamestate.integer == GS_WARMUP) ||
-		 (g_gamestate.integer == GS_RESET) ) {
-		G_swapTeams();
-		return;
-	}
-
-	G_resetModeState();
-
-	trap_Cvar_Set( "g_swapteams", "1" );
-	Svcmd_ResetMatch_f(qfalse, qtrue);
-}
-
-
-/*
-====================
-Svcmd_ShuffleTeams_f
-
-OSP - randomly places players on teams
-====================
-*/
-void Svcmd_ShuffleTeams_f(void)
-{
-	G_resetRoundState();
-	G_shuffleTeams();
-
-	if((g_gamestate.integer == GS_INITIALIZE) ||
-	  (g_gamestate.integer == GS_WARMUP) ||
-	  (g_gamestate.integer == GS_RESET)) {
-		return;
-	}
-
-	G_resetModeState();
-	Svcmd_ResetMatch_f(qfalse, qtrue);
-}
-
-void Svcmd_Campaign_f(void) {
-	char	str[MAX_TOKEN_CHARS];
-	int		i;
-	g_campaignInfo_t *campaign = NULL;
-
-	// find the campaign
-	trap_Argv( 1, str, sizeof( str ) );
-	
-	for( i = 0; i < level.campaignCount; i++ ) {
-		campaign = &g_campaigns[i];
-
-		if( !Q_stricmp( campaign->shortname, str ) ) {
-			break;
-		}
-	}
-
-	if( i == level.campaignCount || !(campaign->typeBits & (1 << GT_WOLF) ) ) {
-		G_Printf( "Can't find campaign '%s'\n", str );
-		return;
-	}
-
-	trap_Cvar_Set( "g_oldCampaign", g_currentCampaign.string );
-	trap_Cvar_Set( "g_currentCampaign", campaign->shortname );
-	trap_Cvar_Set( "g_currentCampaignMap", "0" );
-
-	level.newCampaign = qtrue;
-
-	// we got a campaign, start it
-	trap_Cvar_Set( "g_gametype", va( "%i", GT_WOLF_CAMPAIGN ) );
-#if 0
-	if( g_developer.integer )
-		trap_SendConsoleCommand( EXEC_APPEND, va( "devmap %s\n", campaign->mapnames[0] ) );
-	else
-#endif
-		trap_SendConsoleCommand( EXEC_APPEND, va( "map %s\n", campaign->mapnames[0] ) );
-}
-
-void Svcmd_ListCampaigns_f(void) {
-	int i, mpCampaigns;
-
-	mpCampaigns = 0;
-
-	for( i = 0; i < level.campaignCount; i++ ) {
-		if( g_campaigns[i].typeBits & (1 << GT_WOLF) )
-			mpCampaigns++;
-	}
-
-	if( mpCampaigns ) {
-		G_Printf( "%i campaigns found:\n", mpCampaigns );
-	} else {
-		G_Printf( "No campaigns found.\n" );
-		return;
-	}
-
-	for( i = 0; i < level.campaignCount; i++ ) {
-		if( g_campaigns[i].typeBits & (1 << GT_WOLF) )
-			G_Printf( " %s\n", g_campaigns[i].shortname );
-	}
-}
-
-
 
 // ydnar: modified from maddoc sp func
 extern void ReviveEntity(gentity_t *ent, gentity_t *traceEnt);
@@ -1294,27 +1151,6 @@ qboolean	ConsoleCommand( void ) {
 		return qtrue;
 	}
 
-	// NERVE - SMF
-	if (Q_stricmp (cmd, "start_match") == 0) {
-		Svcmd_StartMatch_f();
-		return qtrue;
-	}
-
-	if (Q_stricmp (cmd, "reset_match") == 0) {
-		Svcmd_ResetMatch_f(qtrue, qtrue);
-		return qtrue;
-	}
-
-	if (Q_stricmp (cmd, "swap_teams") == 0) {
-		Svcmd_SwapTeams_f();
-		return qtrue;
-	}
-
-	if (Q_stricmp (cmd, "shuffle_teams") == 0) {
-		Svcmd_ShuffleTeams_f();
-		return qtrue;
-	}
-
 	// -NERVE - SMF
 
 	if (Q_stricmp (cmd, "makeReferee") == 0) {
@@ -1339,16 +1175,6 @@ qboolean	ConsoleCommand( void ) {
 
 	if (Q_stricmp (cmd, "ban") == 0) {
 		G_PlayerBan();
-		return qtrue;
-	}
-
-	if( Q_stricmp( cmd, "campaign" ) == 0 ) {
-		Svcmd_Campaign_f();
-		return qtrue;
-	}
-
-	if( Q_stricmp( cmd, "listcampaigns" ) == 0 ) {
-		Svcmd_ListCampaigns_f();
 		return qtrue;
 	}
 

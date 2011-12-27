@@ -217,10 +217,6 @@ void G_RegisterFireteam(/*const char* name,*/ int entityNum) {
 		G_ClientPrintAndReturn(entityNum, "No free fireteams available");
 	}
 
-	if(leader->client->sess.sessionTeam != TEAM_AXIS && leader->client->sess.sessionTeam != TEAM_ALLIES) {
-		G_ClientPrintAndReturn(entityNum, "Only players on a team can create a fireteam");
-	}
-
 	count = G_CountTeamFireteams(leader->client->sess.sessionTeam);
 	if(count >= MAX_FIRETEAMS / 2) {
 		G_ClientPrintAndReturn(entityNum, "Your team already has the maximum number of fireteams allowed");

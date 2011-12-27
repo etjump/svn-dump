@@ -353,6 +353,9 @@ vmCvar_t	cg_numPopup;
 //Feen: PGM client cvars
 vmCvar_t			cg_viewPlayerPortals; //Enable/Disable viewing other player portals
 
+vmCvar_t			cg_chatPosX;
+vmCvar_t			cg_chatPosY;
+
 
 typedef struct {
 	vmCvar_t	*vmCvar;
@@ -630,6 +633,8 @@ cvarTable_t		cvarTable[] = {
 	{ &cg_popupFadeTime, "cg_popupFadeTime", "2500", CVAR_ARCHIVE },
 	{ &cg_numPopup, "cg_numPopup", "5", CVAR_ARCHIVE },
 	{ &cg_viewPlayerPortals, "cg_viewPlayerPortals", "1", CVAR_ARCHIVE }, //Feen: PGM - View other player portals
+	{ &cg_chatPosX, "cg_chatPosX", "0", CVAR_ARCHIVE },
+	{ &cg_chatPosY, "cg_chatPosY", "0", CVAR_ARCHIVE },
 	
 
 
@@ -676,6 +681,7 @@ void CG_RegisterCvars( void ) {
 	BG_setColor(cg_speedColor.string, cg.speedColor, cg_speedAlpha.value, "cg_speedColor");
 	BG_setColor(cg_keysColor.string, cg.keysColor, 1, "cg_keysColor");
 	BG_setColor(cg_personalTimerColor.string, cg.personalTimerColor, cg_personalTimerAlpha.value, "cg_personalTimerColor");
+	trap_Cvar_Set("viewlog", cg_viewlog.string);
 
 	cvarsLoaded = qtrue;
 }

@@ -16,16 +16,10 @@
 //
 qboolean G_refCommandCheck(gentity_t *ent, char *cmd)
 {
-		 if(!Q_stricmp(cmd, "allready"))	G_refAllReady_cmd(ent);
-	else if(!Q_stricmp(cmd, "lock"))		trap_SendServerCommand(ent-g_entities, "Disabled ref command.");
-	else if(!Q_stricmp(cmd, "help"))		G_refHelp_cmd(ent);
-	else if(!Q_stricmp(cmd, "pause"))		trap_SendServerCommand(ent-g_entities, "Disabled ref command.");
+	if(!Q_stricmp(cmd, "help"))		G_refHelp_cmd(ent);
 	else if(!Q_stricmp(cmd, "putallies"))	G_refPlayerPut_cmd(ent, TEAM_ALLIES);
 	else if(!Q_stricmp(cmd, "putaxis"))		G_refPlayerPut_cmd(ent, TEAM_AXIS);
 	else if(!Q_stricmp(cmd, "remove"))		G_refRemove_cmd(ent);
-	else if(!Q_stricmp(cmd, "unlock"))		trap_SendServerCommand(ent-g_entities, "Disabled ref command.");
-	else if(!Q_stricmp(cmd, "unpause"))		trap_SendServerCommand(ent-g_entities, "Disabled ref command.");
-	else if(!Q_stricmp(cmd, "warmup"))		trap_SendServerCommand(ent-g_entities, "Disabled ref command.");
 	else if(!Q_stricmp(cmd, "warn"))		G_refWarning_cmd(ent);
 	else if(!Q_stricmp(cmd, "mute"))		G_refMute_cmd(ent, qtrue);
 	else if(!Q_stricmp(cmd, "unmute"))		G_refMute_cmd(ent, qfalse);
@@ -160,86 +154,6 @@ void G_ref_cmd(gentity_t *ent, unsigned int dwCommand, qboolean fValue)
 	}
 }
 
-
-// Readies all players in the game.
-void G_refAllReady_cmd(gentity_t *ent)
-{
-	int i;
-	gclient_t *cl;
-
-	if( g_gamestate.integer == GS_PLAYING ) {
-// rain - #105 - allow allready in intermission
-//	|| g_gamestate.integer == GS_INTERMISSION) {
-		G_refPrintf(ent, "Match already in progress!");
-		return;
-	}
-
-	// Ready them all and lock the teams
-	for(i=0; i<level.numConnectedClients; i++ ) {
-		cl = level.clients + level.sortedClients[i];
-		if(cl->sess.sessionTeam != TEAM_SPECTATOR) cl->pers.ready = qtrue;
-	}
-
-	// Can we start?
-	level.ref_allready = qtrue;
-	G_readyMatchState();
-}
-
-
-// Changes team lock status
-void G_refLockTeams_cmd(gentity_t *ent, qboolean fLock)
-{
-	char *status;
-
-	teamInfo[TEAM_AXIS].team_lock = (TeamCount(-1, TEAM_AXIS)) ? fLock : qfalse;
-	teamInfo[TEAM_ALLIES].team_lock = (TeamCount(-1, TEAM_ALLIES)) ? fLock : qfalse;
-
-	status = va("Referee has ^3%sLOCKED^7 teams", ((fLock) ? "" : "UN"));
-
-	G_printFull(status, ent);
-	G_refPrintf(ent, "You have %sLOCKED teams\n", ((fLock) ? "" : "UN"));
-
-	if( fLock ) {
-		level.server_settings |= CV_SVS_LOCKTEAMS;
-	} else {
-		level.server_settings &= ~CV_SVS_LOCKTEAMS;
-	}
-	trap_SetConfigstring(CS_SERVERTOGGLES, va("%d", level.server_settings));
-}
-
-
-// Pause/unpause a match.
-void G_refPause_cmd(gentity_t *ent, qboolean fPause)
-{
-	char *status[2] = { "^5UN", "^1" };
-	char *referee = (ent) ? "Referee" : "ref";
-
-	if((PAUSE_UNPAUSING >= level.match_pause && !fPause) || (PAUSE_NONE != level.match_pause && fPause)) {
-		G_refPrintf(ent, "The match is already %sPAUSED!\n\"", status[fPause]);
-		return;
-	}
-
-	if(ent && !G_cmdDebounce(ent, ((fPause)?"pause":"unpause"))) return;
-
-	// Trigger the auto-handling of pauses
-	if(fPause) {
-		level.match_pause = 100 + ((ent) ? (1 + ent - g_entities) : 0);
-		G_globalSound("sound/misc/referee.wav");
-		G_spawnPrintf(DP_PAUSEINFO, level.time + 15000, NULL);
-		AP(va("print \"^3%s ^1PAUSED^3 the match^3!\n", referee));
-		CP(va("cp \"^3Match is ^1PAUSED^3! (^7%s^3)\n\"", referee));
-		level.server_settings |= CV_SVS_PAUSE;
-		trap_SetConfigstring(CS_SERVERTOGGLES, va("%d", level.server_settings));
-	} else {
-		AP(va("print \"\n^3%s ^5UNPAUSES^3 the match ... resuming in 10 seconds!\n\n\"", referee));
-		level.match_pause = PAUSE_UNPAUSING;
-		G_globalSound("sound/osp/prepare.wav");
-		G_spawnPrintf(DP_UNPAUSING, level.time + 10, NULL);
-		return;
-	}
-}
-
-
 // Puts a player on a team.
 void G_refPlayerPut_cmd(gentity_t *ent, int team_id)
 {
@@ -318,21 +232,6 @@ void G_refRemove_cmd(gentity_t *ent)
 	if(g_gamestate.integer == GS_WARMUP || g_gamestate.integer == GS_WARMUP_COUNTDOWN) {
 		G_readyMatchState();
 	}
-}
-
-void G_refWarmup_cmd(gentity_t* ent)
-{
-	char cmd[MAX_TOKEN_CHARS];
-
-	trap_Argv(2, cmd, sizeof(cmd));
-
-	if(!*cmd || atoi(cmd) < 0) {
-		trap_Cvar_VariableStringBuffer( "g_warmup", cmd, sizeof(cmd));
-		G_refPrintf(ent, "Warmup Time: %d\n", atoi(cmd));
-		return;
-	}
-
-	trap_Cvar_Set("g_warmup", va("%d", atoi(cmd)));
 }
 
 void G_refWarning_cmd(gentity_t* ent)

@@ -3852,12 +3852,12 @@ void Cmd_NoNading_f(gentity_t *ent) {
 	char *msg;
 	if(ent->client->sess.noNading) {
 		ent->client->sess.noNading = qfalse;
-		msg = "enabled";
+		msg = "Other players can nade you.";
 	} else {
 		ent->client->sess.noNading = qtrue;
-		msg = "disabled";
+		msg = "Other players can't nade you.";
 	}
-	CP(va("print \"Other players' ability to nade you has been %s.\n\"", msg));
+	CP(va("print \"%s\n\"", msg));
 }
 
 
