@@ -1423,3 +1423,32 @@ void target_savereset_use ( gentity_t *self, gentity_t *other, gentity_t *activa
 void SP_target_savereset ( gentity_t *self ) {
 	self->use = target_savereset_use;
 }
+
+//===============================================================
+/*QUAKED target_increase_ident (0 0 1) (-8 -8 -8) (8 8 8)
+Resets saved positions
+*/
+
+void target_increase_ident_use ( gentity_t *self, gentity_t *other, gentity_t *activator ) {
+	int inc = 1;
+	if(self->inc != 0) {
+		inc = self->inc;
+	} 
+
+	if(inc < 0) {
+		if(activator->client->sess.clientident + inc < 0) {
+			activator->client->sess.clientident = 0;
+		} else {
+			activator->client->sess.clientident += inc;
+		}
+	} else {
+		activator->client->sess.clientident += inc;
+	}
+}
+
+void SP_target_increase_ident( gentity_t *self ) {
+
+	G_SpawnInt("inc", "1", &self->inc);
+
+	self->use = target_increase_ident_use;
+}

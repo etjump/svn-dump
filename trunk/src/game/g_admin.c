@@ -58,6 +58,7 @@ static const struct g_admin_cmd g_admin_cmds[] = {
 	{"restart",		G_admin_restart,	'r',	"restarts the map"},
 	{"rmsaves",		G_admin_remove_saves,'T',	"clear saved positions of target"},
 	{"setlevel",	G_admin_setlevel,	's',	"sets target level"},
+	{"spec",		G_admin_spec,		'S',	"spectate target"},
 	{"unban",		G_admin_unban,		'b',	"unbans #"},
 	{"unmute",		G_admin_unmute,		'm',	"unmutes target player"},
 	{"",			NULL,				'\0',	""}
@@ -1706,6 +1707,40 @@ qboolean G_admin_disable_save(gentity_t *ent, int skiparg) {
 		target->client->sess.save_allowed = qtrue;
 		AIP(target, "^3admin:^7 you are now allowed to save position.");
 	}
+	return qtrue;
+}
+
+// !spec <player>
+// flag: S
+
+qboolean G_admin_spec(gentity_t *ent, int skiparg) {
+	char name[MAX_TOKEN_CHARS];
+	char err[MAX_STRING_CHARS];
+	gentity_t *target;
+
+	if(Q_SayArgc() != 2 + skiparg) {
+		AIP(ent, "^3usage:^7 !spec <player>");
+		return qfalse;
+	}
+
+	Q_SayArgv(1 + skiparg, name, sizeof(name));
+	
+	if(!(target = getPlayerForName(name, err, sizeof(err)))) {
+		AIP(ent, va("^3!spec: ^7%s", err));
+		return qfalse;
+	}
+
+	if(!G_AllowFollow(ent, target)) {
+		AIP(ent, va("^3!spec: %s ^7is locked from spectators.", target->client->pers.netname));
+		return qfalse;
+	}
+
+	if ( ent->client->sess.sessionTeam != TEAM_SPECTATOR ) {
+		SetTeam( ent, "spectator", qfalse, -1, -1, qfalse );
+	}
+
+	ent->client->sess.spectatorState = SPECTATOR_FOLLOW;
+	ent->client->sess.spectatorClient = target->client->ps.clientNum;
 	return qtrue;
 }
 

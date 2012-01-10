@@ -1299,12 +1299,11 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker,  vec3
 		knockback *= 0.5;
 	
 	if(targ->client) {
-		if(targ->client->sess.noNading) {
+		if(targ->client->sess.noNading || level.noExplosives) {
 			if(attacker->client && attacker->client != targ->client)
 				knockback = 0;
 		}
 	}
-	AP(va("cpm \"DEBUG: knockback: %i\n\"", knockback)); 
 
 	// figure momentum add, even if the damage won't be taken
 	if ( knockback && targ->client ) {		

@@ -440,6 +440,7 @@ void SP_target_printname (gentity_t *ent);
 void SP_target_fireonce (gentity_t *self);
 void SP_func_fakebrush (gentity_t *ent);
 void SP_target_savereset (gentity_t *self);
+void SP_target_increase_ident (gentity_t *self);
 
 //Feen: PGM
 void SP_weapon_portalgun (gentity_t *self);
@@ -677,6 +678,7 @@ spawn_t	spawns[] = {
 	{"func_fakebrush",		SP_func_fakebrush },
 	{"target_savereset",	SP_target_savereset },
 	{"weapon_portalgun",	SP_weapon_portalgun }, //Feen: PGM
+	{"target_increase_ident", SP_target_increase_ident },
 
 	{0, 0}
 };
@@ -1008,8 +1010,16 @@ void SP_worldspawn( void ) {
 		level.ccLayers = qtrue;
 
 	G_SpawnString("noexplosives", "0", &s);
-	if (atoi(s))
-		level.noExplosives = qtrue;
+	if (atoi(s)) {
+		int val = atoi(s);
+		if(val > 2) {
+			val = 2;
+		} else if(val < 0) {
+			val = 0;
+		}
+
+		level.noExplosives = val;
+	}
 
 	G_SpawnString("nosave", "0", &s);
 	if (atoi(s))

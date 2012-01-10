@@ -507,6 +507,7 @@ struct gentity_s {
 	//etjump
 	int ident;
 	int reqident;
+	int inc; // increment val for target_increase_ident
 
 	//Feen - PGM
 	gentity_t *portal_blue;
@@ -1180,7 +1181,7 @@ typedef struct {
 
 	qboolean	tempTraceIgnoreEnts[ MAX_GENTITIES ];
 
-	qboolean	noExplosives;
+	int			noExplosives;
 	qboolean	noSave;
 	qboolean	noNoclip;
 	qboolean	noGod;
@@ -2692,6 +2693,7 @@ qboolean G_admin_rename(gentity_t *ent, int skiparg);
 qboolean G_admin_restart(gentity_t *ent, int skiparg);
 qboolean G_admin_remove_saves(gentity_t *ent, int skiparg);
 qboolean G_admin_setlevel(gentity_t *ent, int skiparg);
+qboolean G_admin_spec(gentity_t *ent, int skiparg);
 qboolean G_admin_unban(gentity_t *ent, int skiparg);
 qboolean G_admin_unmute(gentity_t *ent, int skiparg);
 qboolean G_admin_permission(gentity_t *ent, char flag);

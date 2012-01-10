@@ -852,8 +852,10 @@ void SetWolfSpawnWeapons( gclient_t *client )
 		// Engineer gets dynamite
 		if (pc == PC_ENGINEER)
 		{
-			AddWeaponToPlayer(client, WP_DYNAMITE, 0, 1, qfalse);
-			AddWeaponToPlayer(client, WP_PLIERS, 0, 1, qfalse);
+			if(level.noExplosives != 2) {
+				AddWeaponToPlayer(client, WP_DYNAMITE, 0, 1, qfalse);
+				AddWeaponToPlayer(client, WP_PLIERS, 0, 1, qfalse);
+			}
 
 			if (g_knifeonly.integer != 1)
 			{
