@@ -523,6 +523,15 @@ void target_teleporter_use( gentity_t *self, gentity_t *other, gentity_t *activa
 		G_Printf ("Couldn't find teleporter destination\n");
 		return;
 	}
+	// reset velocity
+	if( self->spawnflags & 1 ) {
+		VectorClear(activator->client->ps.velocity);
+	}
+
+	if( self->spawnflags & 2 ) {
+		TeleportPlayerExt(activator, dest->s.origin, dest->s.angles);
+		return;
+	}
 
 	TeleportPlayer( activator, dest->s.origin, dest->s.angles );
 }

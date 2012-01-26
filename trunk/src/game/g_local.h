@@ -1425,6 +1425,7 @@ void Think_SetupObjectiveInfo( gentity_t *ent);
 //
 void TeleportPlayer( gentity_t *player, vec3_t origin, vec3_t angles );
 void PortalTeleport( gentity_t *player, vec3_t origin, vec3_t angles ); //Feen: PGM
+void TeleportPlayerExt( gentity_t *player, vec3_t origin, vec3_t angles ); // Zero: spawnflags & 2 on target_teleport
 void mg42_fire( gentity_t *other );
 void mg42_stopusing( gentity_t *self );
 void aagun_fire( gentity_t *other );
@@ -2674,15 +2675,19 @@ void G_admin_register_client(gentity_t *ent);
 // Zero: had a problem with these. For some unknown reason I couldn't compile if
 // these were in g_admin.h. Will keep them here till figured out.
 
+qboolean G_admin_add_level(gentity_t *ent, int skiparg);
 qboolean G_admin_admintest(gentity_t *ent, int skiparg);
 qboolean G_admin_ban_check(char *userinfo, char *reason);
 qboolean G_admin_ban(gentity_t *ent, int skiparg);
 qboolean G_admin_cancelvote(gentity_t *ent, int skiparg);
 qboolean G_admin_disable_goto(gentity_t *ent, int skiparg);
 qboolean G_admin_disable_save(gentity_t *ent, int skiparg);
+qboolean G_admin_edit_level( gentity_t *ent, int skiparg );
 qboolean G_admin_finger(gentity_t *ent, int skiparg);
 qboolean G_admin_help(gentity_t *ent, int skiparg);
 qboolean G_admin_kick(gentity_t *ent, int skiparg);
+qboolean G_admin_levinfo( gentity_t *ent, int skiparg );
+qboolean G_admin_levlist(gentity_t *ent, int skiparg);
 qboolean G_admin_listbans(gentity_t *ent, int skiparg);
 qboolean G_admin_map(gentity_t *ent, int skiparg);
 qboolean G_admin_mute(gentity_t *ent, int skiparg);

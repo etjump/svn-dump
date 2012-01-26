@@ -322,6 +322,15 @@ void trigger_teleporter_touch (gentity_t *self, gentity_t *other, trace_t *trace
 		return;
 	}
 
+	if(self->spawnflags & 1) {
+		VectorClear(other->client->ps.velocity);
+	}
+
+	if(self->spawnflags & 2) {
+		TeleportPlayerExt( other, dest->s.origin, dest->s.angles );
+		return;
+	}
+
 	TeleportPlayer( other, dest->s.origin, dest->s.angles );
 }
 

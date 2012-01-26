@@ -4112,7 +4112,7 @@ void ClientCommand(int clientNum)
 	ent = g_entities + clientNum;
 
 	// setup - imo pointless check because clients are connected to ents in G_InitGame()
-	if (!ent->client)
+	if (!ent->client || (ent->client->pers.connected != CON_CONNECTED))
 		return; // not fully in game yet
 
 	trap_Argv(0, cmd, sizeof(cmd));
@@ -4254,7 +4254,7 @@ void ClientCommand(int clientNum)
 
 	if (!Q_stricmp(cmd, "register_client")) 
 	{
-		G_admin_register_client(ent);
+		//FIXME G_admin_register_client(ent);
 		return;
 	}
 

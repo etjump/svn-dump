@@ -43,6 +43,9 @@
 #define PASSWORD_LEN 40
 #define MAX_STRING_CHARS 1024
 #define MAX_BANS 512
+#define GUID_LEN 32
+#define MIN_PASSWORD_LEN 12
+
 
 // Offset for ban, don't ask.
 #define ADMIN_BAN_EXPIRE_OFFSET 946490400
@@ -59,11 +62,13 @@ typedef struct {
 	int level;
 	char name[MAX_ADMIN_NAME_LEN];
 	char password[PASSWORD_LEN+1];
+	char guid[GUID_LEN+1];
 } admin_user_t;
 
 typedef struct {
 	char name[MAX_NAME_LENGTH];
 	char ip[18];
+	char guid[GUID_LEN+1];
 	char reason[MAX_STRING_CHARS];
 	char made[50];
 	int expires;
@@ -74,7 +79,7 @@ void G_admin_chat_print(char *string);
 
 // Zero: very informative names for the macros.
 
-#define ACP(x) G_admin_chat_print(x); // admin chat print
+#define ACP(x) G_admin_chat_print(x);
 #define AIP(ent, msg) G_admin_personal_info_print(ent, msg); // Admin info print (if ent -> priv else g_printf)
 #define ASP(x) G_admin_print(ent, x) 
 #define ABP(ent, msg) G_admin_buffer_print(ent, msg);

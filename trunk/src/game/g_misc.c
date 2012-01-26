@@ -131,6 +131,33 @@ void TeleportPlayer( gentity_t *player, vec3_t origin, vec3_t angles ) {
 	}
 }
 
+// Turns velocity angle aswell
+
+void TeleportPlayerExt( gentity_t *player, vec3_t origin, vec3_t angles ) {
+
+	vec_t speed;
+	speed = VectorLength(player->client->ps.velocity);
+
+	AngleVectors( angles, player->client->ps.velocity, NULL, NULL );
+
+	VectorCopy ( origin, player->client->ps.origin );
+	player->client->ps.origin[2] += 1;
+
+	VectorScale(player->client->ps.velocity, speed, player->client->ps.velocity);
+
+	player->client->ps.eFlags ^= EF_TELEPORT_BIT;
+
+	SetClientViewAngle( player, angles );
+
+	BG_PlayerStateToEntityState( &player->client->ps, &player->s, qtrue );
+
+	VectorCopy( player->client->ps.origin, player->r.currentOrigin );
+
+	if ( player->client->sess.sessionTeam != TEAM_SPECTATOR ) {
+		trap_LinkEntity (player);
+	}
+}
+
 
 
 /*

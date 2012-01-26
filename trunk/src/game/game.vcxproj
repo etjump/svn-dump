@@ -143,6 +143,7 @@
     <ClCompile Include="..\botai\ai_team.c" />
     <ClCompile Include="..\sha-1\bg_sha.c" />
     <ClCompile Include="..\sha-1\sha1.c" />
+    <ClCompile Include="..\sqlite\sqlite3.c" />
     <ClCompile Include="bg_animation.c" />
     <ClCompile Include="bg_animgroup.c" />
     <ClCompile Include="bg_campaign.c" />
@@ -219,6 +220,7 @@
     <ClInclude Include="..\botai\ai_team.h" />
     <ClInclude Include="..\botai\ai_teamX.h" />
     <ClInclude Include="..\sha-1\sha1.h" />
+    <ClInclude Include="..\sqlite\sqlite3.h" />
     <ClInclude Include="be_aas.h" />
     <ClInclude Include="be_ai_char.h" />
     <ClInclude Include="be_ai_chat.h" />
