@@ -1796,7 +1796,7 @@ void CG_Player( centity_t *cent )
 		return;
 
 	if (ci->hideMe)
-		hidden = qtrue;
+		return;
 
 	character = CG_CharacterForClientinfo( ci, cent );
 

@@ -36,31 +36,38 @@ struct g_admin_cmd {
 	qboolean (* const handler)(gentity_t *ent, int skiparg);
 	char flag;
 	const char *function;
+	const char *syntax;
 };
 
 static const struct g_admin_cmd g_admin_cmds[] = {
-	{"admintest",	G_admin_admintest,	'a',	"Displays your current admin level.\nSyntax: !admintest"},
-	{"ban",			G_admin_ban,		'b',	"Bans target player.\nSyntax: !ban <name> <time> <reason>"},
-	{"cancelvote",  G_admin_cancelvote, 'C',	"Cancels the current vote in progress.\Syntax: !cancelvote"},
-	{"nogoto",		G_admin_disable_goto,'T',	"Prevents target from using goto & call.\nSyntax: !nogoto <target>"},
-	{"nosave",		G_admin_disable_save,'T',	"Prevents target from using save & load.\nSyntax: !nosave <target>"},
-	{"finger",		G_admin_finger,		'f',	"Displayers target's adminlevel.\nSyntax: !finger <target>"},
-	{"help",		G_admin_help,		'h',	"Displays info about commands.\nSyntax: !help <command>"},
-	{"listcmds",	G_admin_help,		'h',	"Displays info about commands.\nSyntax: !help <command>"},
-	{"kick",		G_admin_kick,		'k',	"Kicks target player.\nSyntax: !kick <player>"},
-	{"listbans",	G_admin_listbans,	'L',	"Lists all current bans.\nSyntax: !listbans"},
-	{"map",			G_admin_map,		'M',	"Changes map.\nSyntax: !map <mapname>"},
-	{"mute",		G_admin_mute,		'm',	"Mutes target player.\nSyntax: !mute <target>"},
-	{"passvote",	G_admin_passvote,	'P',	"Passes the current vote in progress.\nSyntax: !passvote"},
-	{"putteam",		G_admin_putteam,	'p',	"Puts target to a team.\nSyntax: !putteam target <b|r|s>"},
-	{"readconfig",	G_admin_readconfig,	'G',	"Reads admin config.\nSyntax: !readconfig"},
-	{"rename",		G_admin_rename,		'R',	"Renames the target player.\nSyntax: !rename <target> <newname>"},
-	{"restart",		G_admin_restart,	'r',	"Restarts the map.\nSyntax: !restart"},
-	{"rmsaves",		G_admin_remove_saves,'T',	"Clear saved positions of target.\nSyntax: !rmsaves <target>"},
-	{"setlevel",	G_admin_setlevel,	's',	"Sets target level.\nSyntax: !setlevel <target> <level>"},
-	{"spec",		G_admin_spec,		'S',	"Spectate target.\nSyntax: !spec <target>"},
-	{"unban",		G_admin_unban,		'b',	"Unbans #.\nSyntax: !unban <number>"},
-	{"unmute",		G_admin_unmute,		'm',	"Unmutes target player.\nSyntax: !unmute <target>"},
+	{"admintest",	G_admin_admintest,	'a',	"Displays your current admin level.", "Syntax: !admintest"},
+	{"ban",			G_admin_ban,		'b',	"Bans target player.", "Syntax: !ban <name> <time> <reason>"},
+	{"cancelvote",  G_admin_cancelvote, 'C',	"Cancels the current vote in progress.", "Syntax: !cancelvote"},
+	{"finger",		G_admin_finger,		'f',	"Displayers target's adminlevel.", "Syntax: !finger <target>"},
+	{"help",		G_admin_help,		'h',	"Displays info about commands.", "Syntax: !help <command>"},
+	{"kick",		G_admin_kick,		'k',	"Kicks target player.", "Syntax: !kick <player>"},
+	{"listbans",	G_admin_listbans,	'L',	"Lists all current bans.", "Syntax: !listbans"},
+	{"listcmds",	G_admin_help,		'h',	"Displays info about commands.", "Syntax: !help <command>"},
+	{"map",			G_admin_map,		'M',	"Changes map.", "Syntax: !map <mapname>"},
+	{"mute",		G_admin_mute,		'm',	"Mutes target player.", "Syntax: !mute <target>"},
+	{"nogoto",		G_admin_disable_goto,'T',	"Prevents target from using goto & call.", "Syntax: !nogoto <target>"},
+	{"nosave",		G_admin_disable_save,'T',	"Prevents target from using save & load.", "Syntax: !nosave <target>"},
+	{"passvote",	G_admin_passvote,	'P',	"Passes the current vote in progress.","Syntax: !passvote}"},
+	{"putteam",		G_admin_putteam,	'p',	"Puts target to a team.", "Syntax: !putteam target <b|r|s>"},
+	{"readconfig",	G_admin_readconfig,	'G',	"Reads admin config.", "Syntax: !readconfig"},
+	{"rename",		G_admin_rename,		'R',	"Renames the target player.", "Syntax: !rename <target> <newname>"},
+	{"restart",		G_admin_restart,	'r',	"Restarts the map.", "Syntax: !restart"},
+	{"rmsaves",		G_admin_remove_saves,'T',	"Clear saved positions of target.", "Syntax: !rmsaves <target>"},
+	{"setlevel",	G_admin_setlevel,	's',	"Sets target level.", "Syntax: !setlevel <target> <level>"},
+	{"spec",		G_admin_spec,		'S',	"Spectate target.", "Syntax: !spec <target>"},
+	{"unban",		G_admin_unban,		'b',	"Unbans #.", "Syntax: !unban <number>"},
+	{"unmute",		G_admin_unmute,		'm',	"Unmutes target player.", "Syntax: !unmute <target>"},
+
+#ifdef EDITION999
+	{"noclip",		G_admin_noclip,		AF_ADMINBYPASS, "Noclip on/off for target player.", "Syntax: !noclip <target>"},
+#endif
+
+
 	{"",			NULL,				'\0',	""}
 };
 // Prints on both chat & console.
@@ -1268,6 +1275,7 @@ qboolean G_admin_help(gentity_t *ent, int skiparg) {
 					return qfalse;
 				}
 				AIP(ent, va("^3%s:^7 %s", g_admin_cmds[i].keyword, g_admin_cmds[i].function));
+				AIP(ent, va("%s", g_admin_cmds[i].syntax));
 				return qtrue;
 			} else {
 				continue;
@@ -1763,7 +1771,9 @@ qboolean G_admin_spec(gentity_t *ent, int skiparg) {
 			return qfalse;
 		}
 	} else {
-		AIP(target, va("^3adminsystem:^7 %s ^7is spectating you.", ent->client->pers.netname));
+		if(!G_AllowFollow(ent, target)) {
+			AIP(target, va("^3adminsystem:^7 %s ^7is spectating you.", ent->client->pers.netname));
+		}
 	}
 
 #else
@@ -1787,5 +1797,30 @@ qboolean G_admin_spec(gentity_t *ent, int skiparg) {
 
 
 #ifdef EDITION999
+
+qboolean G_admin_noclip(gentity_t *ent, int skiparg) {
+	char name[MAX_TOKEN_CHARS];
+	char err[MAX_STRING_CHARS];
+	gentity_t *target;
+
+	if(Q_SayArgc() != 2 + skiparg) {
+		AIP(ent, "^3usage:^7 !noclip <player>");
+		return qfalse;
+	}
+
+	Q_SayArgv(1 + skiparg, name, sizeof(name));
+	
+	if(!(target = getPlayerForName(name, err, sizeof(err)))) {
+		AIP(ent, va("^3!noclip: ^7%s", err));
+		return qfalse;
+	}
+
+	if(target->client->noclip) {
+		target->client->noclip = qfalse;
+	} else {
+		target->client->noclip = qtrue;
+	}
+
+}
 
 #endif

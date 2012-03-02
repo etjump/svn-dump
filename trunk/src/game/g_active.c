@@ -1429,22 +1429,6 @@ void ClientThink_real( gentity_t *ent ) {
 			SetTeam(ent, "s", qtrue, -1, -1, qfalse);
 		}
 	}
-
-	/*
-	Plenty of requests for this. Maybe not a very good idea but I guess it's up to the server 
-	admin to decide. 
-	*/
-
-	if (!g_cgaz.integer) {
-		static int time = 0;
-		if(level.time - time > 1000) {
-			if(client->pers.clientFlags & CGF_CGAZ) {
-				CP("cpm \"CGazMeter is not allowed on this server.\n\"");
-				trap_SendServerCommand(ent - g_entities, "cgazOff");
-			}
-			time = level.time;
-		}
-	}
 }
 
 /*

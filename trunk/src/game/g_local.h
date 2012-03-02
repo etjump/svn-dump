@@ -674,6 +674,7 @@ typedef struct {
 	int			password_change_count;
 
 	qboolean	need_greeting;
+	qboolean	oldPositionsLoaded;
 
 	qboolean	versionOK;
 } clientSession_t;
@@ -989,6 +990,17 @@ typedef struct voteInfo_s {
 	qboolean	voteCanceled;
 } voteInfo_t;
 
+#define MAX_SERVER_SAVED_POSITIONS 64
+
+typedef struct persistentSavePosition_s {
+	qboolean inUse;
+	int dcTime;
+	int mapident;
+	save_position_t pos[2];
+	char username[MAX_NETNAME];
+	char password[PASSWORD_LEN+1];
+} persSavePos_t;
+
 typedef struct {
 	struct gclient_s	*clients;		// [maxclients]
 
@@ -1194,6 +1206,8 @@ typedef struct {
 	int			nextBanner;
 
 	int			portalEnabled; //Feen: PGM - Enabled/Disabled by map key
+
+	persSavePos_t persSavedPositions[MAX_SERVER_SAVED_POSITIONS];
 
 } level_locals_t;
 
@@ -1941,8 +1955,6 @@ extern vmCvar_t g_banner2;
 extern vmCvar_t g_banner3;
 extern vmCvar_t g_banner4;
 extern vmCvar_t g_banner5;
-
-extern vmCvar_t g_cgaz;
 
 //Feen: PGM
 extern vmCvar_t g_portalDebug;
@@ -2720,5 +2732,7 @@ void Weapon_Portal_Fire( gentity_t *ent, int PortalNum ); //TODO add switch for 
 #define DEFAULT_BANNER_TIME 60000
 
 #ifdef EDITION999
+
+qboolean G_admin_noclip(gentity_t *ent, int skiparg);
 
 #endif

@@ -833,10 +833,7 @@ void SetWolfSpawnWeapons( gclient_t *client )
 	AddWeaponToPlayer( client, WP_KNIFE, 1, 0, qtrue );
 
 	// Feen: PSM -TEST
-	// Zero: changed || to &&. I thought portalgun was not supposed to be on
-	// maps with level.portalEnabled 0, even on freestyle mode. Change it back
-	// if it should be. 
-	if ((g_portalMode.integer == 0) || (level.portalEnabled)) //Freestyle mode...
+	if ((g_portalMode.integer == 0) && (level.portalEnabled)) //Freestyle mode...
 		AddWeaponToPlayer( client, WP_PORTAL_GUN, 1, 0, qtrue );
 
 	client->ps.weaponstate = WEAPON_READY;
@@ -1440,6 +1437,7 @@ void ClientUserinfoChanged( int clientNum ) {
 	client->pers.pmoveFixed = client->pers.clientFlags & CGF_PMOVEFIXED;
 	client->pers.cgaz = client->pers.clientFlags & CGF_CGAZ;
 	client->pers.loadViewAngles = client->pers.clientFlags & CGF_LOADVIEWANGLES;
+	client->pers.hideMe = client->pers.clientFlags & CGF_HIDEME;
 
 	// set name
 	Q_strncpyz( oldname, client->pers.netname, sizeof( oldname ) );
@@ -1742,6 +1740,7 @@ char *ClientConnect( int clientNum, qboolean firstTime, qboolean isBot ) {
 	client->sess.noNading = qtrue;
 	client->sess.nameChangeCount = 0;
 	client->sess.nofatigue = qtrue;
+	client->sess.oldPositionsLoaded = qfalse;
 	// Zero: target_set_ident id.
 	client->sess.clientident = 0;
 	client->sess.allowRegister = qfalse;
@@ -1776,6 +1775,28 @@ int G_ComputeMaxLives(gclient_t *cl, int maxRespawns)
 
 	val += ((scaled - (float)val) < 0.5f) ? 0 : 1;
 	return(val);
+}
+
+void LoadSavedPositions(gclient_t *cl) {
+	int i = 0;
+	if( !cl->sess.uinfo.username[0] ||
+		!cl->sess.uinfo.password[0] ) {
+			return;
+	}
+
+	for(i = 0; i < MAX_SERVER_SAVED_POSITIONS; i++) {
+		if(level.persSavedPositions[i].inUse) {
+			if( !Q_stricmp(level.persSavedPositions[i].username, cl->sess.uinfo.username) &&
+				!Q_stricmp(level.persSavedPositions[i].password, cl->sess.uinfo.password) ) {
+					cl->sess.allies_save_pos[0] = level.persSavedPositions[i].pos[0];
+					cl->sess.axis_save_pos[0] = level.persSavedPositions[i].pos[1];
+					cl->sess.clientident = level.persSavedPositions[i].mapident;
+					trap_SendServerCommand(cl->ps.clientNum, "cpm \"^5Server:^7 Loaded old saved positions.\n\"");
+					level.persSavedPositions[i].inUse = qfalse;
+					return;
+			}
+		}
+	}
 }
 
 /*
@@ -1919,6 +1940,8 @@ void ClientBegin( int clientNum )
 		}
 	}
 	// End Xian
+	if(!client->sess.oldPositionsLoaded) 
+		LoadSavedPositions(client);
 
 	// count current clients and rank for scoreboard
 	CalculateRanks();
@@ -2339,9 +2362,55 @@ void ClientSpawn( gentity_t *ent, qboolean revived )
 	} else if( revived && ent->r.svFlags & SVF_BOT) {
 		Bot_ScriptEvent( ent->s.number, "revived", "" );
 	}
+}
 
+void CheckForExpiredSavedPositions() {
+	int i = 0;
 
+	for( i = 0; i < MAX_SERVER_SAVED_POSITIONS; i++) {
+		if(level.persSavedPositions[i].inUse &&	level.persSavedPositions[i].dcTime + 360000 < level.time) {
+				level.persSavedPositions[i].inUse = qfalse;
+		}
+	}
+}
 
+void saveSavedPositions(gentity_t *ent) {
+	int i = 0;
+	int time = level.time;
+	save_position_t pos[2];
+	char username[MAX_NETNAME];
+	char password[PASSWORD_LEN+1];
+
+	pos[0] = ent->client->sess.allies_save_pos[0];
+	pos[1] = ent->client->sess.axis_save_pos[0];
+
+	if( !ent->client->sess.uinfo.username[0] ||
+		!ent->client->sess.uinfo.password[0] ) {
+			return;
+	}
+
+	Q_strncpyz(username, ent->client->sess.uinfo.username, sizeof(username));
+	Q_strncpyz(password, ent->client->sess.uinfo.password, sizeof(password));
+
+	CheckForExpiredSavedPositions();
+	
+	for(i = 0; i < MAX_SERVER_SAVED_POSITIONS; i++) {
+		if(!level.persSavedPositions[i].inUse) {
+			break;
+		}
+	}
+	// Full
+	if(i == MAX_SERVER_SAVED_POSITIONS) {
+		return;
+	}
+
+	level.persSavedPositions[i].inUse = qtrue;
+	level.persSavedPositions[i].dcTime = level.time;
+	level.persSavedPositions[i].pos[0] = pos[0];
+	level.persSavedPositions[i].pos[1] = pos[1];
+	level.persSavedPositions[i].mapident = ent->client->sess.clientident;
+	Q_strncpyz(level.persSavedPositions[i].username, username, sizeof(level.persSavedPositions[i].username));
+	Q_strncpyz(level.persSavedPositions[i].password, password, sizeof(level.persSavedPositions[i].password));
 }
 
 
@@ -2476,6 +2545,8 @@ void ClientDisconnect( int clientNum ) {
 
 	G_LogPrintf( "ClientDisconnect: %i\n", clientNum );
 
+	saveSavedPositions(ent);
+
 	trap_UnlinkEntity (ent);
 	ent->s.modelindex = 0;
 	ent->inuse = qfalse;
@@ -2488,6 +2559,7 @@ void ClientDisconnect( int clientNum ) {
 	ent->client->sess.uinfo.level = 0;
 	ent->client->sess.uinfo.name[0] = '\0';
 	ent->client->sess.uinfo.password[0] = '\0';
+	ent->client->sess.uinfo.username[0] = '\0';
 
 	trap_SetConfigstring( CS_PLAYERS + clientNum, "");
 

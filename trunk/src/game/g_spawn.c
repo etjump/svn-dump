@@ -1039,7 +1039,7 @@ void SP_worldspawn( void ) {
 
 	//Feen: PGM - Enable/Disable frivolous use
 	//			  of portal gun....
-	G_SpawnString("portalgun_spawn", "0", &s);
+	G_SpawnString("portalgun_spawn", "1", &s);
 	if (atoi(s))
 		level.portalEnabled = qtrue;
 

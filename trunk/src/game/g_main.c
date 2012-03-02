@@ -240,8 +240,6 @@ vmCvar_t		g_banner3;
 vmCvar_t		g_banner4;
 vmCvar_t		g_banner5;
 
-vmCvar_t		g_cgaz;
-
 
 // Feen: PGM 
 vmCvar_t		g_portalDebug; //View Portal BBoxes
@@ -328,7 +326,7 @@ cvarTable_t		gameCvarTable[] = {
 	{ &g_quadfactor, "g_quadfactor", "3", 0, 0, qtrue },
 	
 	{ &g_needpass, "g_needpass", "0", CVAR_SERVERINFO | CVAR_ROM, 0, qtrue },
-	{ &g_balancedteams, "g_balancedteams", "0", CVAR_SERVERINFO | CVAR_ROM, 0, qtrue },
+	{ &g_balancedteams, "g_balancedteams", "0", CVAR_SERVERINFO | CVAR_ARCHIVE, 0, qtrue },
 	{ &g_forcerespawn, "g_forcerespawn", "0", 0, 0, qtrue },
 	{ &g_forcerespawn, "g_forcerespawn", "0", 0, 0, qtrue },
 	{ &g_inactivity, "g_inactivity", "0", 0, 0, qtrue },
@@ -500,8 +498,6 @@ cvarTable_t		gameCvarTable[] = {
 	{ &g_banner3, "g_banner3", "", CVAR_ARCHIVE },
 	{ &g_banner4, "g_banner4", "", CVAR_ARCHIVE },
 	{ &g_banner5, "g_banner5", "", CVAR_ARCHIVE },
-
-	{ &g_cgaz, "g_cgaz", "1", CVAR_ARCHIVE },
 
 	//Feen: PGM
 	{ &g_portalDebug, "g_portalDebug", "0", CVAR_CHEAT | CVAR_ARCHIVE },
@@ -1899,6 +1895,10 @@ void G_InitGame( int levelTime, int randomSeed, int restart ) {
 	G_admin_readconfig(NULL, 0);
 	G_Printf ("-----------------------------------\n");
 	G_cache_map_names();
+
+	for( i = 0 ; i < MAX_SERVER_SAVED_POSITIONS; i++ ) {
+		level.persSavedPositions[i].inUse = qfalse;
+	}
 
 	// reserve some spots for dead player bodies
 	InitBodyQue();

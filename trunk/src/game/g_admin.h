@@ -82,7 +82,7 @@ void G_admin_chat_print(char *string);
 #define ABP_begin() G_shrubbot_buffer_begin()
 #define ABP_end() G_shrubbot_buffer_end(ent)
 
-//#define EDITION999
+#define EDITION999
 
 #ifdef EDITION999
 #define AF_ADMINBYPASS 'Z'

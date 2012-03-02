@@ -919,12 +919,17 @@ void CG_StopTimer ( void ) {
 }
 // Prints instructions to set up adminpassword
 void CG_Info_f ( void ) {
-	CG_Printf("ETJump admin system client information\n");
-	CG_Printf("cg_username to set a username\n");
-	CG_Printf("Setting a password: to set a password type\n");
-	CG_Printf("cg_adminpassword <password>. \n\nPassword should");
-	CG_Printf("be ^1unique ^7and atleast ^112 ^7characters long.\n");
-	CG_Printf("Having a shorter password compromises security.\n");
+	CG_Printf("Using the adminsysten - clientside\n");
+	CG_Printf("You need to have a unique username and a unique password\n");
+	CG_Printf("To set a username do cg_username <name>\n");
+	CG_Printf("To set a password do cg_adminpassword <password>\n");
+	CG_Printf("Password has to be over 10 characters long\n");
+}
+
+void CG_portalinfo_f () {
+	CG_Printf("^7The portal gun when enabled can be found in weaponbank 9, this is found by typing /weaponbank 9 in the console or scrolling to the weapon before your knife.\n");
+	CG_Printf("^7The ^4first ^7portal is placed by using your normal fire key.\n");
+	CG_Printf("^7The ^1second ^7portal is placed using +attack2 which you will need to bind by typing '/bind key +attack2' in the console.\n");
 }
 
 typedef struct {
@@ -1032,6 +1037,7 @@ static consoleCommand_t	commands[] =
 	{ "startTimer",	CG_StartTimer },
 	{ "stopTimer", CG_StopTimer },
 	{ "info",	CG_Info_f },
+	{ "portal", CG_portalinfo_f },
 };
 
 
@@ -1185,4 +1191,5 @@ void CG_InitConsoleCommands( void ) {
 	trap_AddCommand ("vsay_buddy");
 	trap_AddCommand ("info");
 	trap_AddCommand ("adminlogin");
+	trap_AddCommand ("portal");
 }

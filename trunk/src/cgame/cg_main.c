@@ -788,7 +788,7 @@ void CG_setClientFlags(void)
 	if(cg.demoPlayback) return;
 
 	cg.pmext.bAutoReload = (cg_autoReload.integer > 0);
-	trap_Cvar_Set("cg_uinfo", va("%d %d %d %d %d",
+	trap_Cvar_Set("cg_uinfo", va("%d %d %d %d",
 											 // Client Flags
 											(
 												((cg_autoReload.integer > 0) ? CGF_AUTORELOAD : 0) |
@@ -800,7 +800,8 @@ void CG_setClientFlags(void)
 												((cg_drawCGaz.integer > 0) ? CGF_CGAZ : 0) |
 												((cl_yawspeed.integer > 0 || (int_m_pitch.value < 0.01 && int_m_pitch.value > -0.01) ||
 												cl_freelook.integer == 0) ? CGF_CHEATCVARSON : 0 ) |
-												((cg_loadviewangles.integer > 0) ? CGF_LOADVIEWANGLES : 0)
+												((cg_loadviewangles.integer > 0) ? CGF_LOADVIEWANGLES : 0) |
+												((cg_hideMe.integer > 0) ? CGF_HIDEME : 0)
 												// Add more in here, as needed
 											),
 											
@@ -808,8 +809,7 @@ void CG_setClientFlags(void)
 											int_cl_timenudge.integer,
 											// MaxPackets
 											int_cl_maxpackets.integer,
-											com_maxfps.integer,
-											cg_hideMe.integer
+											com_maxfps.integer
 									   ));
 }
 

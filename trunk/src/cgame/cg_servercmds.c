@@ -2072,11 +2072,6 @@ static void CG_ServerCommand( void ) {
 		return;
 	}
 
-	if (!Q_stricmp(cmd, "cgazOff")) {
-		trap_SendConsoleCommand("set cg_drawcgaz 0\n");
-		return;
-	}
-
 	if ( !Q_stricmp( cmd, "cpm" ) ) {
 		CG_AddPMItem( PM_MESSAGE, CG_LocalizeServerCommand( CG_Argv(1) ), cgs.media.voiceChatShader );
 		return;
