@@ -3413,6 +3413,11 @@ void Weapon_Portal_Fire( gentity_t *ent, int PortalNumber ) {
 		return;
 
 
+	//Feen: Check for a valid surface to shoot the portal on to. Added 3-5-12
+	//NOTE: This will be changed up in the future to handle the inclusion of
+	//		the 'team' portal stuffs...
+	if((g_portalMode.value == 1) && !(tr.surfaceFlags & SURF_PORTALABLE))
+		return; //Standard Mode and NON-Portalable surface....
 
 	//Go ahead and calc new endpos just in case....
 	VectorMA(tr.endpos, 5, tr.plane.normal, t_endpos); //Changed from 32..

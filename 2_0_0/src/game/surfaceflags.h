@@ -73,7 +73,7 @@
 
 //Feen: New ETJump Surfaces...
 #define SURF_PORTALGATE			0x08000000  //Feen: I hereby declare these's SURF's in the name of ETJump!
-#define SURF_MONSLICK_N			0x10000000  
+#define SURF_PORTALABLE			0x10000000  
 #define SURF_MONSLICK_E			0x20000000
 #define SURF_MONSLICK_S			0x40000000
 //END New ETJump Surfaces
