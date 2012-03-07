@@ -5,7 +5,7 @@
 #define WINDOW_X		16
 #define WINDOW_Y		16
 #define WINDOW_WIDTH	400
-#define WINDOW_HEIGHT	205
+#define WINDOW_HEIGHT	217
 #define GROUP_NAME		"grpTjsettings"
 
 // Macros //
@@ -45,7 +45,7 @@ YESNO( 8, 84, (SUBWINDOW_WIDTH)-4, 10, "Hide players:", .2, 8, "cg_hide", "Hide 
 MULTI( 8, 96, (SUBWINDOW_WIDTH)-4, 10, "Hide distance:", 	.2, 8, "cg_hidedist", cvarFloatList { "Short" 64 "Normal" 128 "Long" 256 }, "" )
 
 
-SUBWINDOW( 6, 116, (SUBWINDOW_WIDTH), 78, "BINDS" )
+SUBWINDOW( 6, 116, (SUBWINDOW_WIDTH), 90, "BINDS" )
 
 BIND( 8, 132, (SUBWINDOW_WIDTH)-4, 10, "Save:", .2, 8, save, "To save your position." )
 
@@ -56,6 +56,8 @@ BIND( 8, 156, (SUBWINDOW_WIDTH)-4, 10, "No goto:", .2, 8, nogoto, "To enable/dis
 BIND( 8, 168, (SUBWINDOW_WIDTH)-4, 10, "No call:", .2, 8, nocall, "To enable/disable call." )
 
 BIND( 8, 180, (SUBWINDOW_WIDTH)-4, 10, "No nading:", .2, 8, nonading, "To enable/disable nading." )
+
+BIND( 8, 192, (SUBWINDOW_WIDTH)-4, 10, "Second portal:", .2, 8, "+attack2", "" )
 
 
 }

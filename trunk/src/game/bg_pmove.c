@@ -1789,9 +1789,13 @@ static void PM_CrashLand( void ) {
 			PM_AddEventExt( EV_FALL_SHORT, PM_FootstepForSurface() );
 		} 
 
-		//Feen: Below is handled in g_active.c again.. CrashLand Fix
-		//if (delta > 38.75)
-		//VectorClear(pm->ps->velocity); 
+		// Feen: Below is handled in g_active.c again.. CrashLand Fix
+		// Zero: Can't be handled on g_active. Breaks prediction. I didn't do anything
+		// to the code on g_active.c. I need to talk to you first but I uncommented this
+		// as it was rather annoying prediction failure. Rather hackish way to fix it 
+		// but I don't really want to mess with the code before talking to you.
+		if (delta > 38.75)
+			VectorClear(pm->ps->velocity); 
 
 	}
 	else {

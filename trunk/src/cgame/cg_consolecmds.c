@@ -919,11 +919,11 @@ void CG_StopTimer ( void ) {
 }
 // Prints instructions to set up adminpassword
 void CG_Info_f ( void ) {
-	CG_Printf("Using the adminsysten - clientside\n");
+	CG_Printf("How to use the admin system\n");
 	CG_Printf("You need to have a unique username and a unique password\n");
 	CG_Printf("To set a username do cg_username <name>\n");
 	CG_Printf("To set a password do cg_adminpassword <password>\n");
-	CG_Printf("Password has to be over 10 characters long\n");
+	CG_Printf("Password has to be atleast 8 characters\n");
 }
 
 void CG_portalinfo_f () {

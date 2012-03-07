@@ -2854,6 +2854,7 @@ void CG_keyOn_f(void);
 void CG_keyOff_f(void);
 void CG_dumpStats_f(void);
 void CG_toggleSwing_f(void);
+void CG_Info_f(void);
 
 //
 // cg_servercmds.c

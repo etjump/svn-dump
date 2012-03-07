@@ -773,7 +773,7 @@ void Cmd_Noclip_f( gentity_t *ent ) {
 			}
 		}
 	#else
-		if ( !CheatsOk( ent ) && !g_noclip.integer) {
+		if (!g_noclip.integer && !CheatsOk( ent )) {
 			return;
 		}
 	

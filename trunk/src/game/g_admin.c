@@ -348,10 +348,7 @@ void G_admin_readconfig_float(char **cnf, float *v)
 }
 // Returns pointer to a player if found a single matching player.
 // else returns a nullpointer & error.
-// FIXME: error does not work properly for some reason.
-// G_MatchOnePlayer does work properly but in the function calling
-// this one the error will be 3 chars long no matter what.
-// Feen: (For Nolla) Fixed?
+
 gentity_t *getPlayerForName(char *name, char *err, int size) {
 	int pids[MAX_CLIENTS];
 	gentity_t *player;
@@ -698,7 +695,8 @@ int G_admin_get_level(gentity_t *ent) {
 //////////////////////////////////////////
 // Setlevel command and stuff related to it
 
-admin_t temp;
+admin_t setlevel_temp;
+
 
 qboolean G_admin_setlevel(gentity_t *ent, int skiparg) {
 	int level = 0, i;
@@ -744,7 +742,7 @@ qboolean G_admin_setlevel(gentity_t *ent, int skiparg) {
 
 	for(i = 0; g_admin_levels[i]; i++) {
 		if(g_admin_levels[i]->level == level) {
-			temp.level = level;
+			setlevel_temp.level = level;
 			found = qtrue;
 			break;
 		}
@@ -754,13 +752,15 @@ qboolean G_admin_setlevel(gentity_t *ent, int skiparg) {
 		AIP(ent, "^3setlevel:^7 level not found.");
 		return qfalse;
 	}
+
 	trap_SendServerCommand(pids[0], "server_setlevel");
 	return qtrue;
 }
 
 void G_clear_temp_admin() {
-	temp.level = 0;
-	temp.password[0] = '\0';
+	setlevel_temp.level = 0;
+	setlevel_temp.password[0] = '\0';
+	setlevel_temp.username[0] = '\0';
 }
 // part of setlevel cmd
 void G_admin_register_client(gentity_t *ent) {
@@ -804,12 +804,14 @@ void G_admin_register_client(gentity_t *ent) {
 		if( !Q_strncmp(arg, g_admin_users[i]->password, sizeof(g_admin_users[i]->password)) &&
 			!Q_strncmp(username, g_admin_users[i]->username, sizeof(g_admin_users[i]->username))) {
 
-			ent->client->sess.uinfo.level = temp.level;
+			ent->client->sess.uinfo.level = setlevel_temp.level;
+			Q_strncpyz(ent->client->sess.uinfo.username, g_admin_users[i]->username, sizeof(ent->client->sess.uinfo.username));
+			Q_strncpyz(ent->client->sess.uinfo.password, g_admin_users[i]->password, sizeof(ent->client->sess.uinfo.password));
 
 			Q_strncpyz(ent->client->sess.uinfo.name,
 				ent->client->pers.netname, sizeof(ent->client->sess.uinfo.name));
 
-			g_admin_users[i]->level = temp.level;
+			g_admin_users[i]->level = setlevel_temp.level;
 			Q_strncpyz(g_admin_users[i]->password, arg, sizeof(g_admin_users[i]->password));
 
 			updated = qtrue;
@@ -821,11 +823,11 @@ void G_admin_register_client(gentity_t *ent) {
 			return;
 		}
 		a = malloc(sizeof(admin_user_t));
-		a->level = temp.level;
+		a->level = setlevel_temp.level;
 		Q_strncpyz(a->name, ent->client->pers.netname, sizeof(a->name));
 		Q_strncpyz(a->password, arg, sizeof(a->password));	
 		Q_strncpyz(a->username, username, sizeof(a->username));
-		ent->client->sess.uinfo.level = temp.level;
+		ent->client->sess.uinfo.level = setlevel_temp.level;
 		Q_strncpyz(ent->client->sess.uinfo.name, ent->client->pers.netname, sizeof(ent->client->sess.uinfo.name));
 		g_admin_users[i] = a;
 	}

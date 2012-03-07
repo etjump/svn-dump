@@ -2039,17 +2039,22 @@ static void CG_ServerCommand( void ) {
 		if(*cg_adminpassword.string && *cg_username.string) {
 			char str[256];
 			char hashedPassword[32+1];
-			if(strlen(cg_adminpassword.string) < 10) {
-				CG_Printf("^1ERROR:^7 cg_adminpassword must be atleast 10 characters long.\n");
+			if(strlen(cg_adminpassword.string) < 8) {
+				CG_Printf("^1ERROR:^7 cg_adminpassword must be atleast 8 characters long.\n");
 				trap_SendConsoleCommand("register_failure\n");
 				return;
 			}
 			Com_sprintf(str, sizeof(str), "ETJump%s", cg_adminpassword.string);
 			Q_strncpyz(hashedPassword, G_SHA1(str), sizeof(hashedPassword));
 			trap_SendConsoleCommand(va("register_client %s %s\n", hashedPassword, cg_username.string));
-		} else {
+		} else if (!*cg_adminpassword.string) {
 			trap_SendConsoleCommand("register_failure\n");
-			CG_Printf("^1ERROR:^7 no cg_username or cg_adminpassword set.\n");
+			CG_Printf("^1ERROR:^7 no cg_adminpassword set.\n");
+			CG_Info_f();
+		} else if (!*cg_username.string) {
+			trap_SendConsoleCommand("register_failure\n");
+			CG_Printf("^1ERROR:^7 no cg_username set.\n");
+			CG_Info_f();
 		}
 		return;
 	}
@@ -2477,7 +2482,7 @@ static void CG_ServerCommand( void ) {
 
 			
 
-		trap_SendConsoleCommand(va("name %s\n", line));
+		trap_SendConsoleCommand(va("set name %s\n", line));
 		return;
 	}
 

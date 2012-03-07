@@ -1178,13 +1178,6 @@ qboolean	ConsoleCommand( void ) {
 		return qtrue;
 	}
 
-	if (!Q_stricmp (cmd, "nocgaz") == 0) {
-		int i = 0;
-		for(i = 0; i < level.numConnectedClients; i++) {
-			trap_SendServerCommand(i, "cgazOff");
-		}
-	}
-
 	if (Q_stricmp (cmd, "spawnbot") == 0) {
 		Svcmd_SpawnBot();
 		return qtrue;
