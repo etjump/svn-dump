@@ -3103,95 +3103,157 @@ static void CG_DrawCGazHUD(void)
 }
 
 
+static qboolean CG_IsOverBounce(float vel, float initHeight,
+								float finalHeight, float rintv,
+								float psec, int gravity)
+{
+	float			a, b, c;
+	float			n1;
+	//float			n2;
+	float			hn;
+	int				n;
+
+	a = -psec * rintv / 2;
+	b = psec * (vel - gravity * psec / 2 + rintv / 2);
+	c = initHeight - finalHeight;
+	n1 = (-b - sqrt(b * b - 4 * a * c)) / (2 * a);
+	//n2 = (-b + sqrt(b * b - 4 * a * c)) / (2 * a);
+	//CG_Printf("n1=%f, n2=%f\n", n1, n2);
+
+	n = floor(n1);
+	hn = initHeight + psec * n * (vel - gravity * psec / 2 - (n - 1) * rintv / 2);
+	//CG_Printf("vel=%f, initHeight=%f, finalHeight=%f, n=%d, reachedHeight: %f\n", initHeight, vel, finalHeight, n, hn);
+
+	if (n && hn < finalHeight + 0.25 && hn > finalHeight) {
+		return qtrue;
+	}
+	return qfalse;
+}
+
 /*
 =========
 CG_DrawOB
 
 Fast OB detection.
-TODO below ob
-===========
+=========
 */
 static void CG_DrawOB(void)
 {
-	double a, b, c;
-	float psec;
-	int gravity;
-	vec3_t snap;
-	float rintv;
-	float v0;
-	float h0, hn;
-	float t;
-	trace_t trace;
-	vec3_t start, end;
-	float n1, n2;
-	int n;
+	float			psec;
+	int				gravity;
+	vec3_t			snap;
+	float			rintv;
+	float			v0;
+	float			h0, t;
+	trace_t			trace;
+	vec3_t			start, end;
+	playerState_t	*ps;
 
-	if(!cg_drawOB.integer)
+	if (!cg_drawOB.integer || cg_thirdPerson.integer) {
 		return;
+	}
 
-	if (cg_thirdPerson.integer)
-		return;
+	if (cg.snap->ps.clientNum != cg.clientNum) {
+		ps = &cg.snap->ps;
+	} else {
+		// use predictedPlayerState if not spectating
+		ps = &cg.predictedPlayerState;
+	}
 
 	psec = pmove_msec.integer / 1000.0;
-	gravity = cg.predictedPlayerState.gravity;
-	v0 = cg.predictedPlayerState.velocity[2];
-	h0 = cg.predictedPlayerState.origin[2] + cg.predictedPlayerState.mins[2];
-	//CG_Printf("psec: %f, gravity: %d\n", psec, gravity);
+	gravity = ps->gravity;
+	v0 = ps->velocity[2];
+	h0 = ps->origin[2] + ps->mins[2];
+	//CG_Printf("psec=%f, gravity=%d\n", psec, gravity);
 
 	VectorSet(snap, 0, 0, gravity * psec);
 	trap_SnapVector(snap);
 	rintv = snap[2];
 
+	if (ps->groundEntityNum == ENTITYNUM_NONE) {
+		// below ob
+		VectorCopy(ps->origin, start);
+		start[2] = h0;
+		VectorCopy(start, end);
+		end[2] = -131072;
+
+		CG_Trace(&trace, start, vec3_origin, vec3_origin, end, ps->clientNum,
+				CONTENTS_SOLID);
+
+		if (trace.fraction != 1.0 && trace.plane.type == 2) {
+			// something was hit and it's a floor
+
+			t = trace.endpos[2];
+
+			// below ob
+			if (CG_IsOverBounce(v0, h0, t, rintv, psec, gravity)) {
+				CG_DrawStringExt(330, 220, "B", colorWhite, qfalse, qtrue,
+						TINYCHAR_WIDTH, TINYCHAR_HEIGHT, 0);
+			}
+		}
+	}
+
 	// use origin from playerState?
 	VectorCopy(cg.refdef.vieworg, start);
 	VectorMA(start, 131072, cg.refdef.viewaxis[0], end);
 
-	CG_Trace(&trace, start, vec3_origin, vec3_origin, end,
-			 cg.predictedPlayerState.clientNum, CONTENTS_SOLID);
+	CG_Trace(&trace, start, vec3_origin, vec3_origin, end, ps->clientNum,
+			 CONTENTS_SOLID);
 
-	// we didn't hit anything
-	if (trace.fraction == 1.0)
-		return;
+	if (trace.fraction != 1.0 && trace.plane.type == 2) {
+		// something was hit and it's a floor
+		qboolean b = qfalse;
 
-	// not a floor
-	if (trace.plane.type != 2)
-		return;
+		t = trace.endpos[2];
+		//CG_Printf("h0=%f, t=%f\n", h0, t);
 
-	t = trace.endpos[2];
-	//CG_Printf("h0: %f, t: %f\n", h0, t);
-
-	// fall ob
-	a = -psec * rintv / 2;
-	b = psec * (v0 - gravity * psec / 2 + rintv / 2);
-	c = h0 - t;
-	n1 = (-b + sqrt(b * b - 4 * a * c)) / (2 * a);
-	n2 = (-b - sqrt(b * b - 4 * a * c)) / (2 * a);
-	//CG_Printf("%f, %f\n", n1, n2);
-
-	n = floor(n2);
-	hn = h0 + psec * n * (v0 - gravity * psec / 2 - (n - 1) * rintv / 2);
-	//CG_Printf("h0: %f, v0: %f, n: %d, hn: %f, t: %f\n", h0, v0, n, hn, t);
-	if (n && hn < t + 0.25 && hn > t)
-		CG_DrawStringExt(320, 220, "F", colorWhite, qfalse, qtrue,
-						 TINYCHAR_WIDTH, TINYCHAR_HEIGHT, 0);
-
-	if (cg.predictedPlayerState.groundEntityNum != ENTITYNUM_NONE)
-	{
-		// jump ob
-		v0 += 270; // JUMP_VELOCITY
-		b = psec * (v0 - gravity * psec / 2 + rintv / 2);
-		n1 = (-b + sqrt(b * b - 4 * a * c)) / (2 * a);
-		n2 = (-b - sqrt(b * b - 4 * a * c)) / (2 * a);
-		//CG_Printf("%f, %f\n", n1, n2);
-
-		n = floor(n2);
-		hn = h0 + psec * n * (v0 - gravity * psec / 2 - (n - 1) * rintv / 2);
-		//CG_Printf("h0: %f, v0: %f, n: %d, hn: %f, t: %f\n", h0, v0, n, hn, t);
-		if (hn < t + 0.25 && hn > t)
-			CG_DrawStringExt(330, 220, "J", colorWhite, qfalse, qtrue,
+		// fall ob
+		if (CG_IsOverBounce(v0, h0, t, rintv, psec, gravity)) {
+			CG_DrawStringExt(310, 220, "F", colorWhite, qfalse, qtrue,
 							 TINYCHAR_WIDTH, TINYCHAR_HEIGHT, 0);
+			b = qtrue;
+		}
+
+		// jump ob
+		if (ps->groundEntityNum != ENTITYNUM_NONE
+			&& CG_IsOverBounce(v0 + 270 /*JUMP_VELOCITY*/, h0, t, rintv, psec, gravity)) {
+			CG_DrawStringExt(320, 220, "J", colorWhite, qfalse, qtrue,
+							 TINYCHAR_WIDTH, TINYCHAR_HEIGHT, 0);
+			b = qtrue;
+		}
+
+		// don't predict sticky ob if there is an ob already
+		if (b) {
+			return;
+		}
+
+		// sticky ob
+		b = qfalse;
+		h0 += 0.25;
+		//CG_Printf("h0=%f, t=%f\n", h0, t);
+
+		// sticky fall ob
+		if (CG_IsOverBounce(v0, h0, t, rintv, psec, gravity)) {
+			CG_DrawStringExt(310, 220, "F", colorWhite, qfalse, qtrue,
+							 TINYCHAR_WIDTH, TINYCHAR_HEIGHT, 0);
+			b = qtrue;
+		}
+
+		// sticky jump ob
+		if (ps->groundEntityNum != ENTITYNUM_NONE
+			&& CG_IsOverBounce(v0 + 270 /*JUMP_VELOCITY*/, h0, t, rintv, psec, gravity)) {
+			CG_DrawStringExt(320, 220, "J", colorWhite, qfalse, qtrue,
+							 TINYCHAR_WIDTH, TINYCHAR_HEIGHT, 0);
+			b = qtrue;
+		}
+
+		if (b) {
+			CG_DrawStringExt(300, 220, "S", colorWhite, qfalse, qtrue,
+							 TINYCHAR_WIDTH, TINYCHAR_HEIGHT, 0);
+		}
 	}
 }
+
 
 static void CG_DrawKeys(void)
 {
