@@ -1038,6 +1038,7 @@ static consoleCommand_t	commands[] =
 	{ "stopTimer", CG_StopTimer },
 	{ "info",	CG_Info_f },
 	{ "portal", CG_portalinfo_f },
+	{ "chs", CG_InfoCHS_f }
 };
 
 

@@ -172,3 +172,14 @@ void CG_DrawCHS(void)
 	}
 }
 
+void CG_InfoCHS_f(void)
+{
+	int i;
+	for (i = 0; i < sizeof(stats) / sizeof(stats[0]); i++) {
+		if (!stats[i].fun) {
+			continue;
+		}
+
+		CG_Printf("% 3d: %s\n", i, stats[i].desc);
+	}
+}

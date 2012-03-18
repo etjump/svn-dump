@@ -3608,4 +3608,5 @@ char *G_SHA1(char *string);
 // cg_drawCHS.c
 //
 void CG_DrawCHS(void);
+void CG_InfoCHS_f(void);
 
