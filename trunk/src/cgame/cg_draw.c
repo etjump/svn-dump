@@ -3175,7 +3175,7 @@ static void CG_DrawOB(void)
 		VectorCopy(ps->origin, start);
 		start[2] = h0;
 		VectorCopy(start, end);
-		end[2] = -131072;
+		end[2] -= 131072;
 
 		CG_Trace(&trace, start, vec3_origin, vec3_origin, end, ps->clientNum,
 				CONTENTS_SOLID);
