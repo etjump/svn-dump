@@ -2560,9 +2560,6 @@ qboolean CG_AddLinkedEntity( centity_t *cent, qboolean ignoreframe, int atTime )
 void CG_PositionEntityOnTag( refEntity_t *entity, const refEntity_t *parent, const char *tagName, int startIndex, vec3_t *offset);
 void CG_PositionRotatedEntityOnTag( refEntity_t *entity, const refEntity_t *parent, const char *tagName );
 
-//Feen: PGM - CG stuff..
-static void CG_PortalGate( centity_t *cent );
-
 
 //
 // cg_weapons.c

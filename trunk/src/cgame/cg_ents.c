@@ -2247,6 +2247,239 @@ void CG_CalcEntityLerpPositions( centity_t *cent ) {
 	}
 }
 
+
+//Feen: PGM - Drawing the portals....
+static void CG_PortalGate( centity_t *cent ){
+
+		
+	polyVert_t POLYverts[4];
+	vec3_t verts[4];
+	vec3_t pointDiff, pushedOrigin, angleInverse;
+	vec3_t axis[3];
+	float radius = 64.0f; // TODO: Use #define instead
+	int i;
+
+	//NOTE: just a test...
+	vec4_t temp_Color, temp_Color2;
+
+
+	//Predefined colors
+	byte clrBlue[4] = { 0x00, 0x01, 0xff, 0xff };
+	byte clrOrange[4] = { 0xff, 0x7e, 0x00, 0xff };
+	byte clrGreen[4] = { 0x0b, 0xd6, 0x43, 0xff };
+	byte clrRed[4] = { 0xf3, 0x32, 0x27, 0xff };
+	byte clrLBlue[4] = { 0x27, 0x82, 0xf4, 0xff }; //This is the red complement
+	
+
+
+	//Check if player wants to see other player portals
+	if (!cg_viewPlayerPortals.integer){
+		//We don't want to see other player portals
+		//so let's only render our portal...
+
+		if (cent->currentState.otherEntityNum != cg.clientNum)
+			return; //Not our portal - Don't draw it...
+	}
+
+
+
+	VectorCopy(cent->currentState.angles, angleInverse);
+
+	AnglesToAxis(angleInverse, axis);
+
+	//start- poly test stuff
+
+	/* make rotated polygon axis */ //Feen: Don't need to. ent angles are perfect
+	//VectorCopy( projection, axis[ 0 ] );
+	
+		//PerpendicularVector( axis[ 1 ], axis[ 0 ] );
+	//RotatePointAroundVector( axis[ 2 ], axis[ 0 ], axis[ 1 ], 1.0f );
+	//CrossProduct( axis[ 0 ], axis[ 2 ], axis[ 1 ] );
+	
+	/* push the origin out a bit */
+	//VectorMA( cent->currentState.origin, -1.0f, axis[ 0 ], pushedOrigin );
+	VectorMA( cent->currentState.origin, (-5.0f + 1.0f) /*(-12.0f + 1)*/, axis[ 0 ], pushedOrigin ); //Feen: Note 32 is the offset of the ent from the trace.endpos, so let's undo that for the gfx //TODO: Use #define instead
+																				  //NOTE: Changed back to 15
+	/* create the full polygon */
+	for( i = 0; i < 3; i++ )
+	{
+
+		
+		/* new */
+		verts[ 0 ][ i ] = pushedOrigin[ i ] - radius * axis[ 1 ][ i ] - radius * axis[ 2 ][ i ];
+		verts[ 1 ][ i ] = pushedOrigin[ i ] - radius * axis[ 1 ][ i ] + radius * axis[ 2 ][ i ];
+		verts[ 2 ][ i ] = pushedOrigin[ i ] + radius * axis[ 1 ][ i ] + radius * axis[ 2 ][ i ];
+		verts[ 3 ][ i ] = pushedOrigin[ i ] + radius * axis[ 1 ][ i ] - radius * axis[ 2 ][ i ];
+	}
+	
+		VectorCopy(verts[0], POLYverts[0].xyz);
+		VectorCopy(verts[1], POLYverts[1].xyz);
+		VectorCopy(verts[2], POLYverts[2].xyz);
+		VectorCopy(verts[3], POLYverts[3].xyz);
+	
+	//end poly test stuff
+
+
+		//Texture Coordinates
+		//Top Left
+		POLYverts[0].st[0] = 1;
+		POLYverts[0].st[1] = 0;
+
+		//Top Right
+		POLYverts[1].st[0] = 0;
+		POLYverts[1].st[1] = 0;
+
+		//Bottom Right
+		POLYverts[2].st[0] = 0;
+		POLYverts[2].st[1] = 1;
+
+		//Bottom Left
+		POLYverts[3].st[0] = 1;
+		POLYverts[3].st[1] = 1;
+
+
+		
+		//Assign color portals based on ownership
+		if (cent->currentState.otherEntityNum == cg.clientNum) { //Our Portal
+		
+			if(cent->currentState.eType == ET_PORTAL_BLUE) {
+				
+				POLYverts[0].modulate[0] = clrBlue[0];	//R
+				POLYverts[0].modulate[1] = clrBlue[1]; //G
+				POLYverts[0].modulate[2] = clrBlue[2]; //B
+				POLYverts[0].modulate[3] = clrBlue[3]; //A
+
+				POLYverts[1].modulate[0] = clrBlue[0];	//R
+				POLYverts[1].modulate[1] = clrBlue[1]; //G
+				POLYverts[1].modulate[2] = clrBlue[2]; //B
+				POLYverts[1].modulate[3] = clrBlue[3]; //A
+
+				POLYverts[2].modulate[0] = clrBlue[0];	//R
+				POLYverts[2].modulate[1] = clrBlue[1]; //G
+				POLYverts[2].modulate[2] = clrBlue[2]; //B
+				POLYverts[2].modulate[3] = clrBlue[3]; //A
+
+				POLYverts[3].modulate[0] = clrBlue[0];	//R
+				POLYverts[3].modulate[1] = clrBlue[1]; //G
+				POLYverts[3].modulate[2] = clrBlue[2]; //B
+				POLYverts[3].modulate[3] = clrBlue[3]; //A
+
+			}else{
+
+				POLYverts[0].modulate[0] = clrRed[0];	//R
+				POLYverts[0].modulate[1] = clrRed[1]; //G
+				POLYverts[0].modulate[2] = clrRed[2]; //B
+				POLYverts[0].modulate[3] = clrRed[3]; //A
+
+				POLYverts[1].modulate[0] = clrRed[0];	//R
+				POLYverts[1].modulate[1] = clrRed[1]; //G
+				POLYverts[1].modulate[2] = clrRed[2]; //B
+				POLYverts[1].modulate[3] = clrRed[3]; //A
+
+				POLYverts[2].modulate[0] = clrRed[0];	//R
+				POLYverts[2].modulate[1] = clrRed[1]; //G
+				POLYverts[2].modulate[2] = clrRed[2]; //B
+				POLYverts[2].modulate[3] = clrRed[3]; //A
+
+				POLYverts[3].modulate[0] = clrRed[0];	//R
+				POLYverts[3].modulate[1] = clrRed[1]; //G
+				POLYverts[3].modulate[2] = clrRed[2]; //B
+				POLYverts[3].modulate[3] = clrRed[3]; //A
+
+			}
+
+
+		}else{ //Not our portal
+
+			if(cent->currentState.eType == ET_PORTAL_RED) {
+				
+				POLYverts[0].modulate[0] = clrOrange[0];	//R
+				POLYverts[0].modulate[1] = clrOrange[1]; //G
+				POLYverts[0].modulate[2] = clrOrange[2]; //B
+				POLYverts[0].modulate[3] = clrOrange[3]; //A
+
+				POLYverts[1].modulate[0] = clrOrange[0];	//R
+				POLYverts[1].modulate[1] = clrOrange[1]; //G
+				POLYverts[1].modulate[2] = clrOrange[2]; //B
+				POLYverts[1].modulate[3] = clrOrange[3]; //A
+
+				POLYverts[2].modulate[0] = clrOrange[0];	//R
+				POLYverts[2].modulate[1] = clrOrange[1]; //G
+				POLYverts[2].modulate[2] = clrOrange[2]; //B
+				POLYverts[2].modulate[3] = clrOrange[3]; //A
+
+				POLYverts[3].modulate[0] = clrOrange[0];	//R
+				POLYverts[3].modulate[1] = clrOrange[1]; //G
+				POLYverts[3].modulate[2] = clrOrange[2]; //B
+				POLYverts[3].modulate[3] = clrOrange[3]; //A
+
+			}else{
+
+				POLYverts[0].modulate[0] = clrLBlue[0];	//R
+				POLYverts[0].modulate[1] = clrLBlue[1]; //G
+				POLYverts[0].modulate[2] = clrLBlue[2]; //B
+				POLYverts[0].modulate[3] = clrLBlue[3]; //A
+
+				POLYverts[1].modulate[0] = clrLBlue[0];	//R
+				POLYverts[1].modulate[1] = clrLBlue[1]; //G
+				POLYverts[1].modulate[2] = clrLBlue[2]; //B
+				POLYverts[1].modulate[3] = clrLBlue[3]; //A
+
+				POLYverts[2].modulate[0] = clrLBlue[0];	//R
+				POLYverts[2].modulate[1] = clrLBlue[1]; //G
+				POLYverts[2].modulate[2] = clrLBlue[2]; //B
+				POLYverts[2].modulate[3] = clrLBlue[3]; //A
+
+				POLYverts[3].modulate[0] = clrLBlue[0];	//R
+				POLYverts[3].modulate[1] = clrLBlue[1]; //G
+				POLYverts[3].modulate[2] = clrLBlue[2]; //B
+				POLYverts[3].modulate[3] = clrLBlue[3]; //A
+
+			}
+
+
+		}
+
+
+		/*  - temporarily disabled
+		//Color
+		//Top Left
+		POLYverts[0].modulate[0] = 0;	//R
+		POLYverts[0].modulate[1] = 255; //G
+		POLYverts[0].modulate[2] = 0; //B
+		POLYverts[0].modulate[3] = 255; //A
+
+		//Top Right
+		POLYverts[1].modulate[0] = 0;	//R
+		POLYverts[1].modulate[1] = 255; //G
+		POLYverts[1].modulate[2] = 0; //B
+		POLYverts[1].modulate[3] = 255; //A
+
+		//Bottom Right
+		POLYverts[2].modulate[0] = 0;	//R
+		POLYverts[2].modulate[1] = 255; //G
+		POLYverts[2].modulate[2] = 0; //B
+		POLYverts[2].modulate[3] = 255; //A
+
+		//Bottom Left
+		POLYverts[3].modulate[0] = 0;	//R
+		POLYverts[3].modulate[1] = 255; //G
+		POLYverts[3].modulate[2] = 0; //B
+		POLYverts[3].modulate[3] = 255; //A
+		*/
+
+
+
+
+
+		if(cent->currentState.eType == ET_PORTAL_BLUE)
+			trap_R_AddPolyToScene(cgs.media.portal_blueShader, 4, POLYverts);
+
+		if(cent->currentState.eType == ET_PORTAL_RED)
+			trap_R_AddPolyToScene(cgs.media.portal_redShader, 4, POLYverts);
+		
+}
+
 /*
 ===============
 CG_ProcessEntity
@@ -2805,236 +3038,3 @@ void CG_AttachBitsToTank( centity_t* tank, refEntity_t* mg42base, refEntity_t* m
 	CGTagToRefEntity( flash,		&tank->mountedMG42Flash		);
 }
 
-
-
-//Feen: PGM - Drawing the portals....
-static void CG_PortalGate( centity_t *cent ){
-
-		
-	polyVert_t POLYverts[4];
-	vec3_t verts[4];
-	vec3_t pointDiff, pushedOrigin, angleInverse;
-	vec3_t axis[3];
-	float radius = 64.0f; // TODO: Use #define instead
-	int i;
-
-	//NOTE: just a test...
-	vec4_t temp_Color, temp_Color2;
-
-
-	//Predefined colors
-	byte clrBlue[4] = { 0x00, 0x01, 0xff, 0xff };
-	byte clrOrange[4] = { 0xff, 0x7e, 0x00, 0xff };
-	byte clrGreen[4] = { 0x0b, 0xd6, 0x43, 0xff };
-	byte clrRed[4] = { 0xf3, 0x32, 0x27, 0xff };
-	byte clrLBlue[4] = { 0x27, 0x82, 0xf4, 0xff }; //This is the red complement
-	
-
-
-	//Check if player wants to see other player portals
-	if (!cg_viewPlayerPortals.integer){
-		//We don't want to see other player portals
-		//so let's only render our portal...
-
-		if (cent->currentState.otherEntityNum != cg.clientNum)
-			return; //Not our portal - Don't draw it...
-	}
-
-
-
-	VectorCopy(cent->currentState.angles, angleInverse);
-
-	AnglesToAxis(angleInverse, axis);
-
-	//start- poly test stuff
-
-	/* make rotated polygon axis */ //Feen: Don't need to. ent angles are perfect
-	//VectorCopy( projection, axis[ 0 ] );
-	
-		//PerpendicularVector( axis[ 1 ], axis[ 0 ] );
-	//RotatePointAroundVector( axis[ 2 ], axis[ 0 ], axis[ 1 ], 1.0f );
-	//CrossProduct( axis[ 0 ], axis[ 2 ], axis[ 1 ] );
-	
-	/* push the origin out a bit */
-	//VectorMA( cent->currentState.origin, -1.0f, axis[ 0 ], pushedOrigin );
-	VectorMA( cent->currentState.origin, (-5.0f + 1.0f) /*(-12.0f + 1)*/, axis[ 0 ], pushedOrigin ); //Feen: Note 32 is the offset of the ent from the trace.endpos, so let's undo that for the gfx //TODO: Use #define instead
-																				  //NOTE: Changed back to 15
-	/* create the full polygon */
-	for( i = 0; i < 3; i++ )
-	{
-
-		
-		/* new */
-		verts[ 0 ][ i ] = pushedOrigin[ i ] - radius * axis[ 1 ][ i ] - radius * axis[ 2 ][ i ];
-		verts[ 1 ][ i ] = pushedOrigin[ i ] - radius * axis[ 1 ][ i ] + radius * axis[ 2 ][ i ];
-		verts[ 2 ][ i ] = pushedOrigin[ i ] + radius * axis[ 1 ][ i ] + radius * axis[ 2 ][ i ];
-		verts[ 3 ][ i ] = pushedOrigin[ i ] + radius * axis[ 1 ][ i ] - radius * axis[ 2 ][ i ];
-	}
-	
-		VectorCopy(verts[0], POLYverts[0].xyz);
-		VectorCopy(verts[1], POLYverts[1].xyz);
-		VectorCopy(verts[2], POLYverts[2].xyz);
-		VectorCopy(verts[3], POLYverts[3].xyz);
-	
-	//end poly test stuff
-
-
-		//Texture Coordinates
-		//Top Left
-		POLYverts[0].st[0] = 1;
-		POLYverts[0].st[1] = 0;
-
-		//Top Right
-		POLYverts[1].st[0] = 0;
-		POLYverts[1].st[1] = 0;
-
-		//Bottom Right
-		POLYverts[2].st[0] = 0;
-		POLYverts[2].st[1] = 1;
-
-		//Bottom Left
-		POLYverts[3].st[0] = 1;
-		POLYverts[3].st[1] = 1;
-
-
-		
-		//Assign color portals based on ownership
-		if (cent->currentState.otherEntityNum == cg.clientNum) { //Our Portal
-		
-			if(cent->currentState.eType == ET_PORTAL_BLUE) {
-				
-				POLYverts[0].modulate[0] = clrBlue[0];	//R
-				POLYverts[0].modulate[1] = clrBlue[1]; //G
-				POLYverts[0].modulate[2] = clrBlue[2]; //B
-				POLYverts[0].modulate[3] = clrBlue[3]; //A
-
-				POLYverts[1].modulate[0] = clrBlue[0];	//R
-				POLYverts[1].modulate[1] = clrBlue[1]; //G
-				POLYverts[1].modulate[2] = clrBlue[2]; //B
-				POLYverts[1].modulate[3] = clrBlue[3]; //A
-
-				POLYverts[2].modulate[0] = clrBlue[0];	//R
-				POLYverts[2].modulate[1] = clrBlue[1]; //G
-				POLYverts[2].modulate[2] = clrBlue[2]; //B
-				POLYverts[2].modulate[3] = clrBlue[3]; //A
-
-				POLYverts[3].modulate[0] = clrBlue[0];	//R
-				POLYverts[3].modulate[1] = clrBlue[1]; //G
-				POLYverts[3].modulate[2] = clrBlue[2]; //B
-				POLYverts[3].modulate[3] = clrBlue[3]; //A
-
-			}else{
-
-				POLYverts[0].modulate[0] = clrRed[0];	//R
-				POLYverts[0].modulate[1] = clrRed[1]; //G
-				POLYverts[0].modulate[2] = clrRed[2]; //B
-				POLYverts[0].modulate[3] = clrRed[3]; //A
-
-				POLYverts[1].modulate[0] = clrRed[0];	//R
-				POLYverts[1].modulate[1] = clrRed[1]; //G
-				POLYverts[1].modulate[2] = clrRed[2]; //B
-				POLYverts[1].modulate[3] = clrRed[3]; //A
-
-				POLYverts[2].modulate[0] = clrRed[0];	//R
-				POLYverts[2].modulate[1] = clrRed[1]; //G
-				POLYverts[2].modulate[2] = clrRed[2]; //B
-				POLYverts[2].modulate[3] = clrRed[3]; //A
-
-				POLYverts[3].modulate[0] = clrRed[0];	//R
-				POLYverts[3].modulate[1] = clrRed[1]; //G
-				POLYverts[3].modulate[2] = clrRed[2]; //B
-				POLYverts[3].modulate[3] = clrRed[3]; //A
-
-			}
-
-
-		}else{ //Not our portal
-
-			if(cent->currentState.eType == ET_PORTAL_RED) {
-				
-				POLYverts[0].modulate[0] = clrOrange[0];	//R
-				POLYverts[0].modulate[1] = clrOrange[1]; //G
-				POLYverts[0].modulate[2] = clrOrange[2]; //B
-				POLYverts[0].modulate[3] = clrOrange[3]; //A
-
-				POLYverts[1].modulate[0] = clrOrange[0];	//R
-				POLYverts[1].modulate[1] = clrOrange[1]; //G
-				POLYverts[1].modulate[2] = clrOrange[2]; //B
-				POLYverts[1].modulate[3] = clrOrange[3]; //A
-
-				POLYverts[2].modulate[0] = clrOrange[0];	//R
-				POLYverts[2].modulate[1] = clrOrange[1]; //G
-				POLYverts[2].modulate[2] = clrOrange[2]; //B
-				POLYverts[2].modulate[3] = clrOrange[3]; //A
-
-				POLYverts[3].modulate[0] = clrOrange[0];	//R
-				POLYverts[3].modulate[1] = clrOrange[1]; //G
-				POLYverts[3].modulate[2] = clrOrange[2]; //B
-				POLYverts[3].modulate[3] = clrOrange[3]; //A
-
-			}else{
-
-				POLYverts[0].modulate[0] = clrLBlue[0];	//R
-				POLYverts[0].modulate[1] = clrLBlue[1]; //G
-				POLYverts[0].modulate[2] = clrLBlue[2]; //B
-				POLYverts[0].modulate[3] = clrLBlue[3]; //A
-
-				POLYverts[1].modulate[0] = clrLBlue[0];	//R
-				POLYverts[1].modulate[1] = clrLBlue[1]; //G
-				POLYverts[1].modulate[2] = clrLBlue[2]; //B
-				POLYverts[1].modulate[3] = clrLBlue[3]; //A
-
-				POLYverts[2].modulate[0] = clrLBlue[0];	//R
-				POLYverts[2].modulate[1] = clrLBlue[1]; //G
-				POLYverts[2].modulate[2] = clrLBlue[2]; //B
-				POLYverts[2].modulate[3] = clrLBlue[3]; //A
-
-				POLYverts[3].modulate[0] = clrLBlue[0];	//R
-				POLYverts[3].modulate[1] = clrLBlue[1]; //G
-				POLYverts[3].modulate[2] = clrLBlue[2]; //B
-				POLYverts[3].modulate[3] = clrLBlue[3]; //A
-
-			}
-
-
-		}
-
-
-		/*  - temporarily disabled
-		//Color
-		//Top Left
-		POLYverts[0].modulate[0] = 0;	//R
-		POLYverts[0].modulate[1] = 255; //G
-		POLYverts[0].modulate[2] = 0; //B
-		POLYverts[0].modulate[3] = 255; //A
-
-		//Top Right
-		POLYverts[1].modulate[0] = 0;	//R
-		POLYverts[1].modulate[1] = 255; //G
-		POLYverts[1].modulate[2] = 0; //B
-		POLYverts[1].modulate[3] = 255; //A
-
-		//Bottom Right
-		POLYverts[2].modulate[0] = 0;	//R
-		POLYverts[2].modulate[1] = 255; //G
-		POLYverts[2].modulate[2] = 0; //B
-		POLYverts[2].modulate[3] = 255; //A
-
-		//Bottom Left
-		POLYverts[3].modulate[0] = 0;	//R
-		POLYverts[3].modulate[1] = 255; //G
-		POLYverts[3].modulate[2] = 0; //B
-		POLYverts[3].modulate[3] = 255; //A
-		*/
-
-
-
-
-
-		if(cent->currentState.eType == ET_PORTAL_BLUE)
-			trap_R_AddPolyToScene(cgs.media.portal_blueShader, 4, POLYverts);
-
-		if(cent->currentState.eType == ET_PORTAL_RED)
-			trap_R_AddPolyToScene(cgs.media.portal_redShader, 4, POLYverts);
-		
-}
