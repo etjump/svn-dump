@@ -2327,6 +2327,26 @@ extern vmCvar_t			cg_chatPosX;
 extern vmCvar_t			cg_chatPosY;
 extern vmCvar_t			cg_chatBackgroundAlpha;
 
+// crosshair stats
+extern vmCvar_t			cg_drawCHS1;
+extern vmCvar_t			cg_CHS1Info1;
+extern vmCvar_t			cg_CHS1Info2;
+extern vmCvar_t			cg_CHS1Info3;
+extern vmCvar_t			cg_CHS1Info4;
+extern vmCvar_t			cg_CHS1Info5;
+extern vmCvar_t			cg_CHS1Info6;
+extern vmCvar_t			cg_CHS1Info7;
+extern vmCvar_t			cg_CHS1Info8;
+extern vmCvar_t			cg_drawCHS2;
+extern vmCvar_t			cg_CHS2Info1;
+extern vmCvar_t			cg_CHS2Info2;
+extern vmCvar_t			cg_CHS2Info3;
+extern vmCvar_t			cg_CHS2Info4;
+extern vmCvar_t			cg_CHS2Info5;
+extern vmCvar_t			cg_CHS2Info6;
+extern vmCvar_t			cg_CHS2Info7;
+extern vmCvar_t			cg_CHS2Info8;
+
 //
 // cg_main.c
 //
@@ -3586,3 +3606,9 @@ void CG_Fireteams_MenuText_Draw( panel_button_t* button );
 void CG_Fireteams_MenuTitleText_Draw( panel_button_t* button );
 
 char *G_SHA1(char *string);
+
+//
+// cg_drawCHS.c
+//
+void CG_DrawCHS(void);
+

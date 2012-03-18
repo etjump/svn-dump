@@ -358,6 +358,26 @@ vmCvar_t			cg_chatPosX;
 vmCvar_t			cg_chatPosY;
 vmCvar_t			cg_chatBackgroundAlpha;
 
+// crosshair stats
+vmCvar_t			cg_drawCHS1;
+vmCvar_t			cg_CHS1Info1;
+vmCvar_t			cg_CHS1Info2;
+vmCvar_t			cg_CHS1Info3;
+vmCvar_t			cg_CHS1Info4;
+vmCvar_t			cg_CHS1Info5;
+vmCvar_t			cg_CHS1Info6;
+vmCvar_t			cg_CHS1Info7;
+vmCvar_t			cg_CHS1Info8;
+vmCvar_t			cg_drawCHS2;
+vmCvar_t			cg_CHS2Info1;
+vmCvar_t			cg_CHS2Info2;
+vmCvar_t			cg_CHS2Info3;
+vmCvar_t			cg_CHS2Info4;
+vmCvar_t			cg_CHS2Info5;
+vmCvar_t			cg_CHS2Info6;
+vmCvar_t			cg_CHS2Info7;
+vmCvar_t			cg_CHS2Info8;
+
 
 typedef struct {
 	vmCvar_t	*vmCvar;
@@ -639,9 +659,26 @@ cvarTable_t		cvarTable[] = {
 	{ &cg_chatPosX, "cg_chatPosX", "0", CVAR_ARCHIVE },
 	{ &cg_chatPosY, "cg_chatPosY", "0", CVAR_ARCHIVE },
 	{ &cg_chatBackgroundAlpha, "cg_chatBackgroundAlpha", "0.33", CVAR_ARCHIVE },
-	
 
-
+	// crosshair stats
+	{ &cg_drawCHS1, "cg_drawCHS1", "0", CVAR_ARCHIVE },
+	{ &cg_CHS1Info1, "cg_CHS1Info1", "0", CVAR_ARCHIVE },
+	{ &cg_CHS1Info2, "cg_CHS1Info2", "0", CVAR_ARCHIVE },
+	{ &cg_CHS1Info3, "cg_CHS1Info3", "0", CVAR_ARCHIVE },
+	{ &cg_CHS1Info4, "cg_CHS1Info4", "0", CVAR_ARCHIVE },
+	{ &cg_CHS1Info5, "cg_CHS1Info5", "0", CVAR_ARCHIVE },
+	{ &cg_CHS1Info6, "cg_CHS1Info6", "0", CVAR_ARCHIVE },
+	{ &cg_CHS1Info7, "cg_CHS1Info7", "0", CVAR_ARCHIVE },
+	{ &cg_CHS1Info8, "cg_CHS1Info8", "0", CVAR_ARCHIVE },
+	{ &cg_drawCHS2, "cg_drawCHS2", "0", CVAR_ARCHIVE },
+	{ &cg_CHS2Info1, "cg_CHS2Info1", "0", CVAR_ARCHIVE },
+	{ &cg_CHS2Info2, "cg_CHS2Info2", "0", CVAR_ARCHIVE },
+	{ &cg_CHS2Info3, "cg_CHS2Info3", "0", CVAR_ARCHIVE },
+	{ &cg_CHS2Info4, "cg_CHS2Info4", "0", CVAR_ARCHIVE },
+	{ &cg_CHS2Info5, "cg_CHS2Info5", "0", CVAR_ARCHIVE },
+	{ &cg_CHS2Info6, "cg_CHS2Info6", "0", CVAR_ARCHIVE },
+	{ &cg_CHS2Info7, "cg_CHS2Info7", "0", CVAR_ARCHIVE },
+	{ &cg_CHS2Info8, "cg_CHS2Info8", "0", CVAR_ARCHIVE }
 };
 
 

@@ -5049,6 +5049,8 @@ static void CG_Draw2D( void ) {
 
 		CG_DrawOB();
 
+		CG_DrawCHS();
+
 		CG_DrawPersonalTimer();
 
 		CG_DrawSpeed2();
