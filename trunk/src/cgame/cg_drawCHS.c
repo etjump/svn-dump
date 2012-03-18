@@ -32,7 +32,15 @@ static void CG_CHS_PlayerStateHealth(char *buf, int size)
 
 static void CG_CHS_PlayerStateAmmo(char *buf, int size)
 {
-	// TODO
+	int ammo, clips, akimboammo;
+	CG_PlayerAmmoValue(&ammo, &clips, &akimboammo);
+	if (akimboammo >= 0) {
+		Com_sprintf(buf, size, "%d|%d/%d", akimboammo, ammo, clips);
+	} else if (clips >= 0) {
+		Com_sprintf(buf, size, "%d/%d", ammo, clips);
+	} else if (ammo >= 0 ) {
+		Com_sprintf(buf, size, "%d", ammo);
+	}
 }
 
 typedef struct {
@@ -176,7 +184,7 @@ void CG_InfoCHS_f(void)
 {
 	int i;
 	for (i = 0; i < sizeof(stats) / sizeof(stats[0]); i++) {
-		if (!stats[i].fun) {
+		if (!stats[i].fun || !stats[i].desc) {
 			continue;
 		}
 

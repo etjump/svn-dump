@@ -4343,7 +4343,7 @@ static void CG_DrawNewCompass( void ) {
 //	}
 }
 
-static int CG_PlayerAmmoValue( int *ammo, int *clips, int *akimboammo ) {
+int CG_PlayerAmmoValue( int *ammo, int *clips, int *akimboammo ) {
 	centity_t		*cent;
 	playerState_t	*ps;
 	int				weap;

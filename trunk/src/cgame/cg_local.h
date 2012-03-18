@@ -2506,8 +2506,7 @@ void CG_DrawPlayerWeaponIcon( rectDef_t *rect, qboolean drawHighlighted, int ali
 int CG_CalculateReinfTime( qboolean  menu );
 float CG_CalculateReinfTime_Float( qboolean  menu );
 void CG_Fade( int r, int g, int b, int a, int time, int duration );
-
-
+int CG_PlayerAmmoValue( int *ammo, int *clips, int *akimboammo );
 
 
 //
