@@ -4016,8 +4016,32 @@ void CheckBanner() {
 	// Maximum of five banners.
 	if(g_banners.integer > 5) {
 		bannerCount = 5;
+	} else if(g_banners.integer < 0) {
+		bannerCount = 0;
 	} else {
 		bannerCount = g_banners.integer;
+	}
+
+	if(!*g_banner1.string) {
+		if(g_banners.integer > 0) {
+			Q_strncpyz(g_banner1.string, "Set \"g_banners\" to 0 or set \"g_banner1\"", sizeof(g_banner1.string));
+		}
+	} else if (!*g_banner2.string) {
+		if(g_banners.integer > 1) {
+			Q_strncpyz(g_banner2.string, "Set \"g_banners\" to 0/1 or set \"g_banner2\"", sizeof(g_banner1.string));
+		}
+	} else if (!*g_banner3.string) {
+		if(g_banners.integer > 2) {
+			Q_strncpyz(g_banner3.string, "Set \"g_banners\" to 0/1/2 or set \"g_banner3\"", sizeof(g_banner1.string));
+		}
+	} else if (!*g_banner4.string) {
+		if(g_banners.integer > 3) {
+			Q_strncpyz(g_banner4.string, "Set \"g_banners\" to 0/1/2/3 or set \"g_banner4\"", sizeof(g_banner1.string));
+		}
+	} else if (!*g_banner5.string) {
+		if(g_banners.integer > 3) {
+			Q_strncpyz(g_banner5.string, "Set \"g_banners\" to 0/1/2/3/4 or set \"g_banner5\"", sizeof(g_banner1.string));
+		}
 	}
 
 	if(level.nextBanner == 0) {

@@ -2,22 +2,6 @@
 
 char bigTextBuffer[100000];
 
-/*
-What is needed:	
-disable save?
-BUGS:
-AFTER 110B
-no greeting -> lil lagspike on connect?
-adminhelp
-callvote kick
-
-!setlevel x 2
-!setlevel x 0
-!rename x y
-!setlevel y 2
--> finger y = user (x)
-*/
-
 // I don't think anyone needs over 64 admin levels.
 
 admin_level_t *g_admin_levels[MAX_ADMIN_LEVELS];
@@ -48,6 +32,7 @@ static const struct g_admin_cmd g_admin_cmds[] = {
 	{"kick",		G_admin_kick,		'k',	"Kicks target player.", "Syntax: !kick <player>"},
 	{"listbans",	G_admin_listbans,	'L',	"Lists all current bans.", "Syntax: !listbans"},
 	{"listcmds",	G_admin_help,		'h',	"Displays info about commands.", "Syntax: !help <command>"},
+	{"listplayers",	G_admin_listplayers,'l',	"Displays level info of all players.", "Syntax: !listplayers"},
 	{"map",			G_admin_map,		'M',	"Changes map.", "Syntax: !map <mapname>"},
 	{"mute",		G_admin_mute,		'm',	"Mutes target player.", "Syntax: !mute <target>"},
 	{"nogoto",		G_admin_disable_goto,'T',	"Prevents target from using goto & call.", "Syntax: !nogoto <target>"},
@@ -62,6 +47,9 @@ static const struct g_admin_cmd g_admin_cmds[] = {
 	{"spec",		G_admin_spec,		'S',	"Spectate target.", "Syntax: !spec <target>"},
 	{"unban",		G_admin_unban,		'b',	"Unbans #.", "Syntax: !unban <number>"},
 	{"unmute",		G_admin_unmute,		'm',	"Unmutes target player.", "Syntax: !unmute <target>"},
+
+	{"levadd",		G_admin_levadd,		'A',	"Add level.", "Syntax: !levadd <level>"},
+	{"levedit",		G_admin_levedit,	'A',	"Edit level.", "Syntax: !levedit <level> <name|gtext|cmds> <third parameter>"},
 
 #ifdef EDITION999
 	{"noclip",		G_admin_noclip,		AF_ADMINBYPASS, "Noclip on/off for target player.", "Syntax: !noclip <target>"},
@@ -1796,6 +1784,146 @@ qboolean G_admin_spec(gentity_t *ent, int skiparg) {
 	return qtrue;
 }
 
+qboolean G_admin_listplayers(gentity_t *ent, int skiparg) {
+
+	int i = 0;
+
+	AIP(ent, "^3!listplayers:^7 check console for more information.");
+	if(ent) {
+		CP("print \"ID : Player                    Level     \n\"");
+		CP("print \"----------------------------------------\n\"");
+	} else {
+		G_Printf("ID : Player                    Level     \n\"");
+		G_Printf("----------------------------------------\n\"");
+	}
+
+	for(i = 0; i < level.numConnectedClients; i++) {
+		int idnum = level.sortedClients[i];
+		gclient_t *cl = &level.clients[idnum];
+		char name[MAX_NETNAME];
+
+		Q_strncpyz(name, cl->pers.netname, sizeof(name));
+
+		name[26] = 0;
+
+		if(ent) {
+			CP(va("print \"%2d : %-26s^7  %7d\n\"", idnum, name, cl->sess.uinfo.level));
+		} else {
+			SanitizeString(cl->pers.netname, name, qfalse);
+			name[26] = 0;
+			G_Printf("%2d : %-26s  %7d\n\"", idnum, name, cl->sess.uinfo.level);
+		}
+	}
+	return qtrue;
+}
+
+int adminComparator( const void *first, const void *second ) {
+	admin_level_t* a = *(admin_level_t**)first;
+	admin_level_t* b = *(admin_level_t**)second;
+
+	return a->level - b->level;
+}
+
+qboolean G_admin_levedit( gentity_t *ent, int skiparg ) {
+
+	char arg1[MAX_TOKEN_CHARS] = "\0";
+	char arg2[MAX_TOKEN_CHARS] = "\0";
+	char *arg3 = NULL;
+	int level = -1;
+	int i = 0;
+	qboolean found = qfalse;
+	admin_level_t *lev = NULL;
+
+	// !levedit arg1 arg2 arg3
+	
+	if(Q_SayArgc() < 4 + skiparg) {
+		AIP(ent, "^3usage:^7 !levedit <level> <name|gtext|cmds> <additional parameters.>");
+		return qfalse;
+	}
+
+	Q_SayArgv(1 + skiparg, arg1, sizeof(arg1));
+	Q_SayArgv(2 + skiparg, arg2, sizeof(arg2));
+	arg3 = Q_SayConcatArgs(3 + skiparg);
+
+	level = atoi(arg1);
+
+	for(i = 0; g_admin_levels[i]; i++) {
+		if(g_admin_levels[i]->level == level) {
+			lev = g_admin_levels[i];
+			found = qtrue;
+		}
+	}
+
+	if(!found) {
+		AIP(ent, "^3!levedit: ^7level not found.");
+		return qfalse;
+	}
+	
+	if(ent && level > ent->client->sess.uinfo.level) {
+		AIP(ent, "^3!levedit: ^7you cannot edit levels higher than yours.");
+		return qfalse;
+	}
+	
+	if(!Q_stricmp(arg2, "name")) {
+		Q_strncpyz(lev->name, arg3, sizeof(lev->name));
+	} else if (!Q_stricmp(arg2, "cmds")) {
+		if(arg3[0] == '+') {
+			Q_strcat(lev->commands, sizeof(lev->commands), (arg3+1));
+		} else if (arg3[0] == '-') {
+			for(i = 0; i < strlen(arg3); i++) {
+				RemoveAllChars(arg3[i], lev->commands);
+			}
+		} else {
+			Q_strncpyz(lev->commands, arg3, sizeof(lev->commands));
+		}
+		RemoveDuplicates(lev->commands);
+		SortString(lev->commands);
+	} else if (!Q_stricmp(arg2, "gtext")) {
+		Q_strncpyz(lev->greeting, arg3, sizeof(lev->greeting));
+	} else {
+		AIP(ent, "^3usage:^7 !levedit <level> <name|gtext|cmds> <additional parameters.>");
+		return qfalse;
+	}
+	G_admin_writeconfig();
+	return qtrue;
+}
+
+qboolean G_admin_levadd( gentity_t *ent, int skiparg ) {
+	char arg1[MAX_TOKEN_CHARS];
+	int level = -1;
+	int i = 0;
+	admin_level_t *temp;
+	if(Q_SayArgc() != 2 + skiparg) {
+		AIP(ent, "^3usage: ^7!levadd <level>");
+		return qfalse;
+	}
+
+	Q_SayArgv(1 + skiparg, arg1, sizeof(arg1));
+	level = atoi(arg1);
+
+	for(i = 0; g_admin_levels[i]; i++) {
+		if(g_admin_levels[i]->level == level) {
+			AIP(ent, "^3!levadd:^7 level already exists.");
+			return qtrue;
+		}
+	}
+	if(i == MAX_ADMIN_LEVELS) {
+		AIP(ent, "^3Database error:^7 too many levels on database.");
+		return qfalse;
+	}
+
+	temp = (admin_level_t*)malloc(sizeof(admin_level_t));
+
+	temp->level = level;
+	temp->commands[0] = 0;
+	temp->greeting[0] = 0;
+	temp->name[0] = 0;
+
+	g_admin_levels[i++] = temp;
+	qsort(g_admin_levels, i, sizeof(admin_level_t*), adminComparator);
+	G_admin_writeconfig();
+	return qtrue;
+}
 
 
 #ifdef EDITION999

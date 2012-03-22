@@ -2079,14 +2079,14 @@ qboolean Cmd_CallVote_f( gentity_t *ent, unsigned int dwCommand, qboolean fRefCo
 	}
 
 	if(!Q_stricmp(arg1, "random")) {
-		int random;
+		int number;
 		if(Q_stricmp(arg2, "map")) {
 			CP("print \"^3Usage:^7 Callvote random map");
 			return qfalse;
 		}
-		random = rand() % level.mapCount;
+		number = rand() % level.mapCount;
 		Q_strncpyz(arg1, "map", sizeof("map"));
-		Q_strncpyz(arg2, g_maplist[random], sizeof(arg1));
+		Q_strncpyz(arg2, g_maplist[number], sizeof(arg1));
 	}
 
 	if (!Q_stricmp(arg1, "map"))
@@ -3727,6 +3727,8 @@ void Cmd_Goto_f(gentity_t *ent) {
 	}
 
 	VectorCopy(other->client->ps.origin, ent->client->ps.origin);
+	trap_SendServerCommand(ent->client->ps.clientNum, va("cpm \"%s^7 -> %s\n\"", ent->client->pers.netname, other->client->pers.netname));
+	trap_SendServerCommand(other->client->ps.clientNum, va("cpm \"%s^7 -> %s\n\"", ent->client->pers.netname, other->client->pers.netname));
 }
 
 void Cmd_Call_f(gentity_t *ent)
@@ -3782,6 +3784,8 @@ void Cmd_Call_f(gentity_t *ent)
 	}
 
 	VectorCopy(ent->client->ps.origin, other->client->ps.origin);
+	trap_SendServerCommand(ent->client->ps.clientNum, va("cpm \"%s^7 -> %s\n\"", other->client->pers.netname, ent->client->pers.netname));
+	trap_SendServerCommand(other->client->ps.clientNum, va("cpm \"%s^7 -> %s\n\"", other->client->pers.netname, ent->client->pers.netname));
 }
 
 void Cmd_PrivateMessage_f(gentity_t *ent)
@@ -4413,6 +4417,7 @@ void G_cache_map_names() {
 		if(strlen(dirptr) > 4)
 			dirptr[strlen(dirptr)-4] = '\0';
 		if(i < MAX_MAPS) {
+			G_Printf("%s\n", dirptr);
 			Q_strncpyz(g_maplist[i], dirptr, sizeof(g_maplist[i]));
 		}		
 	}

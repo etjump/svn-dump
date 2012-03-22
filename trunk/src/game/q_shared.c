@@ -1520,3 +1520,61 @@ char *Q_StrReplace(char *haystack, char *needle, char *newp)
 	Q_strncpyz(final, dest, sizeof(final));
 	return final;
 }
+
+qboolean charErase(int pos, char *src) {
+
+	int i = 0;
+
+	if(strlen(src) < pos) {
+		return qfalse;
+	}
+
+	for(i = pos+1; i < strlen(src); i++) {
+		src[i-1] = src[i];
+	}
+	src[strlen(src) - 1] = 0;
+	return qtrue;
+}
+
+void RemoveAllChars(char c, char *src) {
+	int i = 0;
+	for(i = 0; i < strlen(src); i++) {
+		if(src[i] == c) {
+			charErase(i, src);
+			i--;
+		}
+	}
+}
+
+/*
+Removes duplicate chars from a string
+*/
+
+void RemoveDuplicates(char *src) {
+	int i = 0;
+	int j = 0;
+	int outlen = 0;
+	qboolean found = qfalse;
+
+	for(i = 0; i < strlen(src); i++) {
+		char c = src[i];
+		for(j = i+1; j < strlen(src); j++) {
+			if(c == src[j]) {
+				charErase(j, src);
+				--j;
+			}
+		}
+	}
+}
+
+int CharComparator( const void *first, const void *second ) {
+	return ( *(char*)first - *(char*)second );
+}
+
+/*
+Sort string by alphabetic order
+*/
+
+void SortString(char *src, unsigned size) {
+	qsort(src, strlen(src), sizeof(src[0]), CharComparator);
+}

@@ -2697,6 +2697,7 @@ qboolean G_admin_finger(gentity_t *ent, int skiparg);
 qboolean G_admin_help(gentity_t *ent, int skiparg);
 qboolean G_admin_kick(gentity_t *ent, int skiparg);
 qboolean G_admin_listbans(gentity_t *ent, int skiparg);
+qboolean G_admin_listplayers(gentity_t *ent, int skiparg);
 qboolean G_admin_map(gentity_t *ent, int skiparg);
 qboolean G_admin_mute(gentity_t *ent, int skiparg);
 qboolean G_admin_passvote(gentity_t *ent, int skiparg);
@@ -2710,6 +2711,9 @@ qboolean G_admin_spec(gentity_t *ent, int skiparg);
 qboolean G_admin_unban(gentity_t *ent, int skiparg);
 qboolean G_admin_unmute(gentity_t *ent, int skiparg);
 qboolean G_admin_permission(gentity_t *ent, char flag);
+
+qboolean G_admin_levadd( gentity_t *ent, int skiparg );
+qboolean G_admin_levedit(gentity_t *ent, int skiparg);
 
 //Feen: PGM
 
@@ -2736,3 +2740,4 @@ void Weapon_Portal_Fire( gentity_t *ent, int PortalNum ); //TODO add switch for 
 qboolean G_admin_noclip(gentity_t *ent, int skiparg);
 
 #endif
+

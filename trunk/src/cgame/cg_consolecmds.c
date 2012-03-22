@@ -1193,4 +1193,5 @@ void CG_InitConsoleCommands( void ) {
 	trap_AddCommand ("info");
 	trap_AddCommand ("adminlogin");
 	trap_AddCommand ("portal");
+	trap_AddCommand ("setspawnpt");
 }
