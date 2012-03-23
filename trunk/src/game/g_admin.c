@@ -24,17 +24,22 @@ struct g_admin_cmd {
 };
 
 static const struct g_admin_cmd g_admin_cmds[] = {
+	{"8ball",		G_admin_8ball,		'8',	"Magic 8 Ball!", "Syntax: !8ball <question>"},
 	{"admintest",	G_admin_admintest,	'a',	"Displays your current admin level.", "Syntax: !admintest"},
 	{"ban",			G_admin_ban,		'b',	"Bans target player.", "Syntax: !ban <name> <time> <reason>"},
 	{"cancelvote",  G_admin_cancelvote, 'C',	"Cancels the current vote in progress.", "Syntax: !cancelvote"},
 	{"finger",		G_admin_finger,		'f',	"Displayers target's adminlevel.", "Syntax: !finger <target>"},
 	{"help",		G_admin_help,		'h',	"Displays info about commands.", "Syntax: !help <command>"},
 	{"kick",		G_admin_kick,		'k',	"Kicks target player.", "Syntax: !kick <player>"},
-	{"listbans",	G_admin_listbans,	'L',	"Lists all current bans.", "Syntax: !listbans"},
 	{"listcmds",	G_admin_help,		'h',	"Displays info about commands.", "Syntax: !help <command>"},
+	{"listbans",	G_admin_listbans,	'L',	"Lists all current bans.", "Syntax: !listbans"},
+	{"listflags",	G_admin_listflags,	'A',	"Lists all admin command flags.", "Syntax: !listflags"},
 	{"listplayers",	G_admin_listplayers,'l',	"Displays level info of all players.", "Syntax: !listplayers"},
 	{"map",			G_admin_map,		'M',	"Changes map.", "Syntax: !map <mapname>"},
 	{"mute",		G_admin_mute,		'm',	"Mutes target player.", "Syntax: !mute <target>"},
+#ifndef EDITION999
+	{"noclip",		G_admin_noclip,		'N',	"Noclip on/off.", "Syntax: !noclip"},
+#endif
 	{"nogoto",		G_admin_disable_goto,'T',	"Prevents target from using goto & call.", "Syntax: !nogoto <target>"},
 	{"nosave",		G_admin_disable_save,'T',	"Prevents target from using save & load.", "Syntax: !nosave <target>"},
 	{"passvote",	G_admin_passvote,	'P',	"Passes the current vote in progress.","Syntax: !passvote}"},
@@ -48,16 +53,19 @@ static const struct g_admin_cmd g_admin_cmds[] = {
 	{"unban",		G_admin_unban,		'b',	"Unbans #.", "Syntax: !unban <number>"},
 	{"unmute",		G_admin_unmute,		'm',	"Unmutes target player.", "Syntax: !unmute <target>"},
 
+	{"editcmds",	G_admin_editcommands,'A',	"Edit level commands.", "Syntax: !editcmds <level> <+cmd|-cmd> <+cmd2|-cmd>..."},
 	{"levadd",		G_admin_levadd,		'A',	"Add level.", "Syntax: !levadd <level>"},
 	{"levedit",		G_admin_levedit,	'A',	"Edit level.", "Syntax: !levedit <level> <name|gtext|cmds> <third parameter>"},
-
+	{"levinfo",		G_admin_levinfo,	'A',	"Show info about levels.", "Syntax: !levinfo or !levinfo <level>"},
 #ifdef EDITION999
 	{"noclip",		G_admin_noclip,		AF_ADMINBYPASS, "Noclip on/off for target player.", "Syntax: !noclip <target>"},
 #endif
 
-
-	{"",			NULL,				'\0',	""}
+	{"\0",			NULL,				'\0',	"", ""}
 };
+
+
+
 // Prints on both chat & console.
 void G_admin_chat_print(char *string) {
 	AP(va("chat \"%s", string));
@@ -1742,6 +1750,10 @@ qboolean G_admin_spec(gentity_t *ent, int skiparg) {
 	char err[MAX_STRING_CHARS];
 	gentity_t *target;
 
+	if(!ent) {
+		return qfalse;
+	}
+
 	if(Q_SayArgc() != 2 + skiparg) {
 		AIP(ent, "^3usage:^7 !spec <player>");
 		return qfalse;
@@ -1751,6 +1763,11 @@ qboolean G_admin_spec(gentity_t *ent, int skiparg) {
 	
 	if(!(target = getPlayerForName(name, err, sizeof(err)))) {
 		AIP(ent, va("^3!spec: ^7%s", err));
+		return qfalse;
+	}
+
+	if(target->client->sess.sessionTeam == TEAM_SPECTATOR) {
+		AIP(ent, "^3!spec:^7 you can't spectate a spectator.");
 		return qfalse;
 	}
 
@@ -1924,6 +1941,221 @@ qboolean G_admin_levadd( gentity_t *ent, int skiparg ) {
 	G_admin_writeconfig();
 	return qtrue;
 }
+// Just for fun :D
+static const char *m8BallResponses[] = {
+    "It is certain",
+    "It is decidedly so",
+    "Without a doubt",
+    "Yes – definitely",
+    "You may rely on it",
+     
+    "As I see it, yes",
+    "Most likely",
+    "Outlook good",
+    "Signs point to yes",
+    "Yes",
+     
+    "Reply hazy, try again",
+    "Ask again later",
+    "Better not tell you now",
+    "Cannot predict now",
+    "Concentrate and ask again",
+     
+    "Don't count on it",
+    "My reply is no",
+    "My sources say no",
+    "Outlook not so good",
+    "Very doubtful"
+};
+
+
+qboolean G_admin_8ball(gentity_t *ent, int skiparg) {
+	int i = 0;
+	int random = 0;
+	char color[3];
+	if(Q_SayArgc() < 2 + skiparg) {
+		AIP(ent, "^3usage:^7 !8ball <question>");
+		return qfalse;
+	}
+
+	random = rand() % 20;
+	color[0] = '^';
+	if(random < 10) {
+		color[1] = COLOR_GREEN;
+	} else if (random < 15) {
+		color[1] = COLOR_YELLOW;
+	} else {
+		color[1] = COLOR_RED;
+	}
+	color[2] = 0;
+
+	AP(va("chat \"^3Magic 8 Ball: %s%s.\n\"", color, m8BallResponses[random]));
+	return qtrue;
+}
+
+qboolean G_admin_listflags( gentity_t *ent, int skiparg ) {
+	int i = 0;
+
+	if(ent) {
+		AIP(ent, "^3!listflags: ^7check console for more info");
+	}
+
+	for(i = 0; g_admin_cmds[i].keyword[0]; i++) {
+		if(ent) CP(va("print \"%-30s %c\n\"", g_admin_cmds[i].keyword, g_admin_cmds[i].flag));
+		else G_Printf("%-30s %c\n", g_admin_cmds[i].keyword, g_admin_cmds[i].flag);
+	}
+	return qtrue;
+}
+
+qboolean G_admin_levinfo( gentity_t *ent, int skiparg ) {
+	if(Q_SayArgc() > 2 + skiparg) {
+		AIP(ent, "^3usage: ^7!levinfo or !levinfo <level>");
+		return qtrue;
+	}
+	if(Q_SayArgc() == 1 + skiparg) {
+		int i = 0;
+		ASP("Levels: ");
+		for( i = 0; g_admin_levels[i]; i++) {
+			if(i == 0)
+				ASP(va("%d", g_admin_levels[i]->level));
+			else
+				ASP(va(", %d",g_admin_levels[i]->level));
+		}
+		ASP("\n");
+	} else if (Q_SayArgc() > 1 + skiparg) {
+
+		int i = 0;
+		int level = -1;
+		qboolean found = qfalse;
+		char arg1[MAX_TOKEN_CHARS] = "\0";
+		Q_SayArgv(1 + skiparg, arg1, sizeof(arg1));
+		
+		level = atoi(arg1);
+
+		for(i = 0; g_admin_levels[i]; i++) {
+			if(level == g_admin_levels[i]->level) {
+				found = qtrue;
+				break;
+			}
+		}
+
+		if(!found) {
+			AIP(ent, "^3!levinfo: ^7level not found.");
+			return qfalse;
+		}
+
+		if(ent) {
+			AIP(ent, "^3!levinfo: ^7check console for more info.");
+			CP("print \"^5[LEVEL]\n\"");
+			CP(va("print \"^5level    = ^7%d\n\"", g_admin_levels[i]->level));
+			CP(va("print \"^5name     = ^7%s\n\"", g_admin_levels[i]->name));
+			CP(va("print \"^5commands = ^7%s\n\"", g_admin_levels[i]->commands));
+			CP(va("print \"^5greeting = ^7%s\n\"", g_admin_levels[i]->greeting));
+		} else {
+			G_Printf("^5[LEVEL]\n");
+			G_Printf("^5level     = ^7%d\n", g_admin_levels[i]->level);
+			G_Printf("^5name      = ^7%s\n", g_admin_levels[i]->name);
+			G_Printf("^5commands  = ^7%s\n", g_admin_levels[i]->commands);
+			G_Printf("^5greeting  =^7 %s\n", g_admin_levels[i]->greeting);
+		}		
+	}
+	return qtrue;
+}
+// !editcmds 0 +admintest +kick -ban (example)
+qboolean G_admin_editcommands(gentity_t *ent, int skiparg) {
+
+	// array to store all commands into
+	char	levelstr[MAX_TOKEN_CHARS];
+	char	addcmdflags[MAX_COMMANDS];
+	char	rmcmdflags[MAX_COMMANDS];
+	char	commands[MAX_COMMANDS][MAX_CMD_LEN];
+	int		commandCount = 0;
+	int		addflagCount = 0;
+	int		rmflagCount = 0;
+	int		i = 0;
+	int		level = -1;
+	int		levelIndex = -1;
+
+	if(Q_SayArgc() < 3 + skiparg) {
+		AIP(ent, "^3usage: ^7!editcmds <level> <+command|-command> <+another|-another> ...");
+		return qfalse;
+	}
+	// Let's copy all args to an array
+	for( i = 2 + skiparg; i < Q_SayArgc(); i++) {
+		char arg[MAX_TOKEN_CHARS];
+		// Just in case.. should never happen tho.
+		if(i > MAX_COMMANDS) {
+			AIP(ent, "^1ERROR:^7 too many parameters.");
+			return qfalse;
+		}
+		Q_SayArgv(1 + skiparg, levelstr, sizeof(levelstr));
+		level = atoi(levelstr);
+		Q_SayArgv(i, arg, sizeof(arg));
+		Q_strncpyz(commands[commandCount++], arg, sizeof(commands[0]));
+	}
+
+	for(i = 0; g_admin_levels[i]; i++) {
+		if(g_admin_levels[i]->level == level) {
+			levelIndex = i;
+			break;
+		}
+	}
+
+	if(levelIndex < 0) {
+		AIP(ent, "^3!editcmds:^7 level not found.");
+		return qfalse;
+	}
+	
+	for( i = 0; i < commandCount; i++) {
+		char sign = '+';
+		qboolean signexist = qfalse;
+		int j = 0;
+		if(commands[i][0] == '+') {
+			signexist = qtrue;
+			sign = '+';
+		} else if (commands[i][0] == '-') {
+			signexist = qtrue;
+			sign = '-';
+		} else {
+			signexist = qfalse;
+			sign = '+';
+		}
+
+		for(j = 0; g_admin_cmds[j].keyword[0]; j++) {
+			if(signexist) {
+				if(sign == '+') {
+					if(!Q_stricmp(g_admin_cmds[j].keyword, &commands[i][1])) {
+						addcmdflags[addflagCount++] = g_admin_cmds[j].flag;
+						break;
+					} 
+				} else {
+					if(!Q_stricmp(g_admin_cmds[j].keyword, &commands[i][1])) {
+						rmcmdflags[rmflagCount++] = g_admin_cmds[j].flag;
+						break;
+					}
+				}
+			} else {
+				if(!Q_stricmp(g_admin_cmds[j].keyword, commands[i])) {
+					addcmdflags[addflagCount++] = g_admin_cmds[j].flag;
+					break;
+				}
+			}
+		}
+		addcmdflags[addflagCount] = 0;
+		rmcmdflags[rmflagCount] = 0;
+	}
+
+	for(i = 0; rmcmdflags[i]; i++) {
+		RemoveAllChars(rmcmdflags[i], g_admin_levels[levelIndex]->commands);
+	}
+
+	Q_strcat(g_admin_levels[levelIndex]->commands, sizeof(g_admin_levels[levelIndex]->commands), addcmdflags);
+
+	RemoveDuplicates(g_admin_levels[levelIndex]->commands);
+	SortString(g_admin_levels[levelIndex]->commands);
+	
+	return qtrue;
+}
 
 
 #ifdef EDITION999
@@ -1951,6 +2183,21 @@ qboolean G_admin_noclip(gentity_t *ent, int skiparg) {
 		target->client->noclip = qtrue;
 	}
 
+}
+
+#else
+
+qboolean G_admin_noclip(gentity_t *ent, int skiparg) {
+	if(level.noNoclip) {
+		AIP(ent, "^3!noclip:^7 noclip is disabled on this map.");
+		return qfalse;
+	}
+
+	if(ent->client->noclip) {
+		ent->client->noclip = qfalse;
+	} else {
+		ent->client->noclip = qtrue;
+	}
 }
 
 #endif

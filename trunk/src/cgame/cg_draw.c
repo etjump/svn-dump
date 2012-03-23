@@ -2448,12 +2448,14 @@ static void CG_DrawVote(void) {
 		if ( !(cg.snap->ps.eFlags & EF_VOTED) ) {
 			s = va( CG_TranslateString( "VOTE(%i): %s" ), sec, cgs.voteString);
 			CG_DrawStringExt( 8, 200, s, color, qtrue, qtrue, TINYCHAR_WIDTH, TINYCHAR_HEIGHT, 80 );
-
+			// Zero: didn't want to delete this yet, not sure if I want specs to be able to vote.
+			/*
 			if( cgs.clientinfo[cg.clientNum].team != TEAM_AXIS && cgs.clientinfo[cg.clientNum].team != TEAM_ALLIES ) {
 				s = CG_TranslateString( "Cannot vote as Spectator" );
 			} else {
+			*/
 				s = va( CG_TranslateString( "YES(%s):%i, NO(%s):%i" ), str1, cgs.voteYes, str2, cgs.voteNo );
-			}
+			//}
 			CG_DrawStringExt( 8, 214, s, color, qtrue, qtrue, TINYCHAR_WIDTH, TINYCHAR_HEIGHT, 60 );
 			return;
 		} else {

@@ -2687,6 +2687,7 @@ void G_admin_identify_all();
 void G_admin_login(gentity_t *ent);
 void G_admin_register_client(gentity_t *ent);
 
+qboolean G_admin_8ball(gentity_t *ent, int skiparg);
 qboolean G_admin_admintest(gentity_t *ent, int skiparg);
 qboolean G_admin_ban_check(char *userinfo, char *reason);
 qboolean G_admin_ban(gentity_t *ent, int skiparg);
@@ -2700,6 +2701,7 @@ qboolean G_admin_listbans(gentity_t *ent, int skiparg);
 qboolean G_admin_listplayers(gentity_t *ent, int skiparg);
 qboolean G_admin_map(gentity_t *ent, int skiparg);
 qboolean G_admin_mute(gentity_t *ent, int skiparg);
+qboolean G_admin_noclip(gentity_t *ent, int skiparg);
 qboolean G_admin_passvote(gentity_t *ent, int skiparg);
 qboolean G_admin_putteam(gentity_t *ent, int skiparg);
 qboolean G_admin_readconfig(gentity_t *ent, int skiparg);
@@ -2712,6 +2714,9 @@ qboolean G_admin_unban(gentity_t *ent, int skiparg);
 qboolean G_admin_unmute(gentity_t *ent, int skiparg);
 qboolean G_admin_permission(gentity_t *ent, char flag);
 
+qboolean G_admin_editcommands(gentity_t *ent, int skiparg);
+qboolean G_admin_listflags( gentity_t *ent, int skiparg );
+qboolean G_admin_levinfo( gentity_t *ent, int skiparg );
 qboolean G_admin_levadd( gentity_t *ent, int skiparg );
 qboolean G_admin_levedit(gentity_t *ent, int skiparg);
 
@@ -2734,10 +2739,4 @@ void Weapon_Portal_Fire( gentity_t *ent, int PortalNum ); //TODO add switch for 
 #define BANNER_BP 1
 #define BANNER_SAY 2
 #define DEFAULT_BANNER_TIME 60000
-
-#ifdef EDITION999
-
-qboolean G_admin_noclip(gentity_t *ent, int skiparg);
-
-#endif
 

@@ -76,7 +76,8 @@ void G_admin_chat_print(char *string);
 // Zero: very informative names for the macros.
 
 #define ACP(x) G_admin_chat_print(x); // admin chat print
-#define AIP(ent, msg) G_admin_personal_info_print(ent, msg); // Admin info print (if ent -> priv else g_printf)
+// if ent prints to chat. else prints to console.
+#define AIP(ent, msg) G_admin_personal_info_print(ent, msg); 
 #define ASP(x) G_admin_print(ent, x) 
 #define ABP(ent, msg) G_admin_buffer_print(ent, msg);
 #define ABP_begin() G_shrubbot_buffer_begin()

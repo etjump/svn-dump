@@ -2454,10 +2454,12 @@ void Cmd_Vote_f( gentity_t *ent ) {
 		trap_SendServerCommand( ent-g_entities, "print \"Vote already cast.\n\"" );
 		return;
 	}
+	/*
 	if ( ent->client->sess.sessionTeam == TEAM_SPECTATOR ) {
 		trap_SendServerCommand( ent-g_entities, "print \"Not allowed to vote as spectator.\n\"" );
 		return;
 	}
+	*/
 
 	if( level.voteInfo.vote_fn == G_Kick_v ) {
 		int pid = atoi( level.voteInfo.vote_value );
@@ -2475,6 +2477,8 @@ void Cmd_Vote_f( gentity_t *ent ) {
 
 	ent->client->ps.eFlags |= EF_VOTED;
 	level.voteInfo.voteCanceled = qfalse;
+
+	CalculateRanks();
 
 	trap_Argv( 1, msg, sizeof( msg ) );
 
@@ -3467,7 +3471,7 @@ void Cmd_SelectedObjective_f ( gentity_t* ent ) {
 
 void Cmd_Ignore_f (gentity_t* ent ) {
 	char	cmd[MAX_TOKEN_CHARS];
-	int		cnum;
+	int		clientNum;
 
 	trap_Argv( 1, cmd, sizeof( cmd ) );		
 
@@ -3476,10 +3480,11 @@ void Cmd_Ignore_f (gentity_t* ent ) {
 		return;
 	}
 
-	cnum = G_refClientnumForName(ent, cmd);
+	if ((clientNum = ClientNumberFromString(ent, cmd)) == -1)
+		return;
 
-	if ( cnum != MAX_CLIENTS ) {
-		COM_BitSet( ent->client->sess.ignoreClients, cnum );
+	if ( clientNum != MAX_CLIENTS ) {
+		COM_BitSet( ent->client->sess.ignoreClients, clientNum );
 	}
 }
 
@@ -3493,7 +3498,7 @@ void Cmd_TicketTape_f ( void ) {
 
 void Cmd_UnIgnore_f (gentity_t* ent ) {
 	char	cmd[MAX_TOKEN_CHARS];
-	int		cnum;
+	int		clientNum;
 
 	trap_Argv( 1, cmd, sizeof( cmd ) );		
 
@@ -3502,14 +3507,13 @@ void Cmd_UnIgnore_f (gentity_t* ent ) {
 		return;
 	}
 
-	cnum = G_refClientnumForName(ent, cmd);
+	if ((clientNum = ClientNumberFromString(ent, cmd)) == -1)
+		return;
 
-	if ( cnum != MAX_CLIENTS ) {
-		COM_BitClear( ent->client->sess.ignoreClients, cnum );
+	if ( clientNum != MAX_CLIENTS ) {
+		COM_BitClear( ent->client->sess.ignoreClients, clientNum );
 	}
 }
-
-// VanillaTJ Commands
 
 void Cmd_Load_f(gentity_t *ent)
 {
@@ -3807,7 +3811,11 @@ void Cmd_PrivateMessage_f(gentity_t *ent)
 
 	other = g_entities + clientNum;
 
-	G_LogPrintf("%s -> %s: %s", ent->client->pers.netname, other->client->pers.netname, msg);
+	if(ent) {
+		G_LogPrintf("%s -> %s: %s", ent->client->pers.netname, other->client->pers.netname, msg);
+	} else {
+		G_LogPrintf("Console -> %s: %s", other->client->pers.netname, msg);
+	}
 
 	if(!ent) {
 		msg = ConcatArgs(2);
@@ -3816,7 +3824,7 @@ void Cmd_PrivateMessage_f(gentity_t *ent)
 		return;
 	}
 
-	if (!COM_BitCheck(other->client->sess.ignoreClients, ent - g_entities))
+	if (!COM_BitCheck(other->client->sess.ignoreClients, ent->client->ps.clientNum))
 	{
 		msg = ConcatArgs(2);
 		CPx(other - g_entities, va("chat \"^7Private message from %s^7: ^3%s\"", ent->client->pers.netname, msg));
@@ -3893,18 +3901,18 @@ void Cmd_Class_f(gentity_t *ent)
 	if (trap_Argc() < 2)
 	{
 		CP("Print \"^dUsage:\n\n\"");
-		CP("Print \"^dMedic - /class m\n\"");
-		CP("Print \"^dEngineer with SMG - /class e 1\n\"");
-		CP("Print \"^dEngineer with Rifle - /class e 2\n\"");
-		CP("Print \"^dField ops - /class f\n\"");
-		CP("Print \"^dCovert ops with sten - /class c 1\n\"");
-		CP("Print \"^dCovert ops with FG42 - /class c 2\n\"");
-		CP("Print \"^dCovert ops with Rifle - /class c 3\n\"");
-		CP("Print \"^dSoldier with SMG - /class s 1\n\"");
-		CP("Print \"^dSoldier with MG42 - /class s 2\n\"");
-		CP("Print \"^dSoldier with Flamethrower - /class s 3\n\"");
-		CP("Print \"^dSoldier with Panzerfaust - /class s 4\n\"");
-		CP("Print \"^dSoldier with Mortar - /class s 5\n\"");
+		CP("Print \"^dMedic                      /class m\n\"");
+		CP("Print \"^dEngineer with SMG          /class e 1\n\"");
+		CP("Print \"^dEngineer with Rifle        /class e 2\n\"");
+		CP("Print \"^dField ops                  /class f\n\"");
+		CP("Print \"^dCovert ops with sten       /class c 1\n\"");
+		CP("Print \"^dCovert ops with FG42       /class c 2\n\"");
+		CP("Print \"^dCovert ops with Rifle      /class c 3\n\"");
+		CP("Print \"^dSoldier with SMG           /class s 1\n\"");
+		CP("Print \"^dSoldier with MG42          /class s 2\n\"");
+		CP("Print \"^dSoldier with Flamethrower  /class s 3\n\"");
+		CP("Print \"^dSoldier with Panzerfaust   /class s 4\n\"");
+		CP("Print \"^dSoldier with Mortar        /class s 5\n\"");
 		return;
 	}
 
@@ -4405,11 +4413,11 @@ void DecolorString( char *in, char *out)
 
 void G_cache_map_names() {
 	int numdirs;
-	char dirlist[1024];
+	char dirlist[8192];
 	char* dirptr;
 	int i;
 	int dirlen;
-	numdirs = trap_FS_GetFileList("maps", ".bsp", dirlist, 1024);
+	numdirs = trap_FS_GetFileList("maps", ".bsp", dirlist, sizeof(dirlist));
 
 	dirptr = dirlist;
 	for(i = 0; i < numdirs; i++, dirptr += dirlen+1) {
@@ -4417,7 +4425,6 @@ void G_cache_map_names() {
 		if(strlen(dirptr) > 4)
 			dirptr[strlen(dirptr)-4] = '\0';
 		if(i < MAX_MAPS) {
-			G_Printf("%s\n", dirptr);
 			Q_strncpyz(g_maplist[i], dirptr, sizeof(g_maplist[i]));
 		}		
 	}

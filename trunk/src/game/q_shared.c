@@ -1572,7 +1572,7 @@ int CharComparator( const void *first, const void *second ) {
 }
 
 /*
-Sort string by alphabetic order
+Sort string in alphabetic order
 */
 
 void SortString(char *src, unsigned size) {
