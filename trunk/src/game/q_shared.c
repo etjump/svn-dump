@@ -1575,6 +1575,6 @@ int CharComparator( const void *first, const void *second ) {
 Sort string in alphabetic order
 */
 
-void SortString(char *src, unsigned size) {
+void SortString(char *src) {
 	qsort(src, strlen(src), sizeof(src[0]), CharComparator);
 }
