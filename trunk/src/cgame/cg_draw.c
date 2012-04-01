@@ -3224,8 +3224,9 @@ static void CG_DrawOB(void)
 			b = qtrue;
 		}
 
-		// don't predict sticky ob if there is an ob already
-		if (b) {
+		// don't predict sticky ob if there is an ob already or if the sticky
+		// ob detection isn't requested
+		if (b || cg_drawOB.integer != 2) {
 			return;
 		}
 
