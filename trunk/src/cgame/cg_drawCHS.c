@@ -389,16 +389,16 @@ static stat_t stats[] = {
 /*  38 */	{CG_CHS_ViewPosition_Z, "View Position Z", "view Z position"},
 /*  39 */	{NULL}, // empty
 
-/*  30 */	{CG_CHS_Pitch_Yaw, "Pitch Yaw", "player pitch/yaw"},
-/*  31 */	{CG_CHS_Player_XYZ, "Player XYZ", "player position in the world"},
-/*  32 */	{CG_CHS_Player_XYZ_Pitch_Yaw, "Player XYZ Pitch Yaw", "player position in the world and pitch/yaw"},
-/*  33 */	{CG_CHS_ViewPosition_XYZ_Pitch_Yaw, "View Position XYZ Pitch Yaw", "view position in the world and pitch/yaw"},
-/*  34 */	{CG_CHS_Position_XYZ, "Position XYZ", "position x y z"},
-/*  35 */	{CG_CHS_ViewPosition_XYZ, "View Position XYZ", "view position x y z"},
-/*  36 */	{CG_CHS_Angles_XYZ, "Angles XYZ", "angles x y z"},
-/*  37 */	{CG_CHS_Velocity_XYZ, "Velocity XYZ", "velocity x y z"},
-/*  38 */	{NULL}, // empty
-/*  39 */	{NULL}, // empty
+/*  40 */	{CG_CHS_Pitch_Yaw, "Pitch Yaw", "player pitch/yaw"},
+/*  41 */	{CG_CHS_Player_XYZ, "Player XYZ", "player position in the world"},
+/*  42 */	{CG_CHS_Player_XYZ_Pitch_Yaw, "Player XYZ Pitch Yaw", "player position in the world and pitch/yaw"},
+/*  43 */	{CG_CHS_ViewPosition_XYZ_Pitch_Yaw, "View Position XYZ Pitch Yaw", "view position in the world and pitch/yaw"},
+/*  44 */	{CG_CHS_Position_XYZ, "Position XYZ", "position x y z"},
+/*  45 */	{CG_CHS_ViewPosition_XYZ, "View Position XYZ", "view position x y z"},
+/*  46 */	{CG_CHS_Angles_XYZ, "Angles XYZ", "angles x y z"},
+/*  47 */	{CG_CHS_Velocity_XYZ, "Velocity XYZ", "velocity x y z"},
+/*  48 */	{NULL}, // empty
+/*  49 */	{NULL}, // empty
 
 			{NULL}
 };
