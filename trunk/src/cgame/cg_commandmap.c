@@ -305,7 +305,8 @@ static void CG_DrawGrid( float x, float y, float w, float h, mapScissor_t *sciss
 		}
 		trap_R_SetColor( NULL );
 	} else {
-		char coord_char[3], coord_int;
+		// Zero: changed coord_char from [3] to [6], was causing overflow on huge maps like handbreaker4_antefinal
+		char coord_char[6], coord_int;
 		float text_width, text_height;
 		vec2_t textOrigin;
 
@@ -338,6 +339,7 @@ static void CG_DrawGrid( float x, float y, float w, float h, mapScissor_t *sciss
 		Vector4Set( gridColour, clrBrownLine[0], clrBrownLine[1], clrBrownLine[2], 1.f );
 
 		coord_char[1] = '\0';
+		coord_char[5] = '\0';
 		for( coord_char[0] = ('A' - 1); grid_x < dim_x[1]; grid_x += step[0], coord_char[0]++ )
 		{
 			if( coord_char[0] >= 'A' ) {

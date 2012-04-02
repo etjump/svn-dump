@@ -514,62 +514,6 @@ void CG_GameStatsDraw()
 			}
 		}
 
-
-		// No rank/xp/skill info for LMS
-		if(cgs.gametype == GT_WOLF_LMS) {
-			return;
-		}
-
-
-		// Rank/XP info
-		y += tSpacing;
-		y += 2;
-		CG_FillRect(GS_X, y, GS_W, tSpacing + 3, bgColorTitle);
-		CG_DrawRect(GS_X, y, GS_W, tSpacing + 3, 1, borderColorTitle);
-
-		y += 1 + tSpacing;
-		CG_Text_Paint_Ext(x, y, hScale2, hScaleY2, hdrColor, "Rank", 0.0f, 0, hStyle2, hFont2);
-		x += 82;
-		CG_Text_Paint_Ext(x, y, hScale2, hScaleY2, hdrColor, "XP", 0.0f, 0, hStyle2, hFont2);
-
-		x = GS_X + 4;
-
-		y += 1;
-		y += tSpacing;
-		CG_Text_Paint_Ext(x, y, tScale, tScale, tColor, gs->strRank, 0.0f, 0, tStyle, tFont);
-
-
-
-		// Skill info
-		y += tSpacing;
-		y += 2;
-		CG_FillRect(GS_X, y, GS_W, tSpacing + 3, bgColorTitle);
-		CG_DrawRect(GS_X, y, GS_W, tSpacing + 3, 1, borderColorTitle);
-
-		y += 1 + tSpacing;
-		CG_Text_Paint_Ext(x, y, hScale2, hScaleY2, hdrColor, "Skills", 0.0f, 0, hStyle2, hFont2);
-		x += 84;
-		CG_Text_Paint_Ext(x, y, hScale2, hScaleY2, hdrColor, "Level", 0.0f, 0, hStyle2, hFont2);
-		x += 40;
-		CG_Text_Paint_Ext(x, y, hScale2, hScaleY2, hdrColor, "XP / Next Level", 0.0f, 0, hStyle2, hFont2);
-		if(cgs.gametype == GT_WOLF_CAMPAIGN) {
-			x += 86;
-			CG_Text_Paint_Ext(x, y, hScale2, hScaleY2, hdrColor, "Medals", 0.0f, 0, hStyle2, hFont2);
-		}
-
-		x = GS_X + 4;
-
-		y += 1;
-		if(gs->cSkills == 0) {
-			y += tSpacing;
-			CG_Text_Paint_Ext(x, y, tScale, tScale, tColor, "No skills acquired!", 0.0f, 0, tStyle, tFont);
-		} else {
-			for(i=0; i<gs->cSkills; i++) {
-				y += tSpacing;
-				CG_Text_Paint_Ext(x, y, tScale, tScale, tColor, gs->strSkillz[i], 0.0f, 0, tStyle, tFont);
-			}
-
-		}
 	}
 }
 

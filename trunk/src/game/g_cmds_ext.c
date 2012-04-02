@@ -340,7 +340,8 @@ void G_ready_cmd(gentity_t *ent, unsigned int dwCommand, qboolean state)
 // Team chat w/no location info
 void G_say_teamnl_cmd(gentity_t *ent, unsigned int dwCommand, qboolean fValue)
 {
-	Cmd_Say_f(ent, SAY_TEAMNL, qfalse, qtrue);
+	if(!ent->client->sess.muted)
+		Cmd_Say_f(ent, SAY_TEAMNL, qfalse, qtrue);
 }
 
 

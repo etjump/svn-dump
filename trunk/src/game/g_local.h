@@ -672,9 +672,11 @@ typedef struct {
 	admin_t		uinfo;
 
 	int			password_change_count;
+	int			lastListmapsTime;
 
 	qboolean	need_greeting;
 	qboolean	oldPositionsLoaded;
+	qboolean	canChangePassword;
 
 	qboolean	versionOK;
 } clientSession_t;
@@ -1960,6 +1962,9 @@ extern vmCvar_t g_banner5;
 extern vmCvar_t g_portalDebug;
 extern vmCvar_t g_portalMode;
 
+extern vmCvar_t g_maxConnsPerIP;
+extern vmCvar_t	g_mute;
+
 void	trap_Printf( const char *fmt );
 void	trap_Error( const char *fmt );
 int		trap_Milliseconds( void );
@@ -2698,6 +2703,7 @@ qboolean G_admin_finger(gentity_t *ent, int skiparg);
 qboolean G_admin_help(gentity_t *ent, int skiparg);
 qboolean G_admin_kick(gentity_t *ent, int skiparg);
 qboolean G_admin_listbans(gentity_t *ent, int skiparg);
+qboolean G_admin_listmaps(gentity_t *ent, int skiparg);
 qboolean G_admin_listplayers(gentity_t *ent, int skiparg);
 qboolean G_admin_map(gentity_t *ent, int skiparg);
 qboolean G_admin_mute(gentity_t *ent, int skiparg);
@@ -2713,12 +2719,15 @@ qboolean G_admin_spec(gentity_t *ent, int skiparg);
 qboolean G_admin_unban(gentity_t *ent, int skiparg);
 qboolean G_admin_unmute(gentity_t *ent, int skiparg);
 qboolean G_admin_permission(gentity_t *ent, char flag);
-
 qboolean G_admin_editcommands(gentity_t *ent, int skiparg);
 qboolean G_admin_listflags( gentity_t *ent, int skiparg );
 qboolean G_admin_levinfo( gentity_t *ent, int skiparg );
 qboolean G_admin_levadd( gentity_t *ent, int skiparg );
 qboolean G_admin_levedit(gentity_t *ent, int skiparg);
+qboolean G_admin_removeuser( gentity_t *ent, int skiparg );
+qboolean G_admin_removelevel( gentity_t *ent, int skiparg );
+qboolean G_admin_listusers(gentity_t *ent, int skiparg);
+qboolean G_admin_removelevel( gentity_t *ent, int skiparg );
 
 //Feen: PGM
 

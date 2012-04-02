@@ -878,7 +878,7 @@ void Info_NextPair( const char **s, char *key, char *value );
 qboolean charErase(int pos, char *str);
 void RemoveAllChars(char c, char *str);
 void RemoveDuplicates(char *str);
-void SortString(char *str);
+void SortString(char *src);
 
 // this is only here so the functions in q_shared.c and bg_*.c can link
 void	QDECL Com_Error( int level, const char *error, ... )_attribute((format(printf,2,3)));

@@ -1350,6 +1350,28 @@ static void ClientCleanName( const char *in, char *out, int outSize )
 void G_StartPlayerAppropriateSound(gentity_t *ent, char *soundType) {
 }
 
+const char *GetParsedIP(const char *ipadd)
+{
+	// code by Dan Pop, http://bytes.com/forum/thread212174.html
+	unsigned b1, b2, b3, b4, port = 0;
+	unsigned char c;
+	int rc;
+	static char ipge[20];
+
+	if(!Q_strncmp(ipadd,"localhost",strlen("localhost")))
+		return "localhost";
+
+	rc = sscanf(ipadd, "%3u.%3u.%3u.%3u:%u%c", &b1, &b2, &b3, &b4, &port, &c);
+	if (rc < 4 || rc > 5)
+		return NULL;
+	if ( (b1 | b2 | b3 | b4) > 255 || port > 65535)
+		return NULL;
+	if (strspn(ipadd, "0123456789.:") < strlen(ipadd))
+		return NULL;
+	sprintf(ipge, "%u.%u.%u.%u", b1, b2, b3, b4);
+	return ipge;
+}
+
 /*
 ===========
 ClientUserInfoChanged
@@ -1547,6 +1569,10 @@ char *ClientConnect( int clientNum, qboolean firstTime, qboolean isBot ) {
 	char		userinfo[MAX_INFO_STRING];
 	gentity_t	*ent;
 	char reason[MAX_STRING_CHARS] = "";
+	int connPerIP = 1, i = 0;
+	int clientNum2 = -1;
+	char ip[20] = "\0", ip2[20] = "\0";
+	char userinfo2[MAX_INFO_STRING] = "\0";
 #ifdef USEXPSTORAGE
 	ipXPStorage_t* xpBackup;
 	int			i;
@@ -1564,12 +1590,37 @@ char *ClientConnect( int clientNum, qboolean firstTime, qboolean isBot ) {
 	if ( G_FilterIPBanPacket( value ) ) {
 		return "You are banned from this server.";
 	}
-
+	
 	if(G_admin_ban_check(userinfo, reason)) {
 		value = Info_ValueForKey(userinfo, "name");
 		AP(va("cpm \"Banned player: %s^7, tried to connect.\"", value));
 		return va("You are banned from this server.\n%s\n", reason);
 	}
+
+	/* ETPub fakeplayers DoS fix */
+
+	Q_strncpyz(ip, GetParsedIP(value), sizeof(ip));
+	for(i = 0; i < level.numConnectedClients; i++) {
+		clientNum2 = level.sortedClients[i];
+		if(clientNum == clientNum2) continue;
+		
+		trap_GetUserinfo(clientNum2, userinfo2, sizeof(userinfo2));
+
+		value = Info_ValueForKey(userinfo2, "ip");
+
+		Q_strncpyz(ip2, GetParsedIP(value), sizeof(ip2));
+			if (!Q_stricmp(ip, ip2)) {
+				connPerIP++;
+			}
+	}
+
+	if(connPerIP > g_maxConnsPerIP.integer) {
+		G_LogPrintf("Possible DoS attack. Rejecting client from %s "
+			"(%d connections already)\n", ip, g_maxConnsPerIP.integer);
+		return "Too many connections from your ip.";
+	}
+
+	/* End of ETPub fakeplayers DoS fix */
 
 	// Xian - check for max lives enforcement ban
 	if( g_gametype.integer != GT_WOLF_LMS ) {
@@ -1626,6 +1677,7 @@ char *ClientConnect( int clientNum, qboolean firstTime, qboolean isBot ) {
 		client->pers.initialSpawn = qtrue;				// DHM - Nerve
 		client->sess.goto_allowed = qtrue;
 		client->sess.save_allowed = qtrue;  //qfalse	//Feen: Why was this set to false?
+		client->sess.canChangePassword = qtrue;
 	} else {
 		client->sess.need_greeting = qfalse;
 

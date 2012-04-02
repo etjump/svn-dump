@@ -2064,8 +2064,16 @@ qboolean Cmd_CallVote_f( gentity_t *ent, unsigned int dwCommand, qboolean fRefCo
 				CP("cpm \"Not allowed to call a vote as a spectator.\n\"");
 				return qfalse;
 			}
-		}
+		} 
 	}
+
+	if( ent && ent->client->sess.muted && g_mute.integer > 1) {
+		CP("print \"^1Callvote: ^7not allowed to call a vote while muted.\n\"");
+		return qfalse;
+	}
+
+
+
 
 	// make sure it is a valid command to vote on
 	trap_Argv( 1, arg1, sizeof( arg1 ) );
@@ -3805,6 +3813,11 @@ void Cmd_PrivateMessage_f(gentity_t *ent)
 		return;
 	}
 
+	if(ent && ent->client->sess.muted && g_mute.integer > 0) {
+		CP("print \"^1PM: ^7you're muted.\n\"");
+		return;
+	}
+
 	trap_Argv(1, cmd, sizeof(cmd));
 	if ((clientNum = ClientNumberFromString(ent, cmd)) == -1)
 		return;
@@ -4133,6 +4146,49 @@ void ClientCommand(int clientNum)
 
 	trap_Argv(0, cmd, sizeof(cmd));
 
+	/* Let's handle admin system stuff before checking if we're really connected. */
+
+	if (!Q_stricmp(cmd, "adminlogin"))
+	{
+		if(ent->client->sess.password_change_count > 1) {
+			CP("print \"^3adminsystem:^7 you can only change password once\n\"");
+			return;
+		}
+		G_admin_login(ent);
+		return;
+	}
+
+	if (!Q_stricmp(cmd, "adminlogin_identify"))
+	{
+		G_admin_login(ent);
+		return;
+	}
+
+	if (!Q_stricmp(cmd, "register_failure"))
+	{
+		AIP(ent, "^3adminsystem:^7 registeration failed. Check out console for more info.");
+		ent->client->sess.allowRegister = qfalse;
+		return;
+	}
+
+	if (!Q_stricmp(cmd, "register_client")) 
+	{
+		G_admin_register_client(ent);
+		return;
+	}
+
+	if (!Q_stricmp(cmd, "request_greeting"))
+	{
+		G_admin_greeting(ent);
+		return;
+	}
+
+	if(ent->client->pers.connected != CON_CONNECTED) {
+		return;
+	}
+
+	// Let's handle rest of the commands after checking if we're really connected.
+
 	// handle say/vsay commands
 	if (!Q_stricmp(cmd, "say") || (enc = !Q_stricmp(cmd, "enc_say")))
 	{
@@ -4242,41 +4298,6 @@ void ClientCommand(int clientNum)
 	if (!Q_stricmp(cmd, "followprev"))
 	{
 		Cmd_FollowCycle_f(ent, -1);
-		return;
-	}
-
-	if (!Q_stricmp(cmd, "adminlogin"))
-	{
-		if(ent->client->sess.password_change_count > 1) {
-			CP("print \"^3adminsystem:^7 you can only change password once\n\"");
-			return;
-		}
-		G_admin_login(ent);
-		return;
-	}
-
-	if (!Q_stricmp(cmd, "adminlogin_identify"))
-	{
-		G_admin_login(ent);
-		return;
-	}
-
-	if (!Q_stricmp(cmd, "register_failure"))
-	{
-		AIP(ent, "^3adminsystem:^7 registeration failed. Check out console for more info.");
-		ent->client->sess.allowRegister = qfalse;
-		return;
-	}
-
-	if (!Q_stricmp(cmd, "register_client")) 
-	{
-		G_admin_register_client(ent);
-		return;
-	}
-
-	if (!Q_stricmp(cmd, "request_greeting"))
-	{
-		G_admin_greeting(ent);
 		return;
 	}
 

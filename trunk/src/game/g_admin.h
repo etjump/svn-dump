@@ -79,8 +79,11 @@ void G_admin_chat_print(char *string);
 // if ent prints to chat. else prints to console.
 #define AIP(ent, msg) G_admin_personal_info_print(ent, msg); 
 #define ASP(x) G_admin_print(ent, x) 
+// Use this to print to the buffer
 #define ABP(ent, msg) G_admin_buffer_print(ent, msg);
+// Use this to clear the buffer
 #define ABP_begin() G_shrubbot_buffer_begin()
+// When printing to buffer is done use this to print the text to ent.
 #define ABP_end() G_shrubbot_buffer_end(ent)
 
 #define EDITION999

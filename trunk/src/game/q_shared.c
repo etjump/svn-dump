@@ -1529,10 +1529,8 @@ qboolean charErase(int pos, char *src) {
 		return qfalse;
 	}
 
-	for(i = pos+1; i < strlen(src); i++) {
-		src[i-1] = src[i];
-	}
-	src[strlen(src) - 1] = 0;
+	memmove(src + pos, src + pos + 1, strlen(src+pos));
+
 	return qtrue;
 }
 
@@ -1553,8 +1551,6 @@ Removes duplicate chars from a string
 void RemoveDuplicates(char *src) {
 	int i = 0;
 	int j = 0;
-	int outlen = 0;
-	qboolean found = qfalse;
 
 	for(i = 0; i < strlen(src); i++) {
 		char c = src[i];

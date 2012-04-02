@@ -246,6 +246,11 @@ vmCvar_t		g_portalDebug; //View Portal BBoxes
 vmCvar_t		g_portalMode;  //Defines portal mode.
 							   //0 = Freestyle, 1 = Standard,  2 = team (possible future)
 
+// Bugfixes
+vmCvar_t		g_maxConnsPerIP;
+
+vmCvar_t		g_mute;
+
 cvarTable_t		gameCvarTable[] = {
 	// don't override the cheat state set by the system
 	{ &g_cheats, "sv_cheats", "", 0, qfalse },
@@ -476,7 +481,7 @@ cvarTable_t		gameCvarTable[] = {
 
 	{ &g_ghostPlayers, "g_ghostPlayers", "1", CVAR_SERVERINFO | CVAR_LATCH },
 	{ &g_nofatigue, "g_nofatigue", "1", CVAR_ARCHIVE },
-	{ &g_blockCheatCvars, "g_blockCheatCvars", "1", CVAR_ARCHIVE },
+	{ &g_blockCheatCvars, "g_blockCheatCvars", "0", CVAR_ARCHIVE },
 	{ &g_weapons, "g_weapons", "1", CVAR_ARCHIVE },
 	{ &g_noclip, "g_noclip", "0", CVAR_ARCHIVE },
 	{ &g_savemsg, "g_savemsg", "^7Saved", CVAR_ARCHIVE },
@@ -502,6 +507,9 @@ cvarTable_t		gameCvarTable[] = {
 	//Feen: PGM
 	{ &g_portalDebug, "g_portalDebug", "0", CVAR_CHEAT | CVAR_ARCHIVE },
 	{ &g_portalMode, "g_portalMode", "1", CVAR_ARCHIVE }, //0 - freestyle, 1 - restricted
+
+	{ &g_maxConnsPerIP, "g_maxConnsPerIP", "2", CVAR_ARCHIVE },
+	{ &g_mute, "g_mute", "0", CVAR_ARCHIVE },
 };
 
 // bk001129 - made static to avoid aliasing
