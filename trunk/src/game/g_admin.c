@@ -1834,10 +1834,10 @@ qboolean G_admin_listplayers(gentity_t *ent, int skiparg) {
 
 	AIP(ent, "^3!listplayers:^7 check console for more information.");
 	if(ent) {
-		CP("print \"ID : Player                    Level     \n\"");
+		CP("print \"ID : Player                        Level\n\"");
 		CP("print \"----------------------------------------\n\"");
 	} else {
-		G_Printf("ID : Player                    Level     \n\"");
+		G_Printf("ID : Player                        Level\n\"");
 		G_Printf("----------------------------------------\n\"");
 	}
 
@@ -1845,13 +1845,15 @@ qboolean G_admin_listplayers(gentity_t *ent, int skiparg) {
 		int idnum = level.sortedClients[i];
 		gclient_t *cl = &level.clients[idnum];
 		char name[MAX_NETNAME];
+		char *clean = NULL;
 
 		Q_strncpyz(name, cl->pers.netname, sizeof(name));
-
 		name[26] = 0;
+		clean = Q_CleanStr(name);
+
 
 		if(ent) {
-			CP(va("print \"%2d : %-26s^7  %7d\n\"", idnum, name, cl->sess.uinfo.level));
+			CP(va("print \"%2d : %-26s^7%7d\n\"", idnum, clean, cl->sess.uinfo.level));
 		} else {
 			SanitizeString(cl->pers.netname, name, qfalse);
 			name[26] = 0;
@@ -1945,6 +1947,11 @@ qboolean G_admin_levadd( gentity_t *ent, int skiparg ) {
 	Q_SayArgv(1 + skiparg, arg1, sizeof(arg1));
 	level = atoi(arg1);
 
+	if(ent && level > ent->client->sess.uinfo.level) {
+		AIP(ent, "^3!levadd: ^7you cannot add levels higher than yours.");
+		return qfalse;
+	}
+
 	for(i = 0; g_admin_levels[i]; i++) {
 		if(g_admin_levels[i]->level == level) {
 			AIP(ent, "^3!levadd:^7 level already exists.");
@@ -2031,6 +2038,8 @@ qboolean G_admin_listflags( gentity_t *ent, int skiparg ) {
 		if(ent) CP(va("print \"%-30s %c\n\"", g_admin_cmds[i].keyword, g_admin_cmds[i].flag));
 		else G_Printf("%-30s %c\n", g_admin_cmds[i].keyword, g_admin_cmds[i].flag);
 	}
+	if(ent) CP("print \"\n\""); 
+	else G_Printf("\n");
 	return qtrue;
 }
 
@@ -2217,6 +2226,7 @@ qboolean G_admin_listmaps(gentity_t *ent, int skiparg) {
 
 qboolean G_admin_removeuser( gentity_t *ent, int skiparg ) {
 	int i = 0;
+	int levindex = -1;
 	qboolean found = qfalse;
 	char arg[MAX_TOKEN_CHARS] = "\0";
 	if(Q_SayArgc() != 2 + skiparg) {
@@ -2230,15 +2240,34 @@ qboolean G_admin_removeuser( gentity_t *ent, int skiparg ) {
 
 		if(!Q_stricmp(g_admin_users[i]->username, arg)) {
 			found = qtrue;
+			levindex = i;
 			break;
 		}
+	}
+	/* CRASHES WITH ^ ON NAME */
+	for(i = 0; i < strlen(g_admin_users[levindex]->username); i++) {
+		if(g_admin_users[levindex]->username[i] >= 'A' && g_admin_users[levindex]->username[i] < 'z')
+			g_admin_users[levindex]->username[i] = tolower(g_admin_users[levindex]->username[i]);
+	}
+
+	for(i = 0; i < strlen(arg); i++) {
+		arg[i] = tolower(arg[i]);
 	}
 	
 	if(!found) {
 		AIP(ent, "^3!removeuser:^7 player not found.");
 		return qfalse;
 	}
-	g_admin_users[i]->level = 0;
+	g_admin_users[levindex]->level = 0;
+
+	for(i = 0; i < level.numConnectedClients; i++) {
+		gentity_t *target = NULL;
+		if(!Q_stricmp((target = g_entities + i)->client->sess.uinfo.username,
+			g_admin_users[levindex]->username)) {
+				target->client->sess.uinfo.level = 0;
+		}
+	}
+	AIP(ent, va("^3!removeuser: ^7removed user %s^7.", g_admin_users[levindex]->username));
 	G_admin_writeconfig();
 	return qtrue;
 }
@@ -2253,6 +2282,7 @@ qboolean G_admin_listusers(gentity_t *ent, int skiparg) {
 		}
 		ABP(ent, va("^7%-36s ", g_admin_users[i]->username));
 	}
+	ABP(ent, "\n");
 	ABP_end();
 	return qtrue;
 }
@@ -2261,6 +2291,7 @@ qboolean G_admin_removelevel( gentity_t *ent, int skiparg ) {
 	int i = 0;
 	int lvl = -1;
 	int levelcount = 0;
+	int levindex = -1;
 	qboolean found = qfalse;
 	char arg[MAX_TOKEN_CHARS];
 
@@ -2269,45 +2300,63 @@ qboolean G_admin_removelevel( gentity_t *ent, int skiparg ) {
 		return qfalse;
 	}
 
-	Q_SayArgv(1, arg, sizeof(arg));
+	Q_SayArgv(1 + skiparg, arg, sizeof(arg));
 
 	lvl = atoi(arg);
-	CP(va("print \"%i \n\"", lvl));
+
+	if(ent && lvl > ent->client->sess.uinfo.level) {
+		AIP(ent, "^3!editcommands: ^7you cannot edit levels higher than yours.");
+		return qfalse;
+	}
 
 	for(levelcount = 0; g_admin_levels[levelcount]; levelcount++) {
 		;
 	}
-
+	
 	for(i = 0; g_admin_levels[i]; i++) {
 		if(g_admin_levels[i]->level == lvl && lvl != 0) {
 			found = qtrue;
+			levindex = i;
 			break;
 		}
 	}
-
+	
 	if(!found) {
 		AIP(ent, "^3!removelevel: ^7level not found.");
 		return qfalse;
 	}
-	// Gotta remove connected client data aswell..
+	
+	G_Printf("%d %s %s %s\n", g_admin_levels[levindex]->level, g_admin_levels[levindex]->name, g_admin_levels[levindex]->commands, g_admin_levels[levindex]->greeting);
+	
+	
+	
+	free(g_admin_levels[levindex]);
+	g_admin_levels[levindex] = NULL;
+	levelcount--;
+	
+	if(levindex != levelcount) {
+		g_admin_levels[levindex] = g_admin_levels[levelcount];
+		g_admin_levels[levelcount] = NULL;
+
+		qsort(g_admin_levels, levelcount, sizeof(admin_level_t*), adminComparator);
+	}
+	
 	for(i = 0; g_admin_users[i]; i++) {
 		if(g_admin_users[i]->level == lvl) {
 			g_admin_users[i]->level = 0;
 		}
 	}
 
-	free(g_admin_levels[i]);
-	g_admin_levels[i] = NULL;
-	levelcount--;
-	if(i != levelcount) {
-		g_admin_levels[i] = g_admin_levels[levelcount];
-		g_admin_levels[levelcount] = NULL;
-
-		qsort(g_admin_levels, levelcount, sizeof(admin_level_t*), adminComparator);
+	for(i = 0; i < level.numConnectedClients; i++) {
+		gentity_t *target = NULL;
+		if((target = g_entities + i)->client->sess.uinfo.level == lvl) {
+			target->client->sess.uinfo.level = 0;
+		}
 	}
-
-	AIP(ent, va("^3!removelevel: ^7level %d removed.", level));
+	
+	AIP(ent, va("^3!removelevel: ^7level %d removed.", lvl));
 	G_admin_writeconfig();
+	
 	return qtrue;
 }
 

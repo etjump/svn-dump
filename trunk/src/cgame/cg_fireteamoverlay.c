@@ -271,10 +271,11 @@ void CG_DrawFireTeamOverlay( rectDef_t* rect ) {
 	if(!(f = CG_IsOnFireteam( cg.clientNum ))) {
 		return;
 	}
-
+	
 	h = 12 + 2 + 2;
-	for(i = 0; i < 6; i++) {
-		ci = CG_SortedFireTeamPlayerForPosition( i, 6 );
+	// Changed i < 6 to i < 15, should allow 15 ppl to FT now.
+	for(i = 0; i < 15; i++) {
+		ci = CG_SortedFireTeamPlayerForPosition( i, 15 );
 		if(!ci) {
 			break;;
 		}
@@ -297,11 +298,11 @@ void CG_DrawFireTeamOverlay( rectDef_t* rect ) {
 	x += 2;
 	//y += 2;
 
-	for(i = 0; i < 6; i++) {
+	for(i = 0; i < 15; i++) {
 		y += FT_BAR_HEIGHT + FT_BAR_YSPACING;
 		x = rect->x + 2;
 
-		ci = CG_SortedFireTeamPlayerForPosition( i, 6 );
+		ci = CG_SortedFireTeamPlayerForPosition( i, 15 );
 		if(!ci) {
 			break;;
 		}

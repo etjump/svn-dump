@@ -11,7 +11,7 @@
 #ifndef __BG_PUBLIC_H__
 #define __BG_PUBLIC_H__
 
-#define	GAME_VERSION	"ETJump 2.0.1"
+#define	GAME_VERSION	"etjump"
 
 #define MOD_VERSION		"ETJump 2.0.1"
 

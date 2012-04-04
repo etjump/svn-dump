@@ -3609,3 +3609,4 @@ char *G_SHA1(char *string);
 void CG_DrawCHS(void);
 void CG_InfoCHS_f(void);
 
+char *GetMACAddress(void);
