@@ -1992,8 +1992,10 @@ void ClientBegin( int clientNum )
 		}
 	}
 	// End Xian
-	if(!client->sess.oldPositionsLoaded) 
+	if(!client->sess.oldPositionsLoaded) { 
 		LoadSavedPositions(client);
+        client->sess.oldPositionsLoaded = qtrue;
+    }
 
 	// count current clients and rank for scoreboard
 	CalculateRanks();
@@ -2428,7 +2430,6 @@ void CheckForExpiredSavedPositions() {
 
 void saveSavedPositions(gentity_t *ent) {
 	int i = 0;
-	int time = level.time;
 	save_position_t pos[2];
 	char username[MAX_NETNAME];
 	char password[PASSWORD_LEN+1];

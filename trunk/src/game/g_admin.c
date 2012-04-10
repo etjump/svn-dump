@@ -23,6 +23,19 @@ struct g_admin_cmd {
 	const char *syntax;
 };
 
+struct g_admin_additional_flag {
+    char flag;
+    const char *data;
+};
+
+static const struct g_admin_additional_flag g_admin_additional_flags[] = {
+    {AF_IMMUNITY, "Vote kick/mute immunity."},
+    {AF_NONAMECHANGELIMIT, "No name change limit."},
+    {AF_NOVOTELIMIT, "No vote limit"},
+    {AF_SILENTCOMMANDS, "Silent commands"},
+    {0, "\0"},
+};
+
 static const struct g_admin_cmd g_admin_cmds[] = {
 	{"8ball",		G_admin_8ball,		'8',	"Magic 8 Ball!", "Syntax: !8ball <question>"},
 	{"admintest",	G_admin_admintest,	'a',	"Displays your current admin level.", "Syntax: !admintest"},
@@ -705,7 +718,7 @@ qboolean G_admin_cmd_check(gentity_t *ent) {
 			g_admin_cmds[i].handler(ent, skip);
 			if(g_logCommands.integer) {
 				if(ent)
-					G_ALog("Command: \\!%s\\%s\\%s\\", g_admin_cmds[i].keyword, ent->client->pers.netname, ent->client->sess.uinfo.ip);
+                    G_ALog("Command: \\!%s\\%s\\%s\\", g_admin_cmds[i].keyword, ent->client->sess.uinfo.username, ent->client->sess.uinfo.ip);
 				else 
 					G_ALog("Command: \\!%s\\console\\", g_admin_cmds[i].keyword);
 			}
@@ -1273,17 +1286,16 @@ qboolean G_admin_help(gentity_t *ent, int skiparg) {
 
 	if(Q_SayArgc() == 1 + skiparg) {
 
-		int j = 0;
-		int count = 0;
-		char *str = "";
+        int cmdcount = 0;
 		AIP(ent, "^3!help: ^7check console for more info.");
 		ABP_begin();
 		for(i = 0; g_admin_cmds[i].keyword[0]; i++) {
 			if(G_admin_permission(ent, g_admin_cmds[i].flag)) {
-				if(i != 0 && i % 3 == 0) {
+				if((cmdcount != 0 ) && (cmdcount % 3 == 0)) {
 					ABP(ent, "\n");
 				}
 				ABP(ent, va("%-21s ", g_admin_cmds[i].keyword));
+                ++cmdcount;
 			}
 		}
 		ABP_end();
@@ -2004,7 +2016,6 @@ static const char *m8BallResponses[] = {
 
 
 qboolean G_admin_8ball(gentity_t *ent, int skiparg) {
-	int i = 0;
 	int random = 0;
 	char color[3];
 	if(Q_SayArgc() < 2 + skiparg) {
@@ -2033,13 +2044,17 @@ qboolean G_admin_listflags( gentity_t *ent, int skiparg ) {
 	if(ent) {
 		AIP(ent, "^3!listflags: ^7check console for more info");
 	}
-
+    ABP_begin();
 	for(i = 0; g_admin_cmds[i].keyword[0]; i++) {
-		if(ent) CP(va("print \"%-30s %c\n\"", g_admin_cmds[i].keyword, g_admin_cmds[i].flag));
-		else G_Printf("%-30s %c\n", g_admin_cmds[i].keyword, g_admin_cmds[i].flag);
+        ABP(ent, va("%-30s %c\n", g_admin_cmds[i].keyword, g_admin_cmds[i].flag));
 	}
-	if(ent) CP("print \"\n\""); 
-	else G_Printf("\n");
+    ABP(ent, "\n");
+    ABP(ent, "Additional flags: \n");
+    for(i = 0; g_admin_additional_flags[i].data[0]; i++) {
+        ABP(ent, va("%-30s %c\n", g_admin_additional_flags[i].data, g_admin_additional_flags[i].flag));
+    }
+    ABP(ent, "\n");
+    ABP_end();
 	return qtrue;
 }
 
@@ -2244,20 +2259,12 @@ qboolean G_admin_removeuser( gentity_t *ent, int skiparg ) {
 			break;
 		}
 	}
-	/* CRASHES WITH ^ ON NAME */
-	for(i = 0; i < strlen(g_admin_users[levindex]->username); i++) {
-		if(g_admin_users[levindex]->username[i] >= 'A' && g_admin_users[levindex]->username[i] < 'z')
-			g_admin_users[levindex]->username[i] = tolower(g_admin_users[levindex]->username[i]);
-	}
-
-	for(i = 0; i < strlen(arg); i++) {
-		arg[i] = tolower(arg[i]);
-	}
 	
-	if(!found) {
+    if(!found) {
 		AIP(ent, "^3!removeuser:^7 player not found.");
 		return qfalse;
 	}
+	
 	g_admin_users[levindex]->level = 0;
 
 	for(i = 0; i < level.numConnectedClients; i++) {
@@ -2325,9 +2332,6 @@ qboolean G_admin_removelevel( gentity_t *ent, int skiparg ) {
 		AIP(ent, "^3!removelevel: ^7level not found.");
 		return qfalse;
 	}
-	
-	G_Printf("%d %s %s %s\n", g_admin_levels[levindex]->level, g_admin_levels[levindex]->name, g_admin_levels[levindex]->commands, g_admin_levels[levindex]->greeting);
-	
 	
 	
 	free(g_admin_levels[levindex]);

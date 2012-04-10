@@ -1053,9 +1053,6 @@ void SP_worldspawn( void ) {
 
 	trap_SetConfigstring( CS_MOTD, g_motd.string );		// message of the day
 
-	G_SpawnString( "gravity", "800", &s );
-	trap_Cvar_Set( "g_gravity", s );
-
 	G_SpawnString( "spawnflags", "0", &s );
 	g_entities[ENTITYNUM_WORLD].spawnflags = atoi( s );
 	g_entities[ENTITYNUM_WORLD].r.worldflags = g_entities[ENTITYNUM_WORLD].spawnflags;

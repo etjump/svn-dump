@@ -225,7 +225,7 @@ void AimAtTarget( gentity_t *self ) {
 	}
 
 	height = ent->s.origin[2] - origin[2];
-	gravity = g_gravity.value;
+	gravity = G_GRAVITY;
 	time = sqrt( fabs (height / ( 0.5f * gravity ) ) );
 	if ( !time ) {
 		G_FreeEntity( self );

@@ -110,6 +110,11 @@ typedef enum {
 #define	AAS_AREA_TEAM_ALLIES				0x0040
 #define	AAS_AREA_TEAM_AXIS_DISGUISED		0x0080
 #define	AAS_AREA_TEAM_ALLIES_DISGUISED		0x0100
+// I have no idea how I managed to forget these :D
+// Hopefully no1 will ever notice versions < 2.0.1 have the g_gravity
+// & g_speed cvars :p
+#define G_GRAVITY   800
+#define G_SPEED     320
 
 //============================================================================
 
@@ -1753,9 +1758,7 @@ extern	vmCvar_t	g_fraglimit;
 extern	vmCvar_t	g_timelimit;
 extern	vmCvar_t	g_friendlyFire;
 extern	vmCvar_t	g_password;
-extern	vmCvar_t	sv_privatepassword;
-extern	vmCvar_t	g_gravity;
-extern	vmCvar_t	g_speed;
+extern	vmCvar_t	sv_privatepassword; 
 extern	vmCvar_t	g_knockback;
 extern	vmCvar_t	g_quadfactor;
 extern	vmCvar_t	g_forcerespawn;

@@ -34,8 +34,6 @@ vmCvar_t	g_maxclients;
 vmCvar_t	g_maxGameClients;
 vmCvar_t	g_minGameClients;		// NERVE - SMF
 vmCvar_t	g_dedicated;
-vmCvar_t	g_speed;
-vmCvar_t	g_gravity;
 vmCvar_t	g_cheats;
 vmCvar_t	g_knockback;
 vmCvar_t	g_quadfactor;
@@ -325,8 +323,6 @@ cvarTable_t		gameCvarTable[] = {
 
 	{ &g_dedicated, "dedicated", "0", 0, 0, qfalse },
 
-	{ &g_speed, "g_speed", "320", 0, 0, qtrue, qtrue },
-	{ &g_gravity, "g_gravity", "800", 0, 0, qtrue, qtrue },
 	{ &g_knockback, "g_knockback", "1000", 0, 0, qtrue, qtrue },
 	{ &g_quadfactor, "g_quadfactor", "3", 0, 0, qtrue },
 	
@@ -419,7 +415,7 @@ cvarTable_t		gameCvarTable[] = {
 	{ &z_serverflags, "z_serverflags", "0", 0, 0, qfalse, qfalse },
 
 	{ &g_debugConstruct, "g_debugConstruct", "0", CVAR_CHEAT, 0, qfalse },
-
+    
 	{ &g_scriptDebug, "g_scriptDebug", "0", CVAR_CHEAT, 0, qfalse },
 
 	// What level of detail do we want script printing to go to.
@@ -1827,6 +1823,8 @@ void G_InitGame( int levelTime, int randomSeed, int restart ) {
 	if (g_dailyLogs.integer) {
 		trap_Cvar_Set("g_log", va("logs/%s-%02d-%02d.log", Months[ct.tm_mon], ct.tm_mday, 1900 + ct.tm_year));
 		trap_Cvar_Set("g_adminLog", va("logs/admin-%s-%02d-%02d.log", Months[ct.tm_mon], ct.tm_mday, 1900 + ct.tm_year));
+        trap_Cvar_Update(&g_log);
+        trap_Cvar_Update(&g_adminLog);
 	}
 
 	if ( g_log.string[0] ) {
@@ -2606,17 +2604,16 @@ Print to the logfile with a time stamp if it is open
 void QDECL G_LogPrintf( const char *fmt, ... ) {
 	va_list		argptr;
 	char		string[1024];
-	int			min, tens, sec, l;
+    qtime_t     rt;
+	int			min, hour, sec, l;
+    trap_RealTime(&rt);
 
-	sec = level.time / 1000;
+    hour = rt.tm_hour;
+    min = rt.tm_min;
+    sec = rt.tm_sec;
 
-	min = sec / 60;
-	sec -= min * 60;
-	tens = sec / 10;
-	sec -= tens * 10;
-
-	Com_sprintf( string, sizeof(string), "%i:%i%i ", min, tens, sec );
-
+	Com_sprintf( string, sizeof(string), "%02i:%02i:%02i ", hour, min, sec );
+    
 	l = strlen( string );
 
 	va_start( argptr, fmt );
@@ -2630,7 +2627,7 @@ void QDECL G_LogPrintf( const char *fmt, ... ) {
 	if ( !level.logFile ) {
 		return;
 	}
-
+    
 	trap_FS_Write( string, strlen( string ), level.logFile );
 }
 //bani
@@ -2646,16 +2643,15 @@ Prints to the admin logfile with a time stamp if it is open
 void QDECL G_ALog( const char *fmt, ...) {
 	va_list		argptr;
 	char		string[1024];
-	int			min, tens, sec, l;
+	qtime_t     rt;
+	int			min, hour, sec, l;
+    trap_RealTime(&rt);
 
-	sec = level.time / 1000;
+    hour = rt.tm_hour;
+    min = rt.tm_min;
+    sec = rt.tm_sec;
 
-	min = sec / 60;
-	sec -= min * 60;
-	tens = sec / 10;
-	sec -= tens * 10;
-	
-	Com_sprintf( string, sizeof(string), "%i:%i%i ", min, tens, sec );
+	Com_sprintf( string, sizeof(string), "%02i:%02i:%02i ", hour, min, sec );
 
 	l = strlen( string );
 	

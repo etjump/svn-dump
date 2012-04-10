@@ -3091,7 +3091,7 @@ extern void LogExit( const char *string );
 qboolean G_ScriptAction_EndRound( gentity_t *ent, char *params )
 {
 	if( !g_endround.integer ) {
-		return;
+		return qfalse;
 	}
 	else {
 		if ( g_gamestate.integer == GS_INTERMISSION ) {

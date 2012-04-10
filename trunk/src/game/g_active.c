@@ -1125,10 +1125,10 @@ void ClientThink_real( gentity_t *ent ) {
 	}
 
 	client->ps.aiState = AISTATE_COMBAT;
-	client->ps.gravity = g_gravity.value;
+	client->ps.gravity = G_GRAVITY;
 
 	// set speed
-	client->ps.speed = g_speed.value;
+	client->ps.speed = G_SPEED;
 
 	if( client->speedScale )				// Goalitem speed scale
 		client->ps.speed *= (client->speedScale * 0.01);
@@ -1506,7 +1506,7 @@ void SpectatorClientEndFrame( gentity_t *ent )
 
 	// if we are doing a chase cam or a remote view, grab the latest info
 	if((ent->client->sess.spectatorState == SPECTATOR_FOLLOW) || (ent->client->ps.pm_flags & PMF_LIMBO)) {
-		int clientNum, testtime;
+		int clientNum;
 		gclient_t *cl;
 		qboolean do_respawn = qfalse; // JPW NERVE
 		

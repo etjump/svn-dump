@@ -3362,9 +3362,6 @@ void Weapon_Portal_Fire( gentity_t *ent, int PortalNumber ) {
 	vec3_t		trace_end;		//trace end point
 	trace_t 	tr;				//trace results..
 
-	//portal distance...
-	float portalDistance;		//Distance between the origin of the two portals...
-
 	//BBox info
 	vec3_t t_portalAngles; //Could be used for all angles conversions...
 	float P_DEPTH, P_HEIGHT, P_WIDTH;

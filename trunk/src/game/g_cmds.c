@@ -2164,6 +2164,7 @@ qboolean Cmd_CallVote_f( gentity_t *ent, unsigned int dwCommand, qboolean fRefCo
 		level.voteInfo.voteYes = 1;
 		AP(va("print \"[lof]%s^7 [lon]called a vote.[lof]  Voting for: %s\n\"", ent->client->pers.netname, level.voteInfo.voteString));
 		AP(va("cp \"[lof]%s\n^7[lon]called a vote.\n\"", ent->client->pers.netname));
+        G_LogPrintf("%s called a vote. Voting for: %s\n", ent->client->pers.netname, level.voteInfo.voteString);
 		G_globalSound("sound/misc/vote.wav");
 	}
 

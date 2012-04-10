@@ -29,7 +29,7 @@
 // password = user password // This will be hashed for security purposes.
 /////////////////////////////////////////////////////////////////////////////
 
-// admin flags for variety of things
+// admin flags for a variety of things
 #define AF_IMMUNITY '1'
 #define AF_NONAMECHANGELIMIT '2'
 #define AF_NOVOTELIMIT '3'
