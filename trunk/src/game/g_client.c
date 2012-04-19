@@ -831,6 +831,7 @@ void SetWolfSpawnWeapons( gclient_t *client )
 	}
 
 	AddWeaponToPlayer( client, WP_KNIFE, 1, 0, qtrue );
+	AddWeaponToPlayer( client, WP_MEDIC_ADRENALINE, 1, 1, qtrue );
 
 	// Feen: PSM -TEST
 	if ((g_portalMode.integer == 0) && (level.portalEnabled)) //Freestyle mode...
@@ -1449,13 +1450,8 @@ void ClientUserinfoChanged( int clientNum ) {
 
 	if (client->pers.nofatigue && !(client->pers.clientFlags & CGF_NOFATIGUE))
 		client->ps.powerups[PW_ADRENALINE] = 0;
-	//ft rule nofatigue
-	// FIXME, BUGGED
-	// Sets off adre even if not in a ft.
-	if (!client->sess.nofatigue)
-		client->ps.powerups[PW_ADRENALINE] = 0;
 
-	client->pers.nofatigue = ((client->pers.clientFlags & CGF_NOFATIGUE) && client->sess.nofatigue);
+	client->pers.nofatigue = client->pers.clientFlags & CGF_NOFATIGUE;
 	client->pers.pmoveFixed = client->pers.clientFlags & CGF_PMOVEFIXED;
 	client->pers.cgaz = client->pers.clientFlags & CGF_CGAZ;
 	client->pers.loadViewAngles = client->pers.clientFlags & CGF_LOADVIEWANGLES;
@@ -1791,7 +1787,6 @@ char *ClientConnect( int clientNum, qboolean firstTime, qboolean isBot ) {
 	client->sess.noCall = qtrue;
 	client->sess.noNading = qtrue;
 	client->sess.nameChangeCount = 0;
-	client->sess.nofatigue = qtrue;
 	client->sess.oldPositionsLoaded = qfalse;
 	// Zero: target_set_ident id.
 	client->sess.clientident = 0;

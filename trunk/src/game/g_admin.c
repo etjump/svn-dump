@@ -182,7 +182,7 @@ void G_admin_writeconfig_default() {
 	trap_FS_Write("[level]\n", 8, f);
 	trap_FS_Write("level = 2\n", 10, f);
 	trap_FS_Write("name = ET Admin II\n", 19, f);
-	trap_FS_Write("commands = ak\n", 14, f);
+	trap_FS_Write("commands = *\n", 13, f);
 	trap_FS_Write("greeting = Welcome ET Admin II [n]\n", 35, f);
 	trap_FS_Write("\n", 1, f);
 
@@ -741,6 +741,7 @@ int G_admin_get_level(gentity_t *ent) {
 
 admin_t setlevel_temp;
 
+// Send client a password + username request.
 
 qboolean G_admin_setlevel(gentity_t *ent, int skiparg) {
 	int level = 0, i;
@@ -806,7 +807,9 @@ void G_clear_temp_admin() {
 	setlevel_temp.password[0] = '\0';
 	setlevel_temp.username[0] = '\0';
 }
-// part of setlevel cmd
+// Part of setlevel
+// Client sends "register_client" to server with two args,
+// password & username.
 void G_admin_register_client(gentity_t *ent) {
 	int i ;
 	admin_user_t *a;
@@ -1009,7 +1012,8 @@ void G_admin_identify(gentity_t *ent) {
 void G_admin_identify_all() {
 	int i;
 	for(i = 0; i < level.numConnectedClients; i++) {
-		trap_SendServerCommand(i, "identify_self");
+		int id = level.sortedClients[i];
+		trap_SendServerCommand(id, "identify_self");
 	}
 }
 
@@ -1298,6 +1302,7 @@ qboolean G_admin_help(gentity_t *ent, int skiparg) {
                 ++cmdcount;
 			}
 		}
+		ABP(ent, "\n");
 		ABP_end();
 	}
 	else {
@@ -2269,7 +2274,8 @@ qboolean G_admin_removeuser( gentity_t *ent, int skiparg ) {
 
 	for(i = 0; i < level.numConnectedClients; i++) {
 		gentity_t *target = NULL;
-		if(!Q_stricmp((target = g_entities + i)->client->sess.uinfo.username,
+		int id = level.sortedClients[i];
+		if(!Q_stricmp((target = g_entities + id)->client->sess.uinfo.username,
 			g_admin_users[levindex]->username)) {
 				target->client->sess.uinfo.level = 0;
 		}
@@ -2287,7 +2293,8 @@ qboolean G_admin_listusers(gentity_t *ent, int skiparg) {
 		if(i != 0 && i % 4 == 0) {
 			ABP(ent, "\n");
 		}
-		ABP(ent, va("^7%-36s ", g_admin_users[i]->username));
+		if(g_admin_users[i]->level != 0)
+			ABP(ent, va("^7%-36s ", g_admin_users[i]->username));
 	}
 	ABP(ent, "\n");
 	ABP_end();
@@ -2353,7 +2360,8 @@ qboolean G_admin_removelevel( gentity_t *ent, int skiparg ) {
 
 	for(i = 0; i < level.numConnectedClients; i++) {
 		gentity_t *target = NULL;
-		if((target = g_entities + i)->client->sess.uinfo.level == lvl) {
+		int id = level.sortedClients[i];
+		if((target = g_entities + id)->client->sess.uinfo.level == lvl) {
 			target->client->sess.uinfo.level = 0;
 		}
 	}

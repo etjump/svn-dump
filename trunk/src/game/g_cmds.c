@@ -760,7 +760,7 @@ void Cmd_Noclip_f( gentity_t *ent ) {
 	char	*msg;
 
 	char	*name = ConcatArgs( 1 );
-	if(!g_developer.integer) {
+	if(!g_developer.integer || g_dedicated.integer > 0) {
 	#ifdef EDITION999
 		if(!G_admin_permission(ent, AF_ADMINBYPASS)) {
 			if ( !g_noclip.integer && !CheatsOk( ent ) ) {

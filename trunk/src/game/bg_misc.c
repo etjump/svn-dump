@@ -156,7 +156,7 @@ ammotable_t ammoTableMP[WP_NUM_WEAPONS] = {
 	{	45,				1,		15,		0,		4,		1000,	DELAY_THROW,	1600,	0,		0,		MOD_GRENADE_PINEAPPLE	},	// WP_GRENADE_PINEAPPLE		// 9
 
 	{	96,				1,		32,		32,		32,		3100,	DELAY_LOW,		150,	1200,	450,	MOD_STEN				},	// WP_STEN					// 10
-	{	10,				1,		1,		0,		10,		1500,	50,				1000,	0,		0,		MOD_SYRINGE				},	// WP_MEDIC_SYRINGE			// 11
+	{	10,				0,		1,		0,		1,		1500,	50,				1000,	0,		0,		MOD_SYRINGE				},	// WP_MEDIC_SYRINGE			// 11
 	{	1,				0,		1,		0,		0,		3000,	50,				1000,	0,		0,		MOD_AMMO,				},	// WP_AMMO					// 12
 	{	1,				0,		1,		0,		1,		3000,	50,				1000,	0,		0,		MOD_ARTY,				},	// WP_ARTY					// 13												
 	{	24,				1,		8,		24,		8,		1500,	DELAY_PISTOL,	400,	0,		0,		MOD_SILENCER			},	// WP_SILENCER				// 14
@@ -196,7 +196,7 @@ ammotable_t ammoTableMP[WP_NUM_WEAPONS] = {
 	{	30,				1,		10,		20,		10,		2500,	0,				400,	0,		0,		MOD_K43_SCOPE			},	// WP_K43_SCOPE				// 43		K43
 	{	60,				1,		20,		40,		20,		2000,	DELAY_LOW,		400,	0,		0,		MOD_FG42SCOPE			},	// WP_FG42SCOPE				// 44
 	{	16,				1,		1,		12,		0,		0,		750,			1400,	0,		0,		MOD_MORTAR				},	// WP_MORTAR_SET			// 45
-	{	10,				1,		1,		0,		10,		1500,	50,				1000,	0,		0,		MOD_SYRINGE				},	// WP_MEDIC_ADRENALINE		// 46
+	{	10,				0,		1,		0,		1,		1500,	50,				1000,	0,		0,		MOD_SYRINGE				},	// WP_MEDIC_ADRENALINE		// 46
 	{	48,				1,		8,		48,		8,		2700,	DELAY_PISTOL,	200,	0,		0,		MOD_AKIMBO_SILENCEDCOLT	},	// WP_AKIMBO_SILENCEDCOLT	// 47
 	{	48,				1,		8,		48,		8,		2700,	DELAY_PISTOL,	200,	0,		0,		MOD_AKIMBO_SILENCEDLUGER},	// WP_AKIMBO_SILENCEDLUGER	// 48
 	{	450,			1,		150,	0,		150,	3000,	DELAY_LOW,		66,		1500,	300,	MOD_MOBILE_MG42			},	// WP_MOBILE_MG42_SET		// 49

@@ -2207,7 +2207,6 @@ typedef struct {
 	char		joinOrder[MAX_CLIENTS]; // order in which clients joined the fire team (server), client uses to store if a client is on this fireteam
 	int			leader; // leader = joinOrder[0] on server, stored here on client
 	int			savelimit;
-	qboolean	nofatigue;
 	qboolean	inuse;
 	qboolean	priv;
 } fireteamData_t;

@@ -2052,7 +2052,7 @@ qboolean Bot_ScriptAction_FireAtTarget( bot_state_t *bs, char *params )
 		a = (vec_t)atan((-x - b) / (-2 * d));
 		bs->ideal_viewangles[PITCH] = (AngleMod(RAD2DEG(a)- 180) + 60);*/
 
-		float g = -g_gravity.value;
+		float g = -G_GRAVITY;
 
 		float uz = sqrt(-2 * 3072 * g);
 		float t = ((-uz)/g) * 2;

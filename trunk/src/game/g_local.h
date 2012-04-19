@@ -667,7 +667,6 @@ typedef struct {
 	// Challenge group
 
 	int			savelimit;
-	qboolean	nofatigue;
 
 	int			clientident;
 

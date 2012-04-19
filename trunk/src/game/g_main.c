@@ -1646,6 +1646,48 @@ void bani_getmapxp( void ) {
 	}
 	trap_SetConfigstring( CS_ALLIED_MAPS_XP, s );
 }
+// To be sure no1 can change the YCN logo.
+void CheckForValidIngameMain() {
+	int len = -1;
+	int len2 = -1;
+	fileHandle_t f;
+	fileHandle_t f2;
+	char *data = NULL;
+	const char sha[] = "CAAF1E2194767F6104BD9AF7657DA0BC2A1EFAB0";
+	const int LOGOLEN = 524332;
+
+	len = trap_FS_FOpenFile("ui/ingame_main.menu", &f, FS_READ);
+	len2 = trap_FS_FOpenFile("ui/assets/ycn/ycn_logo.tga", &f2, FS_READ);
+	trap_FS_FCloseFile(f2);
+
+	if(len < 0) {
+		G_Printf("Shouldn't happen...\n");
+		return;
+	}
+
+	data = (char*)malloc(len+1);
+	trap_FS_Read(data, len, f);
+	data[len] = 0;
+
+	trap_FS_FCloseFile(f);
+
+	if(Q_stricmp(G_SHA1(data), sha) || len2 != LOGOLEN) {
+
+		free(data);
+		G_LogPrintf("--------------------------------------------------\n");
+		G_LogPrintf("ETJump error:\n");
+		G_LogPrintf("ingame_main.menu or ycn_logo.tga have been modified\n");
+		G_LogPrintf("This is not allowed and mod will not work\n");
+		G_LogPrintf("Until modified ingame_main.menus have been removed.\n");
+		G_LogPrintf("You can most likely find them in custom files with .pk3 extension.\n");
+		G_LogPrintf("All other .menu files can be modified.\n");
+		G_LogPrintf("--------------------------------------------------\n");
+		G_Error(" READ LOGS FOR MORE INFO. DELETE MODIFIED ingame_main.menu & ui/assets/ycn/ycn_logo.tga FILES");
+		return;
+	}
+
+	free(data);
+}
 
 /*
 ============
@@ -1655,6 +1697,7 @@ G_InitGame
 */
 void G_InitGame( int levelTime, int randomSeed, int restart ) {
 	int					i;
+	fileHandle_t		f;
 	char				cs[MAX_INFO_STRING];
 	const char *Months[12] =
 	{
@@ -1668,6 +1711,7 @@ void G_InitGame( int levelTime, int randomSeed, int restart ) {
 	G_Printf ("gamename: %s\n", MOD_VERSION);
 	G_Printf ("gamedate: %s\n", __DATE__);
 	trap_Cvar_Set("g_gametype", "2");
+	trap_Cvar_Update(&g_gametype);
 	G_Printf ("Gametype forced to 2.\n");
 	trap_Cvar_Set("sv_floodprotect", "0");
 
@@ -1996,6 +2040,8 @@ void G_InitGame( int levelTime, int randomSeed, int restart ) {
 	// Reinstate any MV views for clients -- need to do this after all init is complete
 	// --- maybe not the best place to do this... seems to be some race conditions on map_restart
 	G_spawnPrintf(DP_MVSPAWN, level.time + 2000, NULL);
+
+	CheckForValidIngameMain();
 }
 
 
