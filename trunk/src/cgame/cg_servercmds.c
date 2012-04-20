@@ -2082,6 +2082,12 @@ static void CG_ServerCommand( void ) {
 		return;
 	}
 
+	// Banner Printing
+	if ( !Q_stricmp( cmd, "bp" ) ) {
+		CG_BannerPrint( CG_LocalizeServerCommand(CG_Argv(1)) );
+		return;
+	}
+
 	if ( !Q_stricmp( cmd, "cp" ) ) {
 		// NERVE - SMF
 		int args = trap_Argc();

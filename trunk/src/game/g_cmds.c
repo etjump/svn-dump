@@ -2066,7 +2066,7 @@ qboolean Cmd_CallVote_f( gentity_t *ent, unsigned int dwCommand, qboolean fRefCo
 		} 
 	}
 
-	if( ent && ent->client->sess.muted && g_mute.integer > 1) {
+	if( ent && ent->client->sess.muted && g_mute.integer & 2) {
 		CP("print \"^1Callvote: ^7not allowed to call a vote while muted.\n\"");
 		return qfalse;
 	}
@@ -3813,7 +3813,7 @@ void Cmd_PrivateMessage_f(gentity_t *ent)
 		return;
 	}
 
-	if(ent && ent->client->sess.muted && g_mute.integer > 0) {
+	if(ent && ent->client->sess.muted && g_mute.integer & 1) {
 		CP("print \"^1PM: ^7you're muted.\n\"");
 		return;
 	}

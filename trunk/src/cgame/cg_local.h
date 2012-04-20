@@ -858,6 +858,10 @@ typedef struct {
 
 	qboolean	lightstylesInited;
 
+	// bannerprinting
+	int			bannerPrintTime;
+	char		bannerPrint[1024];
+
 	// centerprinting
 	int			centerPrintTime;
 	int			centerPrintCharWidth;

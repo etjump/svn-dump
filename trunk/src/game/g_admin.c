@@ -1777,6 +1777,7 @@ qboolean G_admin_remove_saves(gentity_t *ent, int skiparg) {
 		for (j = 0; j < MAX_SAVE_POSITIONS; j++)
 			saves[i][j].isValid = qfalse;
 
+	AIP(ent, va("^3adminsystem: ^7%s^7's ^7saves were removed.", target->client->pers.netname) );
     AIP(target, va("^3adminsystem: ^7%s ^7your saves were removed.", target->client->pers.netname) );
 	
 	return qtrue;
@@ -1802,9 +1803,11 @@ qboolean G_admin_disable_goto(gentity_t *ent, int skiparg) {
 	if(target->client->sess.goto_allowed) {
 		target->client->sess.goto_allowed = qfalse;
 		AIP(target, va("^3adminsystem: ^7%s^7 you are not allowed to use goto.", target->client->pers.netname));
+		AIP(ent, va("^3adminsystem: ^7%s^7 is not allowed to use goto.", target->client->pers.netname));
 	} else {
 		target->client->sess.goto_allowed = qtrue;
         AIP(target, va("^3adminsystem:^7 %s^7 you are now allowed to use goto.", target->client->pers.netname));
+		AIP(ent, va("^3adminsystem: ^7%s^7 is now allowed to use goto.", target->client->pers.netname));
 	}
 	return qtrue;
 }
@@ -1829,9 +1832,11 @@ qboolean G_admin_disable_save(gentity_t *ent, int skiparg) {
 	if(target->client->sess.save_allowed) {
 		target->client->sess.save_allowed = qfalse;
         AIP(target, va("^3adminsystem:^7 %s^7 you are not allowed to save your position.", target->client->pers.netname));
+		AIP(ent, va("^3adminsystem:^7 %s^7 is not allowed to save their position.", target->client->pers.netname));
 	} else {
 		target->client->sess.save_allowed = qtrue;
 		AIP(target, va("^3adminsystem:^7 %s^7 you are now allowed to save your position.", target->client->pers.netname));
+		AIP(ent, va("^3adminsystem:^7 %s^7 is now allowed to save their position.", target->client->pers.netname));
 	}
 	return qtrue;
 }
@@ -2457,6 +2462,11 @@ qboolean G_admin_noclip(gentity_t *ent, int skiparg) {
 #else
 
 qboolean G_admin_noclip(gentity_t *ent, int skiparg) {
+
+	char name[MAX_TOKEN_CHARS];
+	char err[MAX_STRING_CHARS];
+	gentity_t *target;
+
 	if(level.noNoclip) {
 		AIP(ent, "^3!noclip:^7 noclip is disabled on this map.");
 		return qfalse;

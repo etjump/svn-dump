@@ -1265,6 +1265,164 @@ void CG_DrawLivesLeft( void ) {
 }
 
 /*
+==============
+CG_BannerPrint
+
+Called for server banner messages that stay in the top center of the screen
+for a few moments
+==============
+*/
+
+#define BP_LINEWIDTH 80
+#define BP_TIME 10000
+
+
+void CG_BannerPrint( const char *str ) {
+	char buff[MAX_STRING_CHARS];
+	int		i, len, textlen;
+	qboolean neednewline = qfalse;
+
+	Q_strncpyz( cg.bannerPrint, str, sizeof(cg.bannerPrint) );
+
+	// turn spaces into newlines, if we've run over the linewidth
+	len = strlen( cg.bannerPrint );
+	for ( i = 0, textlen = 0; i < len; i++, textlen++) {
+		
+		// "\n" in center/banner prints are seen as new lines.
+		// kw: this is also done serverside in etpub
+		if ( cg.bannerPrint[i] == '\\' && cg.bannerPrint[i+1] == 'n' ) {
+			Q_strncpyz( buff, &cg.bannerPrint[i+2], sizeof(buff));
+			cg.bannerPrint[i] = '\n';
+			cg.bannerPrint[i+1] = 0;
+			Q_strcat(cg.bannerPrint, sizeof(cg.bannerPrint), buff);
+		}
+		if( cg.bannerPrint[i] == '\n')
+			textlen = 0;
+
+		if( Q_IsColorString( &cg.bannerPrint[i] ) )
+			textlen -= 2;
+
+		// NOTE: subtracted a few chars here so long words still 
+		// get displayed properly
+		if ( textlen % ( BP_LINEWIDTH - 10 ) == 0 && textlen > 0 )
+			neednewline = qtrue;
+
+		if ( cg.bannerPrint[i] == ' ' && neednewline ) {
+			cg.bannerPrint[i] = '\n';
+			textlen = 0;
+			neednewline = qfalse;
+		}
+
+		// if still to long just cut it at BP_LINEWIDTH
+		if(textlen % BP_LINEWIDTH == 0 && textlen > 0 ) {
+			Q_strncpyz( buff, &cg.bannerPrint[i], sizeof(buff));
+			cg.bannerPrint[i] = '\n';
+			cg.bannerPrint[i+1] = 0;
+			Q_strcat(cg.bannerPrint, sizeof(cg.bannerPrint), buff);
+			textlen = 0;
+			neednewline = qfalse;
+		}
+	}
+
+	// post-editing to print text correctly into the console
+	for(i=0,len=0; i<strlen(cg.bannerPrint); i++ ) {
+		// replace newlines with spaces
+		if(cg.bannerPrint[i] == '\n' ) {
+			if(len != 0 && buff[len-1] != ' ') {
+				buff[len] = ' ';
+				len++;
+			}
+			continue;
+		}
+		// no spaces at the beginning of the string
+		if(len == 0 && cg.bannerPrint[i] == ' ') 
+			continue;
+		buff[len] = cg.bannerPrint[i];
+		len++;
+	}
+	buff[len] = 0;
+	
+	// show the banner in the console
+	// Dens: only if the client wants that
+	CG_Printf( "^9banner: ^7%s\n", buff);
+
+	cg.bannerPrintTime = cg.time;
+
+}
+
+static void CG_DrawBannerPrint( void ) {
+	char	*start;
+	int		l;
+	int		x, y, w;
+	float	*color;
+	char	lastcolor = COLOR_WHITE;
+	int		charHeight;
+
+	if ( !cg.bannerPrintTime ) {
+		return;
+	}
+
+	color = CG_FadeColor( cg.bannerPrintTime, BP_TIME );
+	if ( !color ) {
+		cg.bannerPrintTime = 0;
+		return;
+	}
+
+	trap_R_SetColor( color );
+
+	start = cg.bannerPrint;
+
+	y = 0;
+	charHeight = CG_Text_Height_Ext("A", 0.25,
+				0, &cgs.media.limboFont1);
+
+
+	while ( 1 ) {
+		char linebuffer[1024];
+		char colorchar = lastcolor;
+
+		for ( l = 0; l < strlen( cg.bannerPrint ); l++ ) {
+			if ( !start[l] || start[l] == '\n' ) {
+				break;
+			}
+			if( Q_IsColorString( &start[l] ) )
+				lastcolor = start[l+1];
+			linebuffer[l] = start[l];
+		}
+		linebuffer[l] = 0;
+
+		//w = MINICHAR_WIDTH * CG_DrawStrlen( linebuffer );
+		w = CG_Text_Width_Ext(linebuffer, 0.25,
+				0, &cgs.media.limboFont1);
+
+		x = ( SCREEN_WIDTH - w ) / 2;
+		
+		// colors are saved over newlines in bannerprint messages.
+		//CG_DrawStringExt( x, y, va( "^%c%s", colorchar, linebuffer) , color, 
+		//		qfalse, qtrue, MINICHAR_WIDTH, MINICHAR_HEIGHT, 0 );
+		y += charHeight * 1.5;
+		CG_Text_Paint_Ext( x, y,
+				0.25,
+				0.25,
+				color, va( "^%c%s", colorchar, linebuffer),
+				0, 0, ITEM_TEXTSTYLE_SHADOWED,
+				&cgs.media.limboFont1);
+		//y += MINICHAR_HEIGHT;
+
+
+		while ( *start && ( *start != '\n' ) ) {
+			start++;
+		}
+		if ( !*start ) {
+			break;
+		}
+		start++;
+	}
+
+	trap_R_SetColor( NULL );
+}// bannerprinting
+
+/*
 ===============================================================================
 
 CENTER PRINTING
@@ -5028,7 +5186,7 @@ static void CG_Draw2D( void ) {
 		if (!cg_paused.integer) {
 			CG_DrawUpperRight();
 		}
-
+		CG_DrawBannerPrint();
 		CG_DrawCenterString();
 		CG_DrawPMItems();
 		CG_DrawPMItemsBig();

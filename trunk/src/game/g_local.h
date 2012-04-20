@@ -2744,5 +2744,6 @@ void Weapon_Portal_Fire( gentity_t *ent, int PortalNum ); //TODO add switch for 
 #define BANNER_CP 0
 #define BANNER_BP 1
 #define BANNER_SAY 2
+#define BANNER_CPM 3
 #define DEFAULT_BANNER_TIME 60000
 

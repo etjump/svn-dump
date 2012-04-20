@@ -491,7 +491,7 @@ cvarTable_t		gameCvarTable[] = {
 	{ &g_logCommands, "g_logCommands", "1", CVAR_ARCHIVE },
 
 	{ &g_banners, "g_banners", "0", CVAR_ARCHIVE },
-	{ &g_bannerLocation, "g_bannerLocation", "0", CVAR_ARCHIVE },
+	{ &g_bannerLocation, "g_bannerLocation", "1", CVAR_ARCHIVE },
 	{ &g_bannerTime, "g_bannerTime", "60", CVAR_ARCHIVE },
 	// FIXME: dynamic banner count.
 	{ &g_banner1, "g_banner1", "", CVAR_ARCHIVE },
@@ -4063,6 +4063,7 @@ void CheckBanner() {
 	if(g_bannerTime.integer >= 30000 && g_bannerTime.integer <= 600000) {
 		bannerTime = g_bannerTime.integer;
 	}
+	
 	// Maximum of five banners.
 	if(g_banners.integer > 5) {
 		bannerCount = 5;
@@ -4107,6 +4108,8 @@ void CheckBanner() {
 	}
 
 	if( g_bannerLocation.integer != BANNER_CP &&
+		g_bannerLocation.integer != BANNER_CPM &&
+		g_bannerLocation.integer != BANNER_SAY &&
 		g_bannerLocation.integer != BANNER_BP ) {
 			bannerLocation = BANNER_BP;
 	} else {
@@ -4115,10 +4118,12 @@ void CheckBanner() {
 
 	if(bannerLocation == BANNER_CP) {
 		AP(va("cp \"%s\n\"", msg));
-	} else if(bannerLocation == BANNER_BP) {
+	} else if(bannerLocation == BANNER_CPM) {
 		AP(va("cpm \"%s\n\"", msg));
 	} else if(bannerLocation == BANNER_SAY) {
 		AP(va("chat \"%s\n\"", msg));
+	} else if(bannerLocation == BANNER_BP) {
+		AP(va("bp \"%s\n\"", msg));
 	} else {
 		AP(va("cpm \"%s\n\"", msg));
 	}
