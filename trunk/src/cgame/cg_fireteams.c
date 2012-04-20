@@ -352,16 +352,8 @@ int CG_CountFireteamsByTeam( team_t t ) {
 	int cnt = 0;
 	int i;
 
-	if( t != TEAM_AXIS && t != TEAM_ALLIES ) {
-		return 0;
-	}
-
 	for( i = 0; i < MAX_FIRETEAMS; i++ ) {
 		if( !cg.fireTeams[i].inuse ) {
-			continue;
-		}
-
-		if( cgs.clientinfo[cg.fireTeams[i].leader].team != t ) {
 			continue;
 		}
 
@@ -376,16 +368,8 @@ void CG_DrawFireteamsByTeam( panel_button_t* button, team_t t ) {
 	const char* str;
 	int i;
 
-	if( t != TEAM_AXIS && t != TEAM_ALLIES ) {
-		return;
-	}
-
 	for( i = 0; i < MAX_FIRETEAMS; i++ ) {
 		if( !cg.fireTeams[i].inuse ) {
-			continue;
-		}
-
-		if( cgs.clientinfo[cg.fireTeams[i].leader].team != t ) {
 			continue;
 		}
 
@@ -413,10 +397,6 @@ int CG_CountPlayersSF( void ) {
 			continue;
 		}
 
-		if( cgs.clientinfo[i].team != cgs.clientinfo[cg.clientNum].team ) {
-			continue;
-		}
-
 		if( CG_IsOnFireteam( i ) != CG_IsOnFireteam( cg.clientNum ) ) {
 			continue;
 		}
@@ -437,10 +417,6 @@ int CG_CountPlayersNF( void ) {
 		}
 
 		if( !cgs.clientinfo[i].infoValid ) {
-			continue;
-		}
-
-		if( cgs.clientinfo[i].team != cgs.clientinfo[cg.clientNum].team ) {
 			continue;
 		}
 
@@ -474,10 +450,6 @@ int CG_PlayerSFFromPos( int pos, int* pageofs ) {
 		}
 
 		if( !cgs.clientinfo[i].infoValid ) {
-			continue;
-		}
-
-		if( cgs.clientinfo[i].team != cgs.clientinfo[cg.clientNum].team ) {
 			continue;
 		}
 
@@ -522,10 +494,6 @@ int CG_PlayerNFFromPos( int pos, int* pageofs ) {
 			continue;
 		}
 
-		if( cgs.clientinfo[i].team != cgs.clientinfo[cg.clientNum].team ) {
-			continue;
-		}
-
 		if( CG_IsOnFireteam( i ) ) {
 			continue;
 		}
@@ -549,7 +517,7 @@ void CG_DrawPlayerSF( panel_button_t* button, int* pageofs ) {
 	const char* str;
 	int i, x;
 
-	for( i = 0; i < 8; i++ ) {
+    for( i = 0; i < MAX_FIRETEAM_USERS; i++ ) {
 		x = CG_PlayerSFFromPos( i, pageofs );
 		if( x == -1 ) {
 			break;
@@ -596,7 +564,7 @@ void CG_DrawPlayerNF( panel_button_t* button, int* pageofs ) {
 	const char* str;
 	int i, x;
 
-	for( i = 0; i < 8; i++ ) {
+	for( i = 0; i < MAX_FIRETEAM_USERS; i++ ) {
 		x = CG_PlayerNFFromPos( i, pageofs );
 		if( x == -1 ) {
 			break;
@@ -1035,10 +1003,6 @@ qboolean CG_FireteamCheckExecKey( int key, qboolean doaction ) {
 
 				for( i = 0; i < MAX_FIRETEAMS; i++ ) {
 					if( !cg.fireTeams[i].inuse ) {
-						continue;
-					}
-
-					if( cgs.clientinfo[cg.fireTeams[i].leader].team != cgs.clientinfo[cg.clientNum].team ) {
 						continue;
 					}
 

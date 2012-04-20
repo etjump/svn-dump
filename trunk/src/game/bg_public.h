@@ -13,7 +13,7 @@
 
 #define	GAME_VERSION	"etjump"
 
-#define MOD_VERSION		"ETJump 2.0.1"
+#define MOD_VERSION		"2.0.1"
 
 #if defined(_DEBUG)
 	#define	GAME_VERSION_DATED			GAME_VERSION
@@ -2199,8 +2199,9 @@ typedef struct botpool_x
 // END Mad Doc - TDF
 
 #define MAX_FIRETEAMS		12
+#define MAX_FIRETEAM_USERS  15
 
-extern const char* bg_fireteamNames[MAX_FIRETEAMS / 2];
+extern const char* bg_fireteamNames[MAX_FIRETEAMS];
 
 typedef struct {
 	int			ident;

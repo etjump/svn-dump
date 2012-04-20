@@ -29,52 +29,52 @@ struct g_admin_additional_flag {
 };
 
 static const struct g_admin_additional_flag g_admin_additional_flags[] = {
-    {AF_IMMUNITY, "Vote kick/mute immunity."},
-    {AF_NONAMECHANGELIMIT, "No name change limit."},
-    {AF_NOVOTELIMIT, "No vote limit"},
-    {AF_SILENTCOMMANDS, "Silent commands"},
+    {AF_IMMUNITY, "Immunity to vote kick and mute."},
+    {AF_NONAMECHANGELIMIT, "Unlimited name changes."},
+    {AF_NOVOTELIMIT, "Unlimited vote limit."},
+    {AF_SILENTCOMMANDS, "Silent admin commands."},
     {0, "\0"},
 };
 
 static const struct g_admin_cmd g_admin_cmds[] = {
 	{"8ball",		G_admin_8ball,		'8',	"Magic 8 Ball!", "Syntax: !8ball <question>"},
 	{"admintest",	G_admin_admintest,	'a',	"Displays your current admin level.", "Syntax: !admintest"},
-	{"ban",			G_admin_ban,		'b',	"Bans target player.", "Syntax: !ban <name> <time> <reason>"},
-	{"cancelvote",  G_admin_cancelvote, 'C',	"Cancels the current vote in progress.", "Syntax: !cancelvote"},
-	{"editcmds",	G_admin_editcommands,'A',	"Edit level commands.", "Syntax: !editcmds <level> <+cmd|-cmd> <+cmd2|-cmd>..."},
-	{"finger",		G_admin_finger,		'f',	"Displayers target's adminlevel.", "Syntax: !finger <target>"},
-	{"help",		G_admin_help,		'h',	"Displays info about commands.", "Syntax: !help <command>"},
-	{"kick",		G_admin_kick,		'k',	"Kicks target player.", "Syntax: !kick <player>"},
-	{"levadd",		G_admin_levadd,		'A',	"Add level.", "Syntax: !levadd <level>"},
-	{"levedit",		G_admin_levedit,	'A',	"Edit level.", "Syntax: !levedit <level> <name|gtext|cmds> <third parameter>"},
-	{"levinfo",		G_admin_levinfo,	'A',	"Show info about levels.", "Syntax: !levinfo or !levinfo <level>"},
+	{"ban",			G_admin_ban,		'b',	"Bans target user.", "Syntax: !ban <name> <time> <reason>"},
+	{"cancelvote",  G_admin_cancelvote, 'C',	"Cancels current vote in progress.", "Syntax: !cancelvote"},
+	{"editcmds",	G_admin_editcommands,'A',	"Edits command permissions of target admin level.", "Syntax: !editcmds <level> <+cmd|-cmd> <+cmd2|-cmd>..."},
+	{"finger",		G_admin_finger,		'f',	"Displays target's admin level.", "Syntax: !finger <target>"},
+	{"help",		G_admin_help,		'h',	"Prints useful information about commands.", "Syntax: !help <command>"},
+	{"kick",		G_admin_kick,		'k',	"Kicks target.", "Syntax: !kick <player>"},
+	{"levadd",		G_admin_levadd,		'A',	"Adds admin level to admin level database.", "Syntax: !levadd <level>"},
+	{"levedit",		G_admin_levedit,	'A',	"Edits admin level.", "Syntax: !levedit <level> <name|gtext|cmds> <third parameter>"},
+	{"levinfo",		G_admin_levinfo,	'A',	"Prints information about admin levels.", "Syntax: !levinfo or !levinfo <level>"},
 	{"listbans",	G_admin_listbans,	'L',	"Lists all current bans.", "Syntax: !listbans"},
-	{"listcmds",	G_admin_help,		'h',	"Displays info about commands.", "Syntax: !help <command>"},
-	{"listflags",	G_admin_listflags,	'A',	"Lists all admin command flags.", "Syntax: !listflags"},
-	{"listmaps",	G_admin_listmaps,	'a',	"Lists all maps on the server.", "Syntax: !listmaps"},
-	{"listplayers",	G_admin_listplayers,'l',	"Displays level info of all players.", "Syntax: !listplayers"},
-	{"listusers",	G_admin_listusers,	'A',	"List all users.", "Syntax: !listusers"},
+	{"listcmds",	G_admin_help,		'h',	"Prints useful information about commands.", "Syntax: !help <command>"},
+	{"listflags",	G_admin_listflags,	'A',	"Prints of list of all admin command flags.", "Syntax: !listflags"},
+	{"listmaps",	G_admin_listmaps,	'a',	"Prints a list of all maps on the server.", "Syntax: !listmaps"},
+	{"listplayers",	G_admin_listplayers,'l',	"Displays admin level information about all players on the server.", "Syntax: !listplayers"},
+	{"listusers",	G_admin_listusers,	'A',	"Prints a list of all users in the admin database.", "Syntax: !listusers"},
 	{"map",			G_admin_map,		'M',	"Changes map.", "Syntax: !map <mapname>"},
-	{"mute",		G_admin_mute,		'm',	"Mutes target player.", "Syntax: !mute <target>"},
+	{"mute",		G_admin_mute,		'm',	"Mutes target.", "Syntax: !mute <target>"},
 #ifndef EDITION999
-	{"noclip",		G_admin_noclip,		'N',	"Noclip on/off.", "Syntax: !noclip"},
+	{"noclip",		G_admin_noclip,		'N',	"Toggles noclip for target player.", "Syntax: !noclip"},
 #endif
 #ifdef EDITION999
-	{"noclip",		G_admin_noclip,		AF_ADMINBYPASS, "Noclip on/off for target player.", "Syntax: !noclip <target>"},
+	{"noclip",		G_admin_noclip,		AF_ADMINBYPASS, "Toggles noclip for target player.", "Syntax: !noclip <target>"},
 #endif
-	{"nogoto",		G_admin_disable_goto,'T',	"Prevents target from using goto & call.", "Syntax: !nogoto <target>"},
-	{"nosave",		G_admin_disable_save,'T',	"Prevents target from using save & load.", "Syntax: !nosave <target>"},
+	{"nogoto",		G_admin_disable_goto,'T',	"Disables target's use of goto.", "Syntax: !nogoto <target>"},
+	{"nosave",		G_admin_disable_save,'T',	"Disables target's use of call.", "Syntax: !nosave <target>"},
 	{"passvote",	G_admin_passvote,	'P',	"Passes the current vote in progress.","Syntax: !passvote}"},
 	{"putteam",		G_admin_putteam,	'p',	"Puts target to a team.", "Syntax: !putteam target <b|r|s>"},
 	{"readconfig",	G_admin_readconfig,	'G',	"Reads admin config.", "Syntax: !readconfig"},
-	{"removelevel", G_admin_removelevel,'A',	"Remove level.", "Syntax: !removelevel <level>"},
-	{"removeuser",	G_admin_removeuser,	'A',	"Remove user from database.", "Syntax: !removeuser <username>"},
-	{"rename",		G_admin_rename,		'R',	"Renames the target player.", "Syntax: !rename <target> <newname>"},
+	{"removelevel", G_admin_removelevel,'A',	"Removes admin level from database.", "Syntax: !removelevel <level>"},
+	{"removeuser",	G_admin_removeuser,	'A',	"Remove admin user from database.", "Syntax: !removeuser <username>"},
+	{"rename",		G_admin_rename,		'R',	"Renames target.", "Syntax: !rename <target> <newname>"},
 	{"restart",		G_admin_restart,	'r',	"Restarts the map.", "Syntax: !restart"},
-	{"rmsaves",		G_admin_remove_saves,'T',	"Clear saved positions of target.", "Syntax: !rmsaves <target>"},
+	{"rmsaves",		G_admin_remove_saves,'T',	"Clears target's saved positions.", "Syntax: !rmsaves <target>"},
 	{"setlevel",	G_admin_setlevel,	's',	"Sets target level.", "Syntax: !setlevel <target> <level>"},
-	{"spec",		G_admin_spec,		'S',	"Spectate target.", "Syntax: !spec <target>"},
-	{"unban",		G_admin_unban,		'b',	"Unbans #.", "Syntax: !unban <number>"},
+	{"spec",		G_admin_spec,		'S',	"Spectates target.", "Syntax: !spec <target>"},
+	{"unban",		G_admin_unban,		'b',	"Unbans ban ID.", "Syntax: !unban <number>"},
 	{"unmute",		G_admin_unmute,		'm',	"Unmutes target player.", "Syntax: !unmute <target>"},
 	{"\0",			NULL,				'\0',	"", ""}
 };
@@ -131,6 +131,55 @@ void G_admin_buffer_print(gentity_t *ent, char *string) {
 		Q_strcat(bigTextBuffer, sizeof(bigTextBuffer), string);
 	}
 }
+
+/* 
+Some utility chat print functions with proper naming.
+Probably useless as I forget to use them but they're
+here anyway! Yay!
+*/
+// chat to ent
+#define ChatP(ent, x) ChatPrint(ent, x)
+// chat to all
+#define ChatPA(x) ChatPrintAll(x)
+// cpm to ent
+#define CPMP(ent, x) CPMPrint(ent, x)
+// cpm to all
+#define CPMPA(x) CPMPrintAll(x)
+// cp to ent
+#define CPP(ent, x) CPPrint(ent, x)
+// cp to all
+#define CPPA(x) CPPrintAll(x)
+
+void ChatPrint(gentity_t *ent, char *message) {
+    if(ent) CP(va("chat \"%s\"", message));
+    else G_Printf("%s\n", message);
+}
+
+void ChatPrintAll(char *message) {
+    AP(va("chat \"%s\"", message));
+    G_Printf("%s\n", message);
+}
+
+void CPMPrint(gentity_t *ent, char *message) {
+    if(ent) CP(va("cpm \"%s\n\"", message));
+    else G_Printf("%s\n", message);
+}
+
+void CPMPrintAll(char *message) {
+    AP(va("cpm \"%s\n\"", message));
+    G_Printf("%s\n", message);
+}
+
+void CPPrint(gentity_t *ent, char *message) {
+    if(ent)CP(va("cp \"%s\n\"", message));
+    else G_Printf("%s\n", message);
+}
+
+void CPPrintAll(char *message) {
+    AP(va("cp \"%s\n\"", message));
+    G_Printf("%s\n", message);
+}
+
 // returns true if caller is higher, if equal returns true if equal aswell
 qboolean G_admin_higher(gentity_t *ent, gentity_t *target, qboolean equal) {
 	if(!ent) return qtrue;
@@ -768,7 +817,7 @@ qboolean G_admin_setlevel(gentity_t *ent, int skiparg) {
 	target = g_entities + pids[0];
 
 	if(ent != target && !G_admin_higher(ent, target, qtrue)) {
-		AIP(ent, "^3setlevel: ^7you cannot set the level of a fellow admin");
+		AIP(ent, "^3setlevel: ^7you can't set the level of a fellow admin");
 		return qfalse;
 	}
 	// Allows client to use the register cmd
@@ -1118,11 +1167,11 @@ qboolean G_admin_mute(gentity_t *ent, int skiparg) {
 
 	if(ent) {
 		if(ent != target && !G_admin_higher(ent, target, qfalse)) {
-			AIP(ent, "^3mute: ^7You cannot mute a fellow admin");
+			AIP(ent, "^3mute: ^7you cannot mute a fellow admin");
 			return qfalse;
 		}
 		if(target == ent) {
-			AIP(ent, "^3mute: ^7You cannot mute yourself");
+			AIP(ent, "^3mute: ^7you cannot mute yourself");
 			return qfalse;
 		}
 	}
@@ -1243,6 +1292,7 @@ qboolean G_admin_rename(gentity_t *ent, int skiparg) {
 	trap_SetUserinfo( pids[0], userinfo );
 	target->client->sess.nameChangeCount--;
 	ClientUserinfoChanged(pids[0]);
+    trap_SendServerCommand(pids[0], va("name %s", newname));
 	return qtrue;
 }
 
@@ -1271,7 +1321,7 @@ qboolean G_admin_putteam(gentity_t *ent, int skiparg) {
 
 	if(ent) {
 		if(!G_admin_higher(ent, target, qtrue)) {
-			AIP(ent, "^3putteam:^7 you cannot putteam a fellow admin");
+			AIP(ent, "^3putteam:^7 you can't putteam a fellow admin");
 			return qfalse;
 		}
 	}
@@ -1291,7 +1341,7 @@ qboolean G_admin_help(gentity_t *ent, int skiparg) {
 	if(Q_SayArgc() == 1 + skiparg) {
 
         int cmdcount = 0;
-		AIP(ent, "^3!help: ^7check console for more info.");
+		AIP(ent, "^3!help: ^7check console for more information.");
 		ABP_begin();
 		for(i = 0; g_admin_cmds[i].keyword[0]; i++) {
 			if(G_admin_permission(ent, g_admin_cmds[i].flag)) {
@@ -1405,12 +1455,12 @@ qboolean G_admin_ban(gentity_t *ent, int skiparg) {
 	target = &g_entities[pids[0]];
 	if(ent) {
 		if(ent != target && !G_admin_higher(ent, target, qfalse)) {
-			AIP(ent, "^3ban: ^7you cannot ban a fellow admin");
+			AIP(ent, "^3ban: ^7you can't ban a fellow admin");
 			return qfalse;
 		}
 
 		if(ent == target) {
-			AIP(ent, "^3ban: ^7You cannot ban yourself");
+			AIP(ent, "^3ban: ^7you can't ban yourself");
 			return qfalse;
 		}
 	}
@@ -1727,7 +1777,7 @@ qboolean G_admin_remove_saves(gentity_t *ent, int skiparg) {
 		for (j = 0; j < MAX_SAVE_POSITIONS; j++)
 			saves[i][j].isValid = qfalse;
 
-	AIP(target, "^3admin: ^7your saves were removed.");
+    AIP(target, va("^3adminsystem: ^7%s ^7your saves were removed.", target->client->pers.netname) );
 	
 	return qtrue;
 }
@@ -1751,10 +1801,10 @@ qboolean G_admin_disable_goto(gentity_t *ent, int skiparg) {
 
 	if(target->client->sess.goto_allowed) {
 		target->client->sess.goto_allowed = qfalse;
-		AIP(target, "^3admin:^7 you are not allowed to use goto.");
+		AIP(target, va("^3adminsystem: ^7%s^7 you are not allowed to use goto.", target->client->pers.netname));
 	} else {
 		target->client->sess.goto_allowed = qtrue;
-		AIP(target, "^3admin:^7 you are now allowed to use goto.");
+        AIP(target, va("^3adminsystem:^7 %s^7 you are now allowed to use goto.", target->client->pers.netname));
 	}
 	return qtrue;
 }
@@ -1778,10 +1828,10 @@ qboolean G_admin_disable_save(gentity_t *ent, int skiparg) {
 
 	if(target->client->sess.save_allowed) {
 		target->client->sess.save_allowed = qfalse;
-		AIP(target, "^3admin:^7 you are not allowed to save position.");
+        AIP(target, va("^3adminsystem:^7 %s^7 you are not allowed to save your position.", target->client->pers.netname));
 	} else {
 		target->client->sess.save_allowed = qtrue;
-		AIP(target, "^3admin:^7 you are now allowed to save position.");
+		AIP(target, va("^3adminsystem:^7 %s^7 you are now allowed to save your position.", target->client->pers.netname));
 	}
 	return qtrue;
 }
@@ -1816,17 +1866,14 @@ qboolean G_admin_spec(gentity_t *ent, int skiparg) {
 	}
 
 #ifdef EDITION999
-	if(!G_admin_permission(ent, AF_ADMINBYPASS)) {
-		if(!G_AllowFollow(ent, target)) {
-			AIP(ent, va("^3!spec: %s ^7is locked from spectators.", target->client->pers.netname));
+    if(!G_AllowFollow(ent, target)) {
+        if(!G_admin_permission(ent, AF_ADMINBYPASS)) {
+            AIP(ent, va("^3!spec: %s ^7is locked from spectators.", target->client->pers.netname));
 			return qfalse;
-		}
-	} else {
-		if(!G_AllowFollow(ent, target)) {
-			AIP(target, va("^3adminsystem:^7 %s ^7is spectating you.", ent->client->pers.netname));
-		}
-	}
-
+        } else {
+            AIP(target, va("^3adminsystem:^7 %s ^7is spectating you.", ent->client->pers.netname));
+        }
+    }
 #else
 
 	if(!G_AllowFollow(ent, target)) {
@@ -1923,7 +1970,7 @@ qboolean G_admin_levedit( gentity_t *ent, int skiparg ) {
 	}
 	
 	if(ent && level > ent->client->sess.uinfo.level) {
-		AIP(ent, "^3!levedit: ^7you cannot edit levels higher than yours.");
+		AIP(ent, "^3!levedit: ^7you can't edit levels higher than yours.");
 		return qfalse;
 	}
 	
@@ -2047,7 +2094,7 @@ qboolean G_admin_listflags( gentity_t *ent, int skiparg ) {
 	int i = 0;
 
 	if(ent) {
-		AIP(ent, "^3!listflags: ^7check console for more info");
+		AIP(ent, "^3!listflags: ^7check console for more information.");
 	}
     ABP_begin();
 	for(i = 0; g_admin_cmds[i].keyword[0]; i++) {
@@ -2101,7 +2148,7 @@ qboolean G_admin_levinfo( gentity_t *ent, int skiparg ) {
 		}
 
 		if(ent) {
-			AIP(ent, "^3!levinfo: ^7check console for more info.");
+			AIP(ent, "^3!levinfo: ^7check console for more information.");
 			CP("print \"^5[LEVEL]\n\"");
 			CP(va("print \"^5level    = ^7%d\n\"", g_admin_levels[i]->level));
 			CP(va("print \"^5name     = ^7%s\n\"", g_admin_levels[i]->name));
@@ -2152,7 +2199,7 @@ qboolean G_admin_editcommands(gentity_t *ent, int skiparg) {
 	}
 
 	if(ent && level > ent->client->sess.uinfo.level) {
-		AIP(ent, "^3!editcommands: ^7you cannot edit levels higher than yours.");
+		AIP(ent, "^3!editcommands: ^7you can't edit levels higher than yours.");
 		return qfalse;
 	}
 
@@ -2224,12 +2271,12 @@ qboolean G_admin_listmaps(gentity_t *ent, int skiparg) {
 
 	if(ent) {
 		if(ent->client->sess.lastListmapsTime != 0 && level.time - ent->client->sess.lastListmapsTime < 60000) {
-			AIP(ent, "^3!listmaps:^7 you must wait atleast 60 seconds.");
+			AIP(ent, "^3!listmaps:^7 you must wait atleast 60 seconds before using !listmaps again.");
 			return qfalse;
 		}
 	}
 
-	AIP(ent, "^3!listmaps:^7 check console for more info.");
+	AIP(ent, "^3!listmaps:^7 check console for more information.");
 	ABP_begin();
 	for(i = level.mapCount - 1; i != 0; i--) {
 		if(i % 3 == 0) {
@@ -2288,7 +2335,7 @@ qboolean G_admin_removeuser( gentity_t *ent, int skiparg ) {
 qboolean G_admin_listusers(gentity_t *ent, int skiparg) {
 	int i = 0;
 	ABP_begin();
-	ABP(ent, "^5List of users: \n");
+	ABP(ent, "^5List of admin users: \n");
 	for( i = 0; g_admin_users[i]; i++) {
 		if(i != 0 && i % 4 == 0) {
 			ABP(ent, "\n");
@@ -2319,7 +2366,7 @@ qboolean G_admin_removelevel( gentity_t *ent, int skiparg ) {
 	lvl = atoi(arg);
 
 	if(ent && lvl > ent->client->sess.uinfo.level) {
-		AIP(ent, "^3!editcommands: ^7you cannot edit levels higher than yours.");
+		AIP(ent, "^3!editcommands: ^7you can't edit levels higher than yours.");
 		return qfalse;
 	}
 

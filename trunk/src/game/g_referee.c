@@ -43,23 +43,10 @@ void G_refHelp_cmd(gentity_t *ent)
 
 		G_voteHelp(ent, qfalse);
 
-		CP("print \"\n^5allready         putallies^7 <pid>  ^5speclock          warmup\n\"");
-		CP(  "print \"^5lock             putaxis^7 <pid>    ^5specunlock        warn ^7<pid>\n\"");
-		CP(  "print \"^5help             remove           unlock            mute ^7<pid>\n\"");
-		CP(  "print \"^5pause            restart          unpause           unmute ^7<pid>\n\"");
-
 		CP(  "print \"Usage: ^3\\ref <cmd> [params]\n\n\"");
 
 	// Help for the console
 	} else {
-		G_Printf("\nAdditional console commands:\n");
-		G_Printf(  "----------------------------------------------\n");
-		G_Printf(  "allready    putallies <pid>     unlock\n");
-		G_Printf(  "lock        putaxis <pid>       unpause\n");
-		G_Printf(  "help        restart             warmup [value]\n");
-		G_Printf(  "pause       warn <pid>\n");
-		G_Printf(  "remove      \n\n");
-
 		G_Printf(  "Usage: <cmd> [params]\n\n");
 	}
 }

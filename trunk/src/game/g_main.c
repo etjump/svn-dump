@@ -1676,9 +1676,9 @@ void CheckForValidIngameMain() {
 		free(data);
 		G_LogPrintf("--------------------------------------------------\n");
 		G_LogPrintf("ETJump error:\n");
-		G_LogPrintf("ingame_main.menu or ycn_logo.tga have been modified\n");
+		G_LogPrintf("ingame_main.menu and/or ycn_logo.tga have been modified\n");
 		G_LogPrintf("This is not allowed and mod will not work\n");
-		G_LogPrintf("Until modified ingame_main.menus have been removed.\n");
+		G_LogPrintf("until modified ingame_main.menu/ycn_logo.tga have been removed.\n");
 		G_LogPrintf("You can most likely find them in custom files with .pk3 extension.\n");
 		G_LogPrintf("All other .menu files can be modified.\n");
 		G_LogPrintf("--------------------------------------------------\n");
@@ -1708,7 +1708,7 @@ void G_InitGame( int levelTime, int randomSeed, int restart ) {
 	trap_RealTime(&ct);
 
 	G_Printf ("------- Game Initialization -------\n");
-	G_Printf ("gamename: %s\n", MOD_VERSION);
+	G_Printf ("gamename: %s %s\n", GAME_VERSION, MOD_VERSION);
 	G_Printf ("gamedate: %s\n", __DATE__);
 	trap_Cvar_Set("g_gametype", "2");
 	trap_Cvar_Update(&g_gametype);

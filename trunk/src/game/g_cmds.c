@@ -994,9 +994,6 @@ qboolean SetTeam( gentity_t *ent, char *s, qboolean force, weapon_t w1, weapon_t
 	}
 
 	G_LeaveTank( ent, qfalse );
-	if( team != TEAM_SPECTATOR ) {
-		G_RemoveClientFromFireteams( clientNum, qtrue, qfalse );
-	}
 	if( g_landminetimeout.integer ) {
 		G_ExplodeMines( ent );
 	}

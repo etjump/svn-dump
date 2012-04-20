@@ -2482,11 +2482,6 @@ void G_VoiceTo( gentity_t *ent, gentity_t *other, int mode, const char *id, qboo
 
 
 
-///////////////////////
-// g_config.c
-//
-void G_configSet(int mode, qboolean doComp);
-
 
 
 ///////////////////////

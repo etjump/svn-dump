@@ -284,9 +284,9 @@ void CG_DrawConnectScreen( qboolean interactive, qboolean forcerefresh ) {
 
 		CG_FillRect( 8, 23, 230, 210, clr2 );
 		CG_DrawRect_FixedBorder( 8, 23, 230, 216, 1, colorMdGrey );*/
-
+#define ETJUMP_VERSION ("ETJump " MOD_VERSION)
 		y = 322;
-		CG_Text_Paint_Centred_Ext( 540, y, 0.22f, 0.22f, clr3, MOD_VERSION, 0, 0, 0, &bg_loadscreenfont1 );
+		CG_Text_Paint_Centred_Ext( 540, y, 0.22f, 0.22f, clr3, ETJUMP_VERSION, 0, 0, 0, &bg_loadscreenfont1 );
 		
 		y = 340;
 		str = Info_ValueForKey( buffer, "sv_hostname" );
