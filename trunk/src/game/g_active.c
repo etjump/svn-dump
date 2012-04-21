@@ -1509,51 +1509,6 @@ void SpectatorClientEndFrame( gentity_t *ent )
 		if(ent->client->sess.sessionTeam != TEAM_SPECTATOR)
 			do_respawn = qtrue;
 
-		/*
-		// Players can respawn quickly in warmup
-		if(g_gamestate.integer != GS_PLAYING && ent->client->respawnTime <= level.timeCurrent &&
-		  ent->client->sess.sessionTeam != TEAM_SPECTATOR) {
-			do_respawn = qtrue;
-		} else if(ent->client->sess.sessionTeam == TEAM_AXIS) {
-			testtime = (level.dwRedReinfOffset + level.timeCurrent - level.startTime) % g_redlimbotime.integer;
-			do_respawn = (testtime < ent->client->pers.lastReinforceTime);
-			ent->client->pers.lastReinforceTime = testtime;
-		}
-		else if (ent->client->sess.sessionTeam == TEAM_ALLIES) {
-			testtime = (level.dwBlueReinfOffset + level.timeCurrent - level.startTime) % g_bluelimbotime.integer;
-			do_respawn = (testtime < ent->client->pers.lastReinforceTime);
-			ent->client->pers.lastReinforceTime = testtime;
-		}
-		
-
-		if( g_gametype.integer != GT_WOLF_LMS ) {
-			if ( ( g_maxlives.integer > 0 || g_alliedmaxlives.integer > 0 || g_axismaxlives.integer > 0 )
-				&& ent->client->ps.persistant[PERS_RESPAWNS_LEFT] == 0 ) {
-				if( do_respawn ) {
-					if( g_maxlivesRespawnPenalty.integer ) {
-						if( ent->client->ps.persistant[PERS_RESPAWNS_PENALTY] > 0 ) {
-							ent->client->ps.persistant[PERS_RESPAWNS_PENALTY]--;
-							do_respawn = qfalse;
-						}
-					} else {
-						do_respawn = qfalse;
-					}
-				}
-			}
-		}
-
-		if( g_gametype.integer == GT_WOLF_LMS && g_gamestate.integer == GS_PLAYING ) {
-			// Force respawn in LMS when nobody is playing and we aren't at the timelimit yet
-			if( !level.teamEliminateTime &&
-				level.numTeamClients[0] == level.numFinalDead[0] && level.numTeamClients[1] == level.numFinalDead[1] &&
-				ent->client->respawnTime <= level.timeCurrent && ent->client->sess.sessionTeam != TEAM_SPECTATOR ) {
-				do_respawn = qtrue;
-			} else {
-				do_respawn = qfalse;
-			}
-		}
-		*/
-
 		if ( do_respawn ) {
 			reinforce(ent);
 			return;

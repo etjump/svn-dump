@@ -623,9 +623,7 @@ int G_checkServerToggle(vmCvar_t *cv)
 	int nFlag;
 
 	if(cv == &match_mutespecs) nFlag = CV_SVS_MUTESPECS;
-	else if(cv == &g_friendlyFire) nFlag = CV_SVS_FRIENDLYFIRE;
 	else if(cv == &g_antilag) nFlag = CV_SVS_ANTILAG;
-	else if(cv == &g_balancedteams) nFlag = CV_SVS_BALANCEDTEAMS;
 	// special case for 2 bits
 	else if(cv == &match_warmupDamage) {
 		if(cv->integer > 0) {
@@ -686,79 +684,5 @@ void G_statsPrint(gentity_t *ent, int nType)
 		if((pid = ClientNumberFromString(ent, arg)) == -1) return;
 
 		CP(va("%s %s\n", cmd, G_createStats(g_entities + pid)));
-	}
-}
-
-/*
-// See if the player is allowed to have a panzer
-qboolean G_allowPanzer(gentity_t *ent)
-{
-	int i, cPanzers = 0;
-	gclient_t *cl;
-
-	if(team_maxPanzers.integer < 0) return(qtrue);
-	if(ent->client->sess.latchPlayerType != PC_SOLDIER || ent->client->sess.latchPlayerWeapon != 8) {
-		ent->client->pers.panzerSelectTime = 0;
-		return(qtrue);
-	}
-
-	if(team_maxPanzers.integer == 0) {
-		if(ent->client->pers.cmd_debounce < level.time) {
-			ent->client->pers.cmd_debounce = level.time + 3000;
-			G_printFull("[lof]^3*** [lon]Panzers are disabled on this server[lof].", ent);
-		}
-		return(qfalse);
-	}
-
-	for(i=0; i<level.numConnectedClients; i++) {
-		cl = level.clients + level.sortedClients[i];
-
-		if(cl == ent->client) continue;
-		if(cl->sess.sessionTeam != ent->client->sess.sessionTeam) continue;
-		if(cl->sess.latchPlayerType != PC_SOLDIER) continue;
-
-		// ACTIVE panzers take precedence.  Limbo players will fight amongst themselves
-		if(COM_BitCheck(cl->ps.weapons, WP_PANZERFAUST) || cl->pers.panzerDropTime > level.time) {
-			cPanzers++;
-			continue;
-		}
-
-		// Deal with waiting-to-spawn clients where there is contention on who gets a panzer
-		if((cl->ps.pm_flags & PMF_LIMBO) &&
-		  ((cl->pers.panzerSelectTime != 0 && ent->client->pers.panzerSelectTime == 0) ||
-		   (cl->pers.panzerSelectTime > 0 && cl->pers.panzerSelectTime < ent->client->pers.panzerSelectTime)))
-		{
-			cPanzers++;
-			continue;
-		}
-	}
-
-	if(cPanzers < team_maxPanzers.integer) return(qtrue);
-
-	if(ent->client->pers.cmd_debounce < level.time) {
-		ent->client->pers.cmd_debounce = level.time + 3000;
-		G_printFull(va("[lof]^3*** [lon]Already[lof %d [lon]panzers in the game[lof].", team_maxPanzers.integer), ent);
-	}
-
-	return(qfalse);
-}
-*/
-
-void G_resetRoundState(void) {
-	if(g_gametype.integer == GT_WOLF_STOPWATCH) {
-		trap_Cvar_Set( "g_currentRound", "0" );
-	} else if( g_gametype.integer == GT_WOLF_LMS ) {
-		trap_Cvar_Set( "g_currentRound", "0" );
-		trap_Cvar_Set( "g_lms_currentMatch", "0" );
-	}
-}
-
-
-void G_resetModeState(void) {
-	if ( g_gametype.integer == GT_WOLF_STOPWATCH ) {
-		trap_Cvar_Set( "g_nextTimeLimit", "0" );
-	} else if( g_gametype.integer == GT_WOLF_LMS ) {
-		trap_Cvar_Set( "g_axiswins", "0" );
-		trap_Cvar_Set( "g_alliedwins", "0" );
 	}
 }

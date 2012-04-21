@@ -2039,8 +2039,6 @@ typedef struct {
 	cg_weaponstats_t	dbWeaponStats[WS_MAX];
 	int					dbChatMode;
 
-	int					tdbAxisMapsXP[SK_NUM_SKILLS][MAX_MAPS_PER_CAMPAIGN];
-	int					tdbAlliedMapsXP[SK_NUM_SKILLS][MAX_MAPS_PER_CAMPAIGN];
 	int					tdbMapListOffset;
 	int					tdbSelectedMap;
 

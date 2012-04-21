@@ -1712,12 +1712,11 @@ qboolean G_checkReady(void)
 // Checks ready states to start/stop the sequence to get the match rolling.
 qboolean G_readyMatchState(void)
 {
-	if( (g_doWarmup.integer ||
-		 (g_gametype.integer == GT_WOLF_LMS && g_lms_lockTeams.integer) ||
+	if( (g_doWarmup.integer  ||
 		 level.warmupTime > (level.time + 10*1000) ) &&
 		g_gamestate.integer == GS_WARMUP && G_checkReady()) {
 		level.ref_allready = qfalse;
-		if( g_doWarmup.integer > 0 || (g_gametype.integer == GT_WOLF_LMS && g_lms_lockTeams.integer) ) {
+		if( g_doWarmup.integer > 0) {
 			teamInfo[TEAM_AXIS].team_lock = qtrue;
 			teamInfo[TEAM_ALLIES].team_lock = qtrue;
 		}
@@ -1797,10 +1796,8 @@ qboolean G_teamJoinCheck(int team_num, gentity_t *ent)
 			if(team_maxplayers.integer > 0 && team_maxplayers.integer <= cnt) {
 				G_printFull(va("The %s team is full!", aTeams[team_num]), ent);
 				return(qfalse);
-			} else if( g_gamestate.integer == GS_PLAYING && g_lms_lockTeams.integer && (!(ent->client->pers.invite & team_num))) {
-				G_printFull(va("The %s team is LOCKED!", aTeams[team_num]), ent);
-				return(qfalse);
-			}
+			} 
+
 		}
 	}
 
@@ -1880,15 +1877,6 @@ int G_blockoutTeam(gentity_t *ent, int nTeam)
 // Figure out if we are allowed/want to follow a given player
 qboolean G_allowFollow(gentity_t *ent, int nTeam)
 {
-	if( g_gametype.integer == GT_WOLF_LMS && g_lms_followTeamOnly.integer ) {
-		if( (ent->client->sess.spec_invite & nTeam) == nTeam ) {
-			return qtrue;
-		}
-		if( ent->client->sess.sessionTeam != TEAM_SPECTATOR &&
-			ent->client->sess.sessionTeam != nTeam ) {
-			return qfalse;
-		}
-	}
 
 	if(level.time - level.startTime > 2500) {
 		if(TeamCount(-1, TEAM_AXIS) == 0) teamInfo[TEAM_AXIS].spec_lock = qfalse;

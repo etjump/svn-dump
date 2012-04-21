@@ -307,29 +307,6 @@ void CG_DrawConnectScreen( qboolean interactive, qboolean forcerefresh ) {
 
 		y = 417;
 
-		str = Info_ValueForKey( buffer, "g_friendlyfire" );
-		if( str && *str && atoi( str ) ) {
-			x = 461;
-			CG_DrawPic( x, y, 16, 16, bg_filter_ff );
-		}
-
-		if( atoi( Info_ValueForKey( buffer, "g_gametype" ) ) != GT_WOLF_LMS ) {
-			str = Info_ValueForKey( buffer, "g_alliedmaxlives" );
-			if( str && *str && atoi( str ) ) {
-				enabled = qtrue;
-			} else {
-				str = Info_ValueForKey( buffer, "g_axismaxlives" );
-				if( str && *str && atoi( str ) ) {
-					enabled = qtrue;
-				} else {
-					str = Info_ValueForKey( buffer, "g_maxlives" );
-					if( str && *str && atoi( str ) ) {
-						enabled = qtrue;
-					}
-				}
-			}
-		}
-
 		if( enabled ) {
 			x = 489;
 			CG_DrawPic( x, y, 16, 16, bg_filter_lv );
@@ -351,12 +328,6 @@ void CG_DrawConnectScreen( qboolean interactive, qboolean forcerefresh ) {
 		if( str && *str && atoi( str ) ) {
 			x = 575;
 			CG_DrawPic( x, y, 16, 16, bg_filter_al );
-		}
-
-		str = Info_ValueForKey( buffer, "g_balancedteams" );
-		if( str && *str && atoi( str ) ) {
-			x = 604;
-			CG_DrawPic( x, y, 16, 16, bg_filter_bt );
 		}
 	}
 

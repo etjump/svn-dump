@@ -25,6 +25,7 @@
 #define	INTERMISSION_DELAY_TIME	1000
 
 #define MG42_MULTIPLAYER_HEALTH 350				// JPW NERVE
+#define NO_BOT_SUPPORT
 
 // How long do bodies last?
 // SP : Axis: 20 seconds
@@ -972,6 +973,14 @@ typedef struct limbo_cam_s {
 
 #define MAX_LIMBO_CAMS 32
 
+#define MAX_IP_LEN 15
+#define MAX_IP_MUTES 16
+
+typedef struct ipMute_s {
+    qboolean inuse;
+    char ip[MAX_IP_LEN+1];
+} ipMute_t;
+
 
 // this structure is cleared as each map is entered
 #define	MAX_SPAWN_VARS			64
@@ -1214,6 +1223,8 @@ typedef struct {
 	int			portalEnabled; //Feen: PGM - Enabled/Disabled by map key
 
 	persSavePos_t persSavedPositions[MAX_SERVER_SAVED_POSITIONS];
+
+    ipMute_t    ipMutes[MAX_IP_MUTES]; // I don't think we need more than 16
 
 } level_locals_t;
 
@@ -1509,16 +1520,11 @@ void G_UpdateCharacter( gclient_t *client );
 qboolean ConsoleCommand( void );
 void G_ProcessIPBans(void);
 qboolean G_FilterIPBanPacket( char *from );
-qboolean G_FilterMaxLivesPacket (char *from);
-qboolean G_FilterMaxLivesIPPacket( char *from );
 ipXPStorage_t* G_FindXPBackup( char *from );
 void G_AddXPBackup( gentity_t* ent );
 void G_StoreXPBackup( void );
 void G_ClearXPBackup( void );
 void G_ReadXPBackup( void );
-void AddMaxLivesGUID( char *str );
-void AddMaxLivesBan( const char *str );
-void ClearMaxLivesBans();
 void AddIPBan( const char *str );
 
 void Svcmd_ShuffleTeams_f(void);
@@ -1755,7 +1761,6 @@ extern	vmCvar_t	g_restarted;
 
 extern	vmCvar_t	g_fraglimit;
 extern	vmCvar_t	g_timelimit;
-extern	vmCvar_t	g_friendlyFire;
 extern	vmCvar_t	g_password;
 extern	vmCvar_t	sv_privatepassword; 
 extern	vmCvar_t	g_knockback;
@@ -1777,20 +1782,13 @@ extern	vmCvar_t	voteFlags;
 extern	vmCvar_t	g_complaintlimit;
 extern	vmCvar_t	g_ipcomplaintlimit;
 extern	vmCvar_t	g_filtercams;
-extern	vmCvar_t	g_maxlives;				// DHM - Nerve :: number of respawns allowed (0==infinite)
-extern	vmCvar_t	g_maxlivesRespawnPenalty;
 extern	vmCvar_t	g_voiceChatsAllowed;	// DHM - Nerve :: number before spam control
-extern	vmCvar_t	g_alliedmaxlives;		// Xian
-extern	vmCvar_t	g_axismaxlives;			// Xian
 extern	vmCvar_t	g_fastres;				// Xian - Fast medic res'ing
 extern	vmCvar_t	g_knifeonly;			// Xian - Wacky Knife-Only rounds
-extern	vmCvar_t	g_enforcemaxlives;		// Xian - Temp ban with maxlives between rounds
 
 extern	vmCvar_t	g_needpass;
-extern	vmCvar_t	g_balancedteams;
 extern	vmCvar_t	g_doWarmup;
 extern	vmCvar_t	g_teamAutoJoin;
-extern	vmCvar_t	g_teamForceBalance;
 extern	vmCvar_t	g_banIPs;
 extern	vmCvar_t	g_filterBan;
 extern	vmCvar_t	g_rankings;
@@ -1826,9 +1824,6 @@ extern vmCvar_t		g_scriptDebugLevel;
 // How fast do SP player and allied bots move?
 extern vmCvar_t		g_movespeed;
 
-extern vmCvar_t g_axismapxp;
-extern vmCvar_t g_alliedmapxp;
-
 extern vmCvar_t g_oldCampaign;
 extern vmCvar_t g_currentCampaign;
 extern vmCvar_t g_currentCampaignMap;
@@ -1836,12 +1831,6 @@ extern vmCvar_t g_currentCampaignMap;
 // Arnout: for LMS
 extern vmCvar_t g_axiswins;
 extern vmCvar_t g_alliedwins;
-extern vmCvar_t g_lms_teamForceBalance;
-extern vmCvar_t g_lms_roundlimit;
-extern vmCvar_t g_lms_matchlimit;
-extern vmCvar_t g_lms_currentMatch;
-extern vmCvar_t g_lms_lockTeams;
-extern vmCvar_t g_lms_followTeamOnly;
 
 #ifdef SAVEGAME_SUPPORT
 extern	vmCvar_t	g_reloading;
@@ -1899,11 +1888,9 @@ extern vmCvar_t		vote_allow_pub;
 extern vmCvar_t		vote_allow_referee;
 extern vmCvar_t		vote_allow_shuffleteamsxp;
 extern vmCvar_t		vote_allow_swapteams;
-extern vmCvar_t		vote_allow_friendlyfire;
 extern vmCvar_t		vote_allow_timelimit;
 extern vmCvar_t		vote_allow_warmupdamage;
 extern vmCvar_t		vote_allow_antilag;
-extern vmCvar_t		vote_allow_balancedteams;
 extern vmCvar_t		vote_allow_muting;
 extern vmCvar_t		vote_limit;
 extern vmCvar_t		vote_percent;
@@ -2501,8 +2488,6 @@ void G_matchInfoDump(unsigned int dwDumpType);
 void G_printMatchInfo(gentity_t *ent);
 void G_parseStats(char *pszStatsInfo);
 void G_printFull(char *str, gentity_t *ent);
-void G_resetModeState(void);
-void G_resetRoundState(void);
 void G_spawnPrintf(int print_type, int print_time, gentity_t *owner);
 void G_statsPrint(gentity_t *ent, int nType);
 unsigned int G_weapStatIndex_MOD(unsigned int iWeaponMOD);
@@ -2596,12 +2581,10 @@ int G_Referee_v(gentity_t *ent, unsigned int dwVoteIndex, char *arg, char *arg2,
 int G_ShuffleTeams_v(gentity_t *ent, unsigned int dwVoteIndex, char *arg, char *arg2, qboolean fRefereeCmd);
 int G_StartMatch_v(gentity_t *ent, unsigned int dwVoteIndex, char *arg, char *arg2, qboolean fRefereeCmd);
 int G_SwapTeams_v(gentity_t *ent, unsigned int dwVoteIndex, char *arg, char *arg2, qboolean fRefereeCmd);
-int G_FriendlyFire_v(gentity_t *ent, unsigned int dwVoteIndex, char *arg, char *arg2, qboolean fRefereeCmd);
 int G_Timelimit_v(gentity_t *ent, unsigned int dwVoteIndex, char *arg, char *arg2, qboolean fRefereeCmd);
 int G_Warmupfire_v(gentity_t *ent, unsigned int dwVoteIndex, char *arg, char *arg2, qboolean fRefereeCmd);
 int G_Unreferee_v(gentity_t *ent, unsigned int dwVoteIndex, char *arg, char *arg2, qboolean fRefereeCmd);
 int G_AntiLag_v(gentity_t *ent, unsigned int dwVoteIndex, char *arg, char *arg2, qboolean fRefereeCmd);
-int G_BalancedTeams_v(gentity_t *ent, unsigned int dwVoteIndex, char *arg, char *arg2, qboolean fRefereeCmd);
 
 void G_LinkDebris( void );
 void G_LinkDamageParents( void );
@@ -2669,8 +2652,11 @@ qboolean G_LandmineSnapshotCallback( int entityNum, int clientNum );
 
 void G_cache_map_names();
 
+void G_AddIpMute( char *ip );
+void G_RemoveIPMute( char *ip );
+qboolean G_isIPMuted( char *ip );
+void G_ClearIPMutes();
 // g_admin.c
-
 // These are in g_cmds.c but they're needed in
 // adminsys
 char *G_SHA1(char *string);

@@ -899,25 +899,6 @@ qboolean SetTeam( gentity_t *ent, char *s, qboolean force, weapon_t w1, weapon_t
 			trap_SendServerCommand( clientNum, "cp \"You cannot switch during a match, please wait until the round ends.\n\"" );
 			return qfalse;	// ignore the request
 		}
-
-		if ( ( (g_gametype.integer == GT_WOLF_LMS && g_lms_teamForceBalance.integer) || g_teamForceBalance.integer ) && !force ) {
-			int		counts[TEAM_NUM_TEAMS];
-
-			counts[TEAM_ALLIES] = TeamCount( ent-g_entities, TEAM_ALLIES );
-			counts[TEAM_AXIS] = TeamCount( ent-g_entities, TEAM_AXIS );
-
-			// We allow a spread of one
-			if ( team == TEAM_AXIS && counts[TEAM_AXIS] - counts[TEAM_ALLIES] >= 1 ) {
-				CP("cp \"The Axis has too many players.\n\"");
-				return qfalse; // ignore the request
-			}
-			if ( team == TEAM_ALLIES && counts[TEAM_ALLIES] - counts[TEAM_AXIS] >= 1 ) {
-				CP("cp \"The Allies have too many players.\n\"");
-				return qfalse; // ignore the request
-			}
-
-			// It's ok, the team we are switching to has less or same number of players
-		}
 	}
 
 	if ( g_maxGameClients.integer > 0 && level.numNonSpectatorClients >= g_maxGameClients.integer ) {
@@ -930,18 +911,6 @@ qboolean SetTeam( gentity_t *ent, char *s, qboolean force, weapon_t w1, weapon_t
 	oldTeam = client->sess.sessionTeam;
 	if ( team == oldTeam && team != TEAM_SPECTATOR ) {
 		return qfalse;
-	}
-
-	// NERVE - SMF - prevent players from switching to regain deployments
-	if( g_gametype.integer != GT_WOLF_LMS ) {
-		if( ( g_maxlives.integer > 0 || 
-			( g_alliedmaxlives.integer > 0 && ent->client->sess.sessionTeam == TEAM_ALLIES ) || 
-			( g_axismaxlives.integer > 0 && ent->client->sess.sessionTeam == TEAM_AXIS ) ) 
-			
-			&& ent->client->ps.persistant[PERS_RESPAWNS_LEFT] == 0 && oldTeam != TEAM_SPECTATOR ) {
-			CP("cp \"You can't switch teams because you are out of lives.\n\" 3");
-			return qfalse;	// ignore the request
-		}
 	}
 
 	// DHM - Nerve :: Force players to wait 30 seconds before they can join a new team.
@@ -2058,9 +2027,6 @@ qboolean Cmd_CallVote_f( gentity_t *ent, unsigned int dwCommand, qboolean fRefCo
 				return qfalse;
 			} else if( vote_limit.integer > 0 && ent->client->pers.voteCount >= vote_limit.integer ) {
 				CP(va("cpm \"You have already called the maximum number of votes (%d).\n\"", vote_limit.integer));
-				return qfalse;
-			} else if( ent->client->sess.sessionTeam == TEAM_SPECTATOR) {
-				CP("cpm \"Not allowed to call a vote as a spectator.\n\"");
 				return qfalse;
 			}
 		} 

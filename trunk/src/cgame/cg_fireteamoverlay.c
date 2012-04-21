@@ -336,13 +336,19 @@ void CG_DrawFireTeamOverlay( rectDef_t* rect ) {
 		}*/
 		x += 20;
 		
-		if( ci->health > 80 ) {
-			CG_Text_Paint_Ext(x, y + FT_BAR_HEIGHT,  .2f, .2f, tclr, va("%i", ci->health < 0 ? 0 : ci->health ), 0, 0, ITEM_TEXTSTYLE_SHADOWED, &cgs.media.limboFont2 );
-		} else if( ci->health > 0 ) {
-			CG_Text_Paint_Ext(x, y + FT_BAR_HEIGHT,  .2f, .2f, colorYellow, va("%i", ci->health < 0 ? 0 : ci->health ), 0, 0, ITEM_TEXTSTYLE_SHADOWED, &cgs.media.limboFont2 );
-		} else {
-			CG_Text_Paint_Ext(x, y + FT_BAR_HEIGHT,  .2f, .2f, colorRed, va("%i", ci->health < 0 ? 0 : ci->health ), 0, 0, ITEM_TEXTSTYLE_SHADOWED, &cgs.media.limboFont2 );
-		}
+        if(ci->team == TEAM_SPECTATOR) {
+             CG_Text_Paint_Ext(x, y + FT_BAR_HEIGHT,  .2f, .2f, tclr, "^3S", 0, 0, ITEM_TEXTSTYLE_SHADOWED, &cgs.media.limboFont2 );
+        } else {
+
+		    if( ci->health > 80 ) {
+			    CG_Text_Paint_Ext(x, y + FT_BAR_HEIGHT,  .2f, .2f, tclr, va("%i", ci->health < 0 ? 0 : ci->health ), 0, 0, ITEM_TEXTSTYLE_SHADOWED, &cgs.media.limboFont2 );
+		    } else if( ci->health > 0 ) {
+			    CG_Text_Paint_Ext(x, y + FT_BAR_HEIGHT,  .2f, .2f, colorYellow, va("%i", ci->health < 0 ? 0 : ci->health ), 0, 0, ITEM_TEXTSTYLE_SHADOWED, &cgs.media.limboFont2 );
+		    } else {
+			    CG_Text_Paint_Ext(x, y + FT_BAR_HEIGHT,  .2f, .2f, colorRed, va("%i", ci->health < 0 ? 0 : ci->health ), 0, 0, ITEM_TEXTSTYLE_SHADOWED, &cgs.media.limboFont2 );
+		    }
+
+        }
 		//x += 20;
 
 		{

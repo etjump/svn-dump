@@ -368,12 +368,10 @@ extern const unsigned int aReinfSeeds[MAX_REINFSEEDS];
 #define CS_REINFSEEDS					31		// Reinforcement seeds
 #define CS_SERVERTOGGLES				32		// Shows current enable/disabled settings (for voting UI)
 #define CS_GLOBALFOGVARS				33
-#define CS_AXIS_MAPS_XP					34
-#define CS_ALLIED_MAPS_XP				35
-#define	CS_INTERMISSION_START_TIME		36		//
-#define CS_ENDGAME_STATS				37
-#define CS_CHARGETIMES					38
-#define CS_FILTERCAMS					39
+#define	CS_INTERMISSION_START_TIME		34		//
+#define CS_ENDGAME_STATS				35
+#define CS_CHARGETIMES					36
+#define CS_FILTERCAMS					37
 
 #define	CS_MODELS						64
 #define	CS_SOUNDS						( CS_MODELS +				MAX_MODELS					)

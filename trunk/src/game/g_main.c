@@ -27,7 +27,6 @@ mapEntityData_Team_t mapEntityData[2];
 vmCvar_t	g_gametype;
 vmCvar_t	g_fraglimit;
 vmCvar_t	g_timelimit;
-vmCvar_t	g_friendlyFire;
 vmCvar_t	g_password;
 vmCvar_t	sv_privatepassword;
 vmCvar_t	g_maxclients;
@@ -72,20 +71,13 @@ vmCvar_t	voteFlags;
 vmCvar_t	g_complaintlimit;		// DHM - Nerve
 vmCvar_t	g_ipcomplaintlimit;
 vmCvar_t	g_filtercams;
-vmCvar_t	g_maxlives;				// DHM - Nerve
-vmCvar_t	g_maxlivesRespawnPenalty;
 vmCvar_t	g_voiceChatsAllowed;	// DHM - Nerve
-vmCvar_t	g_alliedmaxlives;		// Xian
-vmCvar_t	g_axismaxlives;			// Xian
 vmCvar_t	g_fastres;				// Xian
 vmCvar_t	g_knifeonly;			// Xian
-vmCvar_t	g_enforcemaxlives;		// Xian
 
 vmCvar_t	g_needpass;
-vmCvar_t	g_balancedteams;
 vmCvar_t	g_doWarmup;
 vmCvar_t	g_teamAutoJoin;
-vmCvar_t	g_teamForceBalance;
 vmCvar_t	g_banIPs;
 vmCvar_t	g_filterBan;
 vmCvar_t	g_rankings;
@@ -144,11 +136,9 @@ vmCvar_t		vote_allow_pub;
 vmCvar_t		vote_allow_referee;
 vmCvar_t		vote_allow_shuffleteamsxp;
 vmCvar_t		vote_allow_swapteams;
-vmCvar_t		vote_allow_friendlyfire;
 vmCvar_t		vote_allow_timelimit;
 vmCvar_t		vote_allow_warmupdamage;
 vmCvar_t		vote_allow_antilag;
-vmCvar_t		vote_allow_balancedteams;
 vmCvar_t		vote_allow_muting;
 vmCvar_t		vote_limit;
 vmCvar_t		vote_percent;
@@ -166,8 +156,6 @@ vmCvar_t		g_landminetimeout;
 vmCvar_t		g_scriptDebugLevel;
 vmCvar_t		g_movespeed;
 
-vmCvar_t g_axismapxp;
-vmCvar_t g_alliedmapxp;
 vmCvar_t g_oldCampaign;
 vmCvar_t g_currentCampaign;
 vmCvar_t g_currentCampaignMap;
@@ -175,12 +163,6 @@ vmCvar_t g_currentCampaignMap;
 // Arnout: for LMS
 vmCvar_t g_axiswins;
 vmCvar_t g_alliedwins;
-vmCvar_t g_lms_teamForceBalance;
-vmCvar_t g_lms_roundlimit;
-vmCvar_t g_lms_matchlimit;
-vmCvar_t g_lms_currentMatch;
-vmCvar_t g_lms_lockTeams;
-vmCvar_t g_lms_followTeamOnly;
 
 #ifdef SAVEGAME_SUPPORT
 vmCvar_t		g_reloading;
@@ -282,14 +264,6 @@ cvarTable_t		gameCvarTable[] = {
 	{ &g_fraglimit, "fraglimit", "0", /*CVAR_SERVERINFO |*/ CVAR_ARCHIVE | CVAR_NORESTART, 0, qtrue },
 	{ &g_timelimit, "timelimit", "0", CVAR_SERVERINFO | CVAR_ARCHIVE | CVAR_NORESTART, 0, qtrue },
 
-#ifdef ALLOW_GSYNC
-	{ &g_synchronousClients, "g_synchronousClients", "0", CVAR_SYSTEMINFO | CVAR_CHEAT, 0, qfalse  },
-#endif // ALLOW_GSYNC
-
-	{ &g_friendlyFire, "g_friendlyFire", "1", CVAR_SERVERINFO | CVAR_ARCHIVE, 0, qtrue, qtrue },
-
-	{ &g_teamForceBalance, "g_teamForceBalance", "0", CVAR_ARCHIVE  },							// NERVE - SMF - merge from team arena
-
 	{ &g_warmup, "g_warmup", "60", CVAR_ARCHIVE, 0, qtrue  },
 	{ &g_doWarmup, "g_doWarmup", "0", CVAR_ARCHIVE, 0, qtrue  },
 
@@ -327,7 +301,6 @@ cvarTable_t		gameCvarTable[] = {
 	{ &g_quadfactor, "g_quadfactor", "3", 0, 0, qtrue },
 	
 	{ &g_needpass, "g_needpass", "0", CVAR_SERVERINFO | CVAR_ROM, 0, qtrue },
-	{ &g_balancedteams, "g_balancedteams", "0", CVAR_SERVERINFO | CVAR_ARCHIVE, 0, qtrue },
 	{ &g_forcerespawn, "g_forcerespawn", "0", 0, 0, qtrue },
 	{ &g_forcerespawn, "g_forcerespawn", "0", 0, 0, qtrue },
 	{ &g_inactivity, "g_inactivity", "0", 0, 0, qtrue },
@@ -345,15 +318,10 @@ cvarTable_t		gameCvarTable[] = {
 	{ &g_complaintlimit, "g_complaintlimit", "6", CVAR_ARCHIVE, 0, qtrue },						// DHM - Nerve
 	{ &g_ipcomplaintlimit, "g_ipcomplaintlimit", "3", CVAR_ARCHIVE, 0, qtrue },
 	{ &g_filtercams, "g_filtercams", "0", CVAR_ARCHIVE, 0, qfalse },
-	{ &g_maxlives, "g_maxlives", "0", CVAR_ARCHIVE|CVAR_LATCH|CVAR_SERVERINFO, 0, qtrue },		// DHM - Nerve
-	{ &g_maxlivesRespawnPenalty, "g_maxlivesRespawnPenalty", "0", CVAR_ARCHIVE|CVAR_LATCH|CVAR_SERVERINFO, 0, qtrue },
 	{ &g_voiceChatsAllowed, "g_voiceChatsAllowed", "4", CVAR_ARCHIVE, 0, qfalse },				// DHM - Nerve
 
-	{ &g_alliedmaxlives, "g_alliedmaxlives", "0", CVAR_LATCH|CVAR_SERVERINFO, 0, qtrue },		// Xian
-	{ &g_axismaxlives, "g_axismaxlives", "0", CVAR_LATCH|CVAR_SERVERINFO, 0, qtrue },			// Xian
 	{ &g_fastres, "g_fastres", "0", CVAR_ARCHIVE, 0, qtrue, qtrue },							// Xian - Fast Medic Resing
 	{ &g_knifeonly, "g_knifeonly", "0", 0, 0, qtrue },											// Xian - Fast Medic Resing
-	{ &g_enforcemaxlives, "g_enforcemaxlives", "1", CVAR_ARCHIVE, 0, qtrue },					// Xian - Gestapo enforce maxlives stuff by temp banning
 
 	{ &g_developer, "developer", "0", CVAR_TEMP, 0, qfalse },
 	{ &g_rankings, "g_rankings", "0", 0, 0, qfalse },
@@ -402,11 +370,9 @@ cvarTable_t		gameCvarTable[] = {
 	{ &vote_allow_referee,		"vote_allow_referee", "0", 0, 0, qfalse, qfalse },
 	{ &vote_allow_shuffleteamsxp,	"vote_allow_shuffleteamsxp", "1", 0, 0, qfalse, qfalse },
 	{ &vote_allow_swapteams,	"vote_allow_swapteams", "1", 0, 0, qfalse, qfalse },
-	{ &vote_allow_friendlyfire,	"vote_allow_friendlyfire", "1", 0, 0, qfalse, qfalse },
 	{ &vote_allow_timelimit,	"vote_allow_timelimit", "0", 0, 0, qfalse, qfalse },
 	{ &vote_allow_warmupdamage,	"vote_allow_warmupdamage", "1", 0, 0, qfalse, qfalse },
 	{ &vote_allow_antilag,		"vote_allow_antilag", "1", 0, 0, qfalse, qfalse },
-	{ &vote_allow_balancedteams,"vote_allow_balancedteams", "1", 0, 0, qfalse, qfalse },
 	{ &vote_allow_muting,		"vote_allow_muting", "1", 0, 0, qfalse, qfalse },
 	{ &vote_limit,		"vote_limit", "5", 0, 0, qfalse, qfalse },
 	{ &vote_percent,	"vote_percent", "50", 0, 0, qfalse, qfalse },
@@ -426,16 +392,8 @@ cvarTable_t		gameCvarTable[] = {
 	{ &g_movespeed, "g_movespeed", "76", CVAR_CHEAT, 0, qfalse },
 
 	// Arnout: LMS	
-	{ &g_lms_teamForceBalance,	"g_lms_teamForceBalance",	"1",	CVAR_ARCHIVE },
-	{ &g_lms_roundlimit,		"g_lms_roundlimit",			"3",	CVAR_ARCHIVE },
-	{ &g_lms_matchlimit,		"g_lms_matchlimit",			"2",	CVAR_ARCHIVE },
-	{ &g_lms_currentMatch,		"g_lms_currentMatch",		"0",	CVAR_ROM, 0, qfalse, qtrue },
-	{ &g_lms_lockTeams,			"g_lms_lockTeams",			"0",	CVAR_ARCHIVE },
-	{ &g_lms_followTeamOnly,	"g_lms_followTeamOnly",		"1",	CVAR_ARCHIVE },
 	{ &g_axiswins,				"g_axiswins",				"0",	CVAR_ROM, 0, qfalse, qtrue },
 	{ &g_alliedwins,			"g_alliedwins",				"0",	CVAR_ROM, 0, qfalse, qtrue },
-	{ &g_axismapxp,				"g_axismapxp",				"0",	CVAR_ROM, 0, qfalse, qtrue },
-	{ &g_alliedmapxp,			"g_alliedmapxp",			"0",	CVAR_ROM, 0, qfalse, qtrue },
 
 	{ &g_oldCampaign,			"g_oldCampaign",			"",		CVAR_ROM, 0, },
 	{ &g_currentCampaign,		"g_currentCampaign",		"",		CVAR_WOLFINFO | CVAR_ROM, 0, },
@@ -773,15 +731,6 @@ void G_CheckForCursorHints( gentity_t *ent ) {
 	}
 
 	ps = &ent->client->ps;
-
-#ifdef SAVEGAME_SUPPORT
-	// don't change anything if reloading.  just set the exit hint
-	if( (g_gametype.integer == GT_SINGLE_PLAYER || g_gametype.integer == GT_COOP) && g_reloading.integer == RELOAD_NEXTMAP_WAITING ) {
-		ps->serverCursorHint = HINT_EXIT;
-		ps->serverCursorHintVal = 0;
-		return;
-	}
-#endif // SAVEGAME_SUPPORT
 
 	indirectHit = qfalse;
 
@@ -1336,14 +1285,11 @@ void G_RegisterCvars( void )
 	if(remapped) {
 		G_RemapTeamShaders();
 	}
-
-	// check some things
-	// DHM - Gametype is currently restricted to supported types only
-	if((g_gametype.integer < GT_WOLF || g_gametype.integer >= GT_MAX_GAME_TYPE)) {
-		G_Printf( "g_gametype %i is out of range, defaulting to GT_WOLF(%i)\n", g_gametype.integer, GT_WOLF );
-		trap_Cvar_Set( "g_gametype", va("%i",GT_WOLF) );
-		trap_Cvar_Update( &g_gametype );
-	}
+    // Zero: make sure gametype is always 2
+    if(g_gametype.integer != GT_WOLF) {
+        trap_Cvar_Set( "g_gametype", va("%i", GT_WOLF) );
+        trap_Cvar_Update( &g_gametype );
+    }
 
 	// OSP
 	if(!G_IsSinglePlayerGame()) {
@@ -1433,24 +1379,6 @@ void G_UpdateCvars( void )
 					trap_Cvar_LatchedVariableStringBuffer( "g_gametype", buffer, sizeof( buffer ) );
 					gametype = atoi( buffer );
 
-
-					if( gametype == GT_WOLF_CAMPAIGN && gametype != g_gametype.integer ) {
-						if( !G_MapIsValidCampaignStartMap() ) {
-							gt = g_gametype.integer;
-							if( gt != GT_WOLF_LMS ) {
-								if( !(worldspawnflags & NO_GT_WOLF) ) {
-									gt = GT_WOLF;	// Default wolf
-								} else {
-									gt = GT_WOLF_LMS;	// Last man standing
-								}
-							}
-
-							G_Printf( "Map '%s' isn't a valid campaign start map, resetting game type to '%i'\n", level.rawmapname, gt );
-							trap_Cvar_Set( "g_gametype", va( "%i", gt ) );
-						}
-						continue;
-					}
-
 					if(!level.latchGametype && g_gamestate.integer == GS_PLAYING && 
 					  ( ( ( g_gametype.integer == GT_WOLF || g_gametype.integer == GT_WOLF_CAMPAIGN ) && (worldspawnflags & NO_GT_WOLF)) ||	
 					  (g_gametype.integer == GT_WOLF_STOPWATCH && (worldspawnflags & NO_STOPWATCH)) ||
@@ -1478,15 +1406,14 @@ void G_UpdateCvars( void )
 
 				// OSP - Update vote info for clients, if necessary
 				else if(!G_IsSinglePlayerGame()) {
-					if(cv->vmCvar == &vote_allow_comp			|| cv->vmCvar == &vote_allow_gametype		||
-						cv->vmCvar == &vote_allow_kick			|| cv->vmCvar == &vote_allow_map			||
-						cv->vmCvar == &vote_allow_matchreset	||
-						cv->vmCvar == &vote_allow_mutespecs		|| cv->vmCvar == &vote_allow_nextmap		||
-						cv->vmCvar == &vote_allow_pub			|| cv->vmCvar == &vote_allow_referee		||
-						cv->vmCvar == &vote_allow_shuffleteamsxp	|| cv->vmCvar == &vote_allow_swapteams		||
-						cv->vmCvar == &vote_allow_friendlyfire	|| cv->vmCvar == &vote_allow_timelimit		||
-						cv->vmCvar == &vote_allow_warmupdamage	|| cv->vmCvar == &vote_allow_antilag		||
-						cv->vmCvar == &vote_allow_balancedteams	|| cv->vmCvar == &vote_allow_muting
+					if(cv->vmCvar == &vote_allow_comp			    || cv->vmCvar == &vote_allow_gametype		||
+						cv->vmCvar == &vote_allow_kick			    || cv->vmCvar == &vote_allow_map			||
+						cv->vmCvar == &vote_allow_matchreset	    || cv->vmCvar == &vote_allow_mutespecs		|| 
+                        cv->vmCvar == &vote_allow_nextmap		    || cv->vmCvar == &vote_allow_muting         ||
+						cv->vmCvar == &vote_allow_pub			    || cv->vmCvar == &vote_allow_referee		||
+						cv->vmCvar == &vote_allow_shuffleteamsxp	|| cv->vmCvar == &vote_allow_swapteams	    || 
+                        cv->vmCvar == &vote_allow_timelimit		    || cv->vmCvar == &vote_allow_warmupdamage	|| 
+                        cv->vmCvar == &vote_allow_antilag		    
 					) {
 						fVoteFlags = qtrue;
 					} else {
@@ -1565,87 +1492,6 @@ char *strcut( char *dest, char *src, int num ) {
 	return src;
 }
 
-//g_{axies,allies}mapxp overflows and crashes the server
-void bani_clearmapxp( void ) {
-	trap_SetConfigstring( CS_AXIS_MAPS_XP, "" );
-	trap_SetConfigstring( CS_ALLIED_MAPS_XP, "" );
-
-	trap_Cvar_Set( va( "%s_axismapxp0", MOD_VERSION ), "" );
-	trap_Cvar_Set( va( "%s_alliedmapxp0", MOD_VERSION ), "" );
-}
-
-void bani_storemapxp( void ) {
-	char cs[MAX_STRING_CHARS];
-	char u[MAX_STRING_CHARS];
-	char *k;
-	int i, j;
-
-	//axis
-	trap_GetConfigstring( CS_AXIS_MAPS_XP, cs, sizeof(cs) );
-	for( i = 0; i < SK_NUM_SKILLS; i++ ) {
-		Q_strcat( cs, sizeof( cs ), va( " %i", (int)level.teamXP[ i ][ 0 ] ) );
-	}
-	trap_SetConfigstring( CS_AXIS_MAPS_XP, cs );
-
-	j = 0;
-	k = strcut( u, cs, SNIPSIZE );
-	while( strlen( u ) ) {
-		//"to be continued..."
-		if( strlen( u ) == SNIPSIZE ) {
-			strcat( u, "+" );
-		}
-		trap_Cvar_Set( va( "%s_axismapxp%i", MOD_VERSION, j ), u );
-		j++;
-		k = strcut( u, k, SNIPSIZE );
-	}
-
-	//allies
-	trap_GetConfigstring( CS_ALLIED_MAPS_XP, cs, sizeof(cs) );
-	for( i = 0; i < SK_NUM_SKILLS; i++ ) {
-		Q_strcat( cs, sizeof( cs ), va( " %i", (int)level.teamXP[ i ][ 1 ] ) );
-	}
-	trap_SetConfigstring( CS_ALLIED_MAPS_XP, cs );
-
-	j = 0;
-	k = strcut( u, cs, SNIPSIZE );
-	while( strlen( u ) ) {
-		//"to be continued..."
-		if( strlen( u ) == SNIPSIZE ) {
-			strcat( u, "+" );
-		}
-		trap_Cvar_Set( va( "%s_alliedmapxp%i", MOD_VERSION, j ), u );
-		j++;
-		k = strcut( u, k, SNIPSIZE );
-	}
-}
-
-void bani_getmapxp( void ) {
-	int j;
-	char s[MAX_STRING_CHARS];
-	char t[MAX_STRING_CHARS];
-
-	j = 0;
-	trap_Cvar_VariableStringBuffer( va( "%s_axismapxp%i", MOD_VERSION, j ), s, sizeof(s) );
-	//reassemble string...
-	while( strrchr( s, '+' ) ) {
-		j++;
-		*strrchr( s, '+' ) = (char)0;
-		trap_Cvar_VariableStringBuffer( va( "%s_axismapxp%i", MOD_VERSION, j ), t, sizeof(t) );
-		strcat( s, t );
-	}
-	trap_SetConfigstring( CS_AXIS_MAPS_XP, s );
-
-	j = 0;
-	trap_Cvar_VariableStringBuffer( va( "%s_alliedmapxp%i", MOD_VERSION, j ), s, sizeof(s) );
-	//reassemble string...
-	while( strrchr( s, '+' ) ) {
-		j++;
-		*strrchr( s, '+' ) = (char)0;
-		trap_Cvar_VariableStringBuffer( va( "%s_alliedmapxp%i", MOD_VERSION, j ), t, sizeof(t) );
-		strcat( s, t );
-	}
-	trap_SetConfigstring( CS_ALLIED_MAPS_XP, s );
-}
 // To be sure no1 can change the YCN logo.
 void CheckForValidIngameMain() {
 	int len = -1;
@@ -1697,7 +1543,6 @@ G_InitGame
 */
 void G_InitGame( int levelTime, int randomSeed, int restart ) {
 	int					i;
-	fileHandle_t		f;
 	char				cs[MAX_INFO_STRING];
 	const char *Months[12] =
 	{
@@ -1723,20 +1568,7 @@ void G_InitGame( int levelTime, int randomSeed, int restart ) {
 
 	G_RegisterCvars();
 
-	// Xian enforcemaxlives stuff	
-	/*
-	we need to clear the list even if enforce maxlives is not active
-	in case the g_maxlives was changed, and a map_restart happened
-	*/
-	ClearMaxLivesBans();
-	
-	// just for verbosity
-	if( g_gametype.integer != GT_WOLF_LMS ) {
-		if( g_enforcemaxlives.integer &&
-			( g_maxlives.integer > 0 || g_axismaxlives.integer > 0 || g_alliedmaxlives.integer > 0 ) ) { 
-			G_Printf ( "EnforceMaxLives-Cleared GUID List\n" );
-		}
-	}
+    G_ClearIPMutes();
 
 	G_ProcessIPBans();
 
@@ -1829,17 +1661,6 @@ void G_InitGame( int levelTime, int randomSeed, int restart ) {
 		trap_SetConfigstring( CS_ROUNDSCORES2, va("%i", g_alliedwins.integer ) );
 	}
 
-	if( g_gametype.integer == GT_WOLF ) {
-		//bani - #113
-		bani_clearmapxp();
-	}
-
-	if( g_gametype.integer == GT_WOLF_STOPWATCH ) {
-		//bani - #113
-		bani_clearmapxp();
-	}
-
-
 	trap_GetServerinfo( cs, sizeof( cs ) );
 	Q_strncpyz( level.rawmapname, Info_ValueForKey( cs, "mapname" ), sizeof(level.rawmapname) );
 
@@ -1849,15 +1670,9 @@ void G_InitGame( int levelTime, int randomSeed, int restart ) {
 			trap_Cvar_Set( "g_axiswins", "0" );
 			trap_Cvar_Set( "g_alliedwins", "0" );
 
-			//bani - #113
-			bani_clearmapxp();
-
 			trap_Cvar_Update( &g_axiswins );
 			trap_Cvar_Update( &g_alliedwins );
-		} else {
-			//bani - #113
-			bani_getmapxp();
-		}
+		} 
 	}
 
 	trap_SetConfigstring( CS_SCRIPT_MOVER_NAMES, "" );	// clear out
@@ -1925,18 +1740,8 @@ void G_InitGame( int levelTime, int randomSeed, int restart ) {
 	trap_LocateGameData( level.gentities, level.num_entities, sizeof( gentity_t ), 
 		&level.clients[0].ps, sizeof( level.clients[0] ) );
 
-	if (g_gametype.integer == GT_SINGLE_PLAYER) {
-		char loading[4];
-
-		trap_Cvar_VariableStringBuffer( "savegame_loading", loading, sizeof(loading) );
-
-		if( atoi(loading) )
-			saveGamePending = 2;
-		else
-			saveGamePending = 1;
-	} else {
-		saveGamePending = 0;
-	}
+	
+	saveGamePending = 0;
 
 	// load level script
 	G_Script_ScriptLoad();
@@ -1955,13 +1760,6 @@ void G_InitGame( int levelTime, int randomSeed, int restart ) {
 
 	numSplinePaths = 0 ;
 	numPathCorners = 0;
-
-#ifdef USEXPSTORAGE
-	G_ClearXPBackup();
-	if( g_gametype.integer == GT_WOLF_CAMPAIGN && !level.newCampaign ) {
-		G_ReadXPBackup();
-	}
-#endif // USEXPSTORAGE
 
 	// START	Mad Doctor I changes, 8/21/2002
 	// This needs to be called before G_SpawnEntitiesFromString, or the 
@@ -2041,6 +1839,7 @@ void G_InitGame( int levelTime, int randomSeed, int restart ) {
 	// --- maybe not the best place to do this... seems to be some race conditions on map_restart
 	G_spawnPrintf(DP_MVSPAWN, level.time + 2000, NULL);
 
+    // Zero: some people decided to replace YCN logo with some shit :C
 	CheckForValidIngameMain();
 }
 
@@ -2770,145 +2569,6 @@ void LogExit( const char *string ) {
 		G_LogPrintf( "score: %i  ping: %i  client: %i %s\n", cl->ps.persistant[PERS_SCORE], ping, level.sortedClients[i], cl->pers.netname );
 	}
 
-	// NERVE - SMF
-	if( g_gametype.integer == GT_WOLF_STOPWATCH ) {
-		char	cs[MAX_STRING_CHARS];
-		int		winner, defender;
-
-		trap_GetConfigstring( CS_MULTI_INFO, cs, sizeof(cs) );
-		defender = atoi( Info_ValueForKey( cs, "defender" ) );
-
-		trap_GetConfigstring( CS_MULTI_MAPWINNER, cs, sizeof(cs) );
-		winner = atoi( Info_ValueForKey( cs, "winner" ) );
-
-		// NERVE - SMF
-		if ( !g_currentRound.integer ) {
-			if ( winner == defender ) {
-				// if the defenders won, use default timelimit
-				trap_Cvar_Set( "g_nextTimeLimit", va( "%f", g_timelimit.value ) );
-			}
-			else {
-				// use remaining time as next timer
-				trap_Cvar_Set( "g_nextTimeLimit", va( "%f", (level.timeCurrent - level.startTime) / 60000.f ) );
-			}
-		}
-		else {
-			// reset timer
-			trap_Cvar_Set( "g_nextTimeLimit", "0" );
-		}
-
-		trap_Cvar_Set( "g_currentRound", va( "%i", !g_currentRound.integer ) );
-
-		//bani - #113
-		bani_storemapxp();
-	}
-	// -NERVE - SMF
-
-	else if( g_gametype.integer == GT_WOLF_CAMPAIGN ) {
-		char	cs[MAX_STRING_CHARS];
-		int		winner;
-		int		highestskillpoints, highestskillpointsclient, j, teamNum;
-
-		trap_GetConfigstring( CS_MULTI_MAPWINNER, cs, sizeof(cs) );
-		winner = atoi( Info_ValueForKey( cs, "winner" ) );
-
-		if( winner == 0 ) {
-			g_axiswins.integer |= (1 << g_campaigns[level.currentCampaign].current);
-			trap_Cvar_Set( "g_axiswins", va( "%i", g_axiswins.integer ) );
-			trap_Cvar_Update( &g_axiswins );
-		} else if( winner == 1 ) {
-			g_alliedwins.integer |= (1 << g_campaigns[level.currentCampaign].current);
-			trap_Cvar_Set( "g_alliedwins", va( "%i", g_alliedwins.integer ) );
-			trap_Cvar_Update( &g_alliedwins );
-		}
-
-		trap_SetConfigstring( CS_ROUNDSCORES1, va("%i", g_axiswins.integer ) );
-		trap_SetConfigstring( CS_ROUNDSCORES2, va("%i", g_alliedwins.integer ) );
-
-		//bani - #113
-		bani_storemapxp();
-
-		// award medals
-		for( teamNum = TEAM_AXIS; teamNum <= TEAM_ALLIES; teamNum++ ) {
-			for( i = 0; i < SK_NUM_SKILLS; i++ ) {
-				highestskillpoints = 0;
-				highestskillpointsclient = -1;
-				for( j = 0; j < level.numConnectedClients; j++ ) {
-					cl = &level.clients[level.sortedClients[j]];
-
-					if( cl->sess.sessionTeam != teamNum )
-						continue;
-
-					if( cl->sess.skillpoints[i] > highestskillpoints ) {
-						highestskillpoints = cl->sess.skillpoints[i];
-						highestskillpointsclient = j;
-					}
-				}
-
-				if( highestskillpointsclient >= 0 ) {
-					// highestskillpointsclient is the first client that has this highest
-					// score. See if there are more clients with this same score. If so,
-					// give them medals too
-					for( j = highestskillpointsclient; j < level.numConnectedClients; j++ ) {
-						cl = &level.clients[level.sortedClients[j]];
-
-						if( cl->sess.sessionTeam != teamNum )
-							continue;
-
-						if( cl->sess.skillpoints[i] == highestskillpoints ) {
-							cl->sess.medals[i]++;
-
-							ClientUserinfoChanged( level.sortedClients[j] );
-						}
-					}
-				}
-			}
-		}
-	} else if( g_gametype.integer == GT_WOLF_LMS ) {
-		int		winner;
-		int		roundLimit = g_lms_roundlimit.integer < 3 ? 3 : g_lms_roundlimit.integer;
-		int		numWinningRounds = (roundLimit / 2) + 1;
-
-		roundLimit -= 1;	// -1 as it starts at 0
-
-		trap_GetConfigstring( CS_MULTI_MAPWINNER, cs, sizeof(cs) );
-		winner = atoi( Info_ValueForKey( cs, "winner" ) );
-
-		if( winner == -1 ) {
-			// who drew first blood?
-			if( level.firstbloodTeam == TEAM_AXIS )
-				winner = 0;
-			else
-				winner = 1;
-		}
-
-		if( winner == 0 ) {
-			trap_Cvar_Set( "g_axiswins", va( "%i", g_axiswins.integer + 1 ) );
-			trap_Cvar_Update( &g_axiswins );
-		} else {
-			trap_Cvar_Set( "g_alliedwins", va( "%i", g_alliedwins.integer + 1 ) );
-			trap_Cvar_Update( &g_alliedwins );
-		}
-
-		if( g_currentRound.integer >= roundLimit || g_axiswins.integer == numWinningRounds || g_alliedwins.integer == numWinningRounds ) {
-			trap_Cvar_Set( "g_currentRound", "0" );
-			if( g_lms_currentMatch.integer + 1 >= g_lms_matchlimit.integer ) {
-				trap_Cvar_Set( "g_lms_currentMatch", "0" );
-				level.lmsDoNextMap = qtrue;
-			} else {
-				trap_Cvar_Set( "g_lms_currentMatch", va( "%i", g_lms_currentMatch.integer + 1 ) );
-				level.lmsDoNextMap = qfalse;
-			}
-		} else {
-			trap_Cvar_Set( "g_currentRound", va( "%i", g_currentRound.integer + 1 ) );
-			trap_Cvar_Update( &g_currentRound );
-		}
-	} else if( g_gametype.integer == GT_WOLF ) {
-
-		//bani - #113
-		bani_storemapxp();
-	}
-
 	G_BuildEndgameStats();
 }
 
@@ -3008,7 +2668,6 @@ can see the last frag.
 =================
 */
 void CheckExitRules( void ) {
-	char	cs[MAX_STRING_CHARS];
 
 	// if at the intermission, wait for all non-bots to
 	// signal ready, then go to next level
@@ -3026,61 +2685,7 @@ void CheckExitRules( void ) {
 	if ( g_timelimit.value && !level.warmupTime ) {
 		// OSP
 		if((level.timeCurrent - level.startTime) >= (g_timelimit.value * 60000)) {
-		// OSP
-
-			// Check who has the most players alive
-			if( g_gametype.integer == GT_WOLF_LMS ) {
-				int axisSurvivors, alliedSurvivors;
-
-				axisSurvivors = level.numTeamClients[0] - level.numFinalDead[0];
-				alliedSurvivors = level.numTeamClients[1] - level.numFinalDead[1];
-
-				//bani - if team was eliminated < 3 sec before round end, we _properly_ end it here
-				if( level.teamEliminateTime ) {
-					LogExit( va( "%s team eliminated.", level.lmsWinningTeam == TEAM_ALLIES ? "Axis" : "Allied" ) );
-				}
-
-				if( axisSurvivors == alliedSurvivors ) {
-					// First blood wins
-					if( level.firstbloodTeam == TEAM_AXIS ) {
-						trap_GetConfigstring( CS_MULTI_MAPWINNER, cs, sizeof(cs) );
-						Info_SetValueForKey( cs, "winner", "0" );
-						trap_SetConfigstring( CS_MULTI_MAPWINNER, cs );
-						LogExit( "Axis team wins by drawing First Blood." );
-						trap_SendServerCommand( -1, "print \"Axis team wins by drawing First Blood.\n\"");
-					} else if( level.firstbloodTeam == TEAM_ALLIES ) {
-						trap_GetConfigstring( CS_MULTI_MAPWINNER, cs, sizeof(cs) );
-						Info_SetValueForKey( cs, "winner", "1" );
-						trap_SetConfigstring( CS_MULTI_MAPWINNER, cs );
-						LogExit( "Allied team wins by drawing First Blood." );
-						trap_SendServerCommand( -1, "print \"Allied team wins by drawing First Blood.\n\"");
-					} else {
-						// no winner yet - sudden death!
-						return;
-					}
-				} else if( axisSurvivors > alliedSurvivors ) {
-					trap_GetConfigstring( CS_MULTI_MAPWINNER, cs, sizeof(cs) );
-					Info_SetValueForKey( cs, "winner", "0" );
-					trap_SetConfigstring( CS_MULTI_MAPWINNER, cs );
-					LogExit( "Axis team has the most survivors." );
-					trap_SendServerCommand( -1, "print \"Axis team has the most survivors.\n\"");
-					return;
-				} else {
-					trap_GetConfigstring( CS_MULTI_MAPWINNER, cs, sizeof(cs) );
-					Info_SetValueForKey( cs, "winner", "1" );
-					trap_SetConfigstring( CS_MULTI_MAPWINNER, cs );
-					LogExit( "Allied team has the most survivors." );
-					trap_SendServerCommand( -1, "print \"Allied team has the most survivors.\n\"");
-					return;
-				}
-			} else {
-				// check for sudden death 
-				if ( ScoreIsTied() ) {
-					// score is tied, so don't end the game
-					return;
-				}
-			}
-
+		
 			if ( level.gameManager ) {
 				G_Script_ScriptEvent( level.gameManager, "trigger", "timelimit_hit" );
 			}
@@ -3094,50 +2699,6 @@ void CheckExitRules( void ) {
 			LogExit( "Timelimit hit." );
 
 			return;
-		}
-	}
-
-	//bani - #444
-	//i dont really get the point of the delay anyway, why not end it immediately like maxlives games?
-	if( g_gametype.integer == GT_WOLF_LMS ) {
-		if( !level.teamEliminateTime ) {
-			if( level.numFinalDead[0] >= level.numTeamClients[0] && level.numTeamClients[0] > 0 ) {
-				level.teamEliminateTime = level.time;
-				level.lmsWinningTeam = TEAM_ALLIES;
-				trap_GetConfigstring( CS_MULTI_MAPWINNER, cs, sizeof( cs ) );
-				Info_SetValueForKey( cs, "winner", "1" );
-				trap_SetConfigstring( CS_MULTI_MAPWINNER, cs );
-			} else if( level.numFinalDead[1] >= level.numTeamClients[1] && level.numTeamClients[1] > 0 ) {
-				level.teamEliminateTime = level.time;
-				level.lmsWinningTeam = TEAM_AXIS;
-				trap_GetConfigstring( CS_MULTI_MAPWINNER, cs, sizeof( cs ) );
-				Info_SetValueForKey( cs, "winner", "0" );
-				trap_SetConfigstring( CS_MULTI_MAPWINNER, cs );
-			}
-		} else if( level.teamEliminateTime + 3000 < level.time ) {
-			LogExit( va( "%s team eliminated.", level.lmsWinningTeam == TEAM_ALLIES ? "Axis" : "Allied" ) );
-		}
-		return;
-	}
-
-	if ( level.numPlayingClients < 2 ) {
-		return;
-	}
-
-	if( g_gametype.integer != GT_WOLF_LMS ) {
-		if( g_maxlives.integer > 0 || g_axismaxlives.integer > 0 || g_alliedmaxlives.integer > 0 ) {
-			if ( level.numFinalDead[0] >= level.numTeamClients[0] && level.numTeamClients[0] > 0 ) {
-				trap_GetConfigstring( CS_MULTI_MAPWINNER, cs, sizeof(cs) );
-				Info_SetValueForKey( cs, "winner", "1" );
-				trap_SetConfigstring( CS_MULTI_MAPWINNER, cs );
-				LogExit( "Axis team eliminated." );
-			}
-			else if ( level.numFinalDead[1] >= level.numTeamClients[1] && level.numTeamClients[1] > 0 ) {
-				trap_GetConfigstring( CS_MULTI_MAPWINNER, cs, sizeof(cs) );
-				Info_SetValueForKey( cs, "winner", "0" );
-				trap_SetConfigstring( CS_MULTI_MAPWINNER, cs );
-				LogExit( "Allied team eliminated." );
-			}
 		}
 	}
 }
@@ -3516,8 +3077,6 @@ CheckCvars
 */
 void CheckCvars( void ) {
 	static int g_password_lastMod = -1;
-	static int g_teamForceBalance_lastMod = -1;
-	static int g_lms_teamForceBalance_lastMod = -1;
 
 	if ( g_password.modificationCount != g_password_lastMod ) {
 		g_password_lastMod = g_password.modificationCount;
@@ -3525,26 +3084,6 @@ void CheckCvars( void ) {
 			trap_Cvar_Set( "g_needpass", "1" );
 		} else {
 			trap_Cvar_Set( "g_needpass", "0" );
-		}
-	}
-
-	if( g_gametype.integer == GT_WOLF_LMS ) {
-		if( g_lms_teamForceBalance.modificationCount != g_lms_teamForceBalance_lastMod ) {
-			g_lms_teamForceBalance_lastMod = g_lms_teamForceBalance.modificationCount;
-			if ( g_lms_teamForceBalance.integer ) {
-				trap_Cvar_Set( "g_balancedteams", "1" );
-			} else {
-				trap_Cvar_Set( "g_balancedteams", "0" );
-			}
-		}
-	} else {
-		if( g_teamForceBalance.modificationCount != g_teamForceBalance_lastMod ) {
-			g_teamForceBalance_lastMod = g_teamForceBalance.modificationCount;
-			if ( g_teamForceBalance.integer ) {
-				trap_Cvar_Set( "g_balancedteams", "1" );
-			} else {
-				trap_Cvar_Set( "g_balancedteams", "0" );
-			}
 		}
 	}
 }

@@ -1249,21 +1249,6 @@ static void CG_DrawLagometer( void ) {
 	CG_DrawDisconnect();
 }
 
-
-void CG_DrawLivesLeft( void ) {
-	if( cg_gameType.integer == GT_WOLF_LMS ) {
-		return;
-	}
-
-	if( cg.snap->ps.persistant[PERS_RESPAWNS_LEFT] < 0 ) {
-		return;
-	}
-
-	CG_DrawPic( 4, 360, 48, 24, cg.snap->ps.persistant[PERS_TEAM] == TEAM_ALLIES ? cgs.media.hudAlliedHelmet : cgs.media.hudAxisHelmet );
-
-	CG_DrawField( 44, 360, 3, cg.snap->ps.persistant[PERS_RESPAWNS_LEFT], 14, 20, qtrue, qtrue );
-}
-
 /*
 ==============
 CG_BannerPrint
@@ -5099,7 +5084,7 @@ static void CG_Draw2D( void ) {
 		CG_DrawFlashFade();
 		return;
 	}
-
+    
 	if( !cg.cameraMode ) {
 		CG_DrawFlashBlendBehindHUD();
 
@@ -5135,7 +5120,7 @@ static void CG_Draw2D( void ) {
 
 		CG_DrawLagometer();
 	}
-
+    
 	// don't draw center string if scoreboard is up
 	if ( !CG_DrawScoreboard() ) {
 		if( cg.snap->ps.persistant[PERS_TEAM] != TEAM_SPECTATOR ) {
@@ -5164,8 +5149,6 @@ static void CG_Draw2D( void ) {
 				CG_DrawStaminaBar( &rect );
 			}
 
-			CG_DrawLivesLeft();
-
 			// Cursor hint
 			rect.w = rect.h = 48;
 			rect.x = .5f * SCREEN_WIDTH - .5f * rect.w;
@@ -5182,7 +5165,7 @@ static void CG_Draw2D( void ) {
 			// Stats Debugging
 			CG_DrawStatsDebug();
 		}
-
+        
 		if (!cg_paused.integer) {
 			CG_DrawUpperRight();
 		}
@@ -5199,7 +5182,7 @@ static void CG_Draw2D( void ) {
 		if ( cg_drawCompass.integer ) {
 			CG_DrawNewCompass();
 		}
-
+        
 		CG_DrawObjectiveInfo();
 
 		CG_DrawSpectatorMessage();
@@ -5235,7 +5218,7 @@ static void CG_Draw2D( void ) {
 
 	// Info overlays
 	CG_DrawOverlays();
-
+    
 	// OSP - window updates
 	CG_windowDraw();
 

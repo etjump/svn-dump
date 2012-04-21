@@ -1369,14 +1369,6 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker,  vec3
 			if ( (g_gamestate.integer != GS_PLAYING && match_warmupDamage.integer == 1)) {
 				return;
 			}
-			else if (!g_friendlyFire.integer) {
-				// record "fake" pain - although the bot is not really hurt, his feeling has been hurt :-)
-				// well at least he wants to shout "watch your fire".
-				if (targ->s.number < level.maxclients && targ->r.svFlags & SVF_BOT) {
-					BotRecordPain( targ->s.number, attacker->s.number, mod );
-				}
-				return;
-			}
 		}
 	}
 

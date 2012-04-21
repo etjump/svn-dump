@@ -496,11 +496,7 @@ void limbo( gentity_t *ent, qboolean makeCorpse )
 	if (!(ent->client->ps.pm_flags & PMF_LIMBO)) {
 
 		if( ent->client->ps.persistant[PERS_RESPAWNS_LEFT] == 0 ) {
-			if( g_maxlivesRespawnPenalty.integer ) {
-				ent->client->ps.persistant[PERS_RESPAWNS_PENALTY] = g_maxlivesRespawnPenalty.integer;
-			} else {
-				ent->client->ps.persistant[PERS_RESPAWNS_PENALTY] = -1;
-			}
+			ent->client->ps.persistant[PERS_RESPAWNS_PENALTY] = -1;
 		}
 
 		// DHM - Nerve :: First save off persistant info we'll need for respawn
@@ -631,22 +627,6 @@ void respawn( gentity_t *ent ) {
 #endif // SAVEGAME_SUPPORT
 
 	ent->client->ps.pm_flags &= ~PMF_LIMBO; // JPW NERVE turns off limbo
-
-	// DHM - Nerve :: Decrease the number of respawns left
-	if( g_gametype.integer != GT_WOLF_LMS ) {
-		if( ent->client->ps.persistant[PERS_RESPAWNS_LEFT] > 0 && g_gamestate.integer == GS_PLAYING ) {
-			if( g_maxlives.integer > 0 ) {
-				ent->client->ps.persistant[PERS_RESPAWNS_LEFT]--;
-			} else {
-				if( g_alliedmaxlives.integer > 0 && ent->client->sess.sessionTeam == TEAM_ALLIES ) {
-					ent->client->ps.persistant[PERS_RESPAWNS_LEFT]--;
-				}
-				if( g_axismaxlives.integer > 0 && ent->client->sess.sessionTeam == TEAM_AXIS ) {
-					ent->client->ps.persistant[PERS_RESPAWNS_LEFT]--;
-				}
-			}
-		}
-	}
 
 	G_DPrintf( "Respawning %s, %i lives left\n", ent->client->pers.netname, ent->client->ps.persistant[PERS_RESPAWNS_LEFT]);
 
@@ -1617,24 +1597,6 @@ char *ClientConnect( int clientNum, qboolean firstTime, qboolean isBot ) {
 	}
 
 	/* End of ETPub fakeplayers DoS fix */
-
-	// Xian - check for max lives enforcement ban
-	if( g_gametype.integer != GT_WOLF_LMS ) {
-		if( g_enforcemaxlives.integer && (g_maxlives.integer > 0 || g_axismaxlives.integer > 0 || g_alliedmaxlives.integer > 0) ) {
-			if( trap_Cvar_VariableIntegerValue( "sv_punkbuster" ) ) {
-				value = Info_ValueForKey ( userinfo, "cl_guid" );
-				if ( G_FilterMaxLivesPacket ( value ) ) {
-					return "Max Lives Enforcement Temp Ban. You will be able to reconnect when the next round starts. This ban is enforced to ensure you don't reconnect to get additional lives.";
-				}
-			} else {
-				value = Info_ValueForKey ( userinfo, "ip" );	// this isn't really needed, oh well.
-				if ( G_FilterMaxLivesIPPacket ( value ) ) {
-					return "Max Lives Enforcement Temp Ban. You will be able to reconnect when the next round starts. This ban is enforced to ensure you don't reconnect to get additional lives.";
-				}
-			}
-		}
-	}
-	// End Xian
 	
 	// we don't check password for bots and local client
 	// NOTE: local client <-> "ip" "localhost"
@@ -1694,56 +1656,9 @@ char *ClientConnect( int clientNum, qboolean firstTime, qboolean isBot ) {
 		G_ReadSessionData( client );
 	}
 
-#ifdef USEXPSTORAGE
-	value = Info_ValueForKey (userinfo, "ip");
-	if( xpBackup = G_FindXPBackup( value ) ) {
-		for( i = 0; i < SK_NUM_SKILLS; i++ ) {
-			client->sess.skillpoints[ i ] = xpBackup->skills[ i ];
-		}
-		G_CalcRank( client );
-	}
-#endif // USEXPSTORAGE
+	client->pers.enterTime = level.time;
 
-	if( g_gametype.integer == GT_WOLF_CAMPAIGN ) {
-		if( g_campaigns[level.currentCampaign].current == 0 || level.newCampaign ) {
-			client->pers.enterTime = level.time;
-		}
-	} else {
-		client->pers.enterTime = level.time;
-	}
-
-	if( isBot ) {
-		// Set up the name for the bot client before initing the bot
-		value = Info_ValueForKey ( userinfo, "scriptName" );
-		if (value && value[0]) {
-			Q_strncpyz( client->pers.botScriptName, value, sizeof( client->pers.botScriptName ) );
-			ent->scriptName = client->pers.botScriptName;
-		}
-		ent->aiName = ent->scriptName;
-		ent->s.number = clientNum;
-
-		ent->r.svFlags |= SVF_BOT;
-		ent->inuse = qtrue;
-		// if this bot is reconnecting, and they aren't supposed to respawn, then dont let it in
-		if (!firstTime) {
-			value = Info_ValueForKey (userinfo, "respawn");
-			if (value && value[0] && (!Q_stricmp(value, "NO") || !Q_stricmp(value, "DISCONNECT"))) {
-				return "BotConnectFailed (no respawn)";
-			}
-		}
-
-		if( !G_BotConnect( clientNum, !firstTime ) ) {
-			return "BotConnectfailed";
-		}
-	}
-	else if( g_gametype.integer == GT_COOP || g_gametype.integer == GT_SINGLE_PLAYER ) {
-		// RF, in single player, enforce team = ALLIES
-		// Arnout: disabled this for savegames as the double ClientBegin it causes wipes out all loaded data
-		if( saveGamePending != 2 )
-			client->sess.sessionTeam = TEAM_ALLIES;
-			client->sess.spectatorState = SPECTATOR_NOT;
-			client->sess.spectatorClient = 0;
-	} else if( firstTime ) {
+    if( firstTime ) {
 		// force into spectator
 		client->sess.sessionTeam = TEAM_SPECTATOR;
 		client->sess.spectatorState = SPECTATOR_FREE;
@@ -1757,24 +1672,6 @@ char *ClientConnect( int clientNum, qboolean firstTime, qboolean isBot ) {
 	G_LogPrintf( "ClientConnect: %i.\n", clientNum);
 	G_UpdateCharacter( client );
 	ClientUserinfoChanged( clientNum );
-
-	if (g_gametype.integer == GT_SINGLE_PLAYER) {
-
-		if (!isBot) {
-			ent->scriptName = "player";
-
-// START	Mad Doctor I changes, 8/14/2002
-			// We must store this here, so that BotFindEntityForName can find the
-			// player.
-			ent->aiName = "player";
-// END		Mad Doctor I changes, 8/12/2002
-
-			G_Script_ScriptParse( ent );
-			G_Script_ScriptEvent( ent, "spawn", "" );
-		}
-
-	}
-
 
 	// don't do the "xxx connected" messages if they were caried over from previous level
 	//		TAT 12/10/2002 - Don't display connected messages in single player
@@ -1803,25 +1700,13 @@ char *ClientConnect( int clientNum, qboolean firstTime, qboolean isBot ) {
 
 	// Tell client to identify self
 	G_admin_identify(ent);
+    // Let's see if user is muted
+    value = Info_ValueForKey (userinfo, "ip");
+    if( G_isIPMuted( value ) ) {
+        ent->client->sess.muted = qtrue;
+    }
 
 	return NULL;
-}
-
-//
-// Scaling for late-joiners of maxlives based on current game time
-//
-int G_ComputeMaxLives(gclient_t *cl, int maxRespawns)
-{
-	float scaled = (float)(maxRespawns - 1) * (1.0f - ((float)(level.time - level.startTime) / (g_timelimit.value * 60000.0f)));
-	int val = (int)scaled;
-
-	// rain - #102 - don't scale of the timelimit is 0
-	if (g_timelimit.value == 0.0) {
-		return maxRespawns - 1;
-	}
-
-	val += ((scaled - (float)val) < 0.5f) ? 0 : 1;
-	return(val);
 }
 
 void LoadSavedPositions(gclient_t *cl) {
@@ -1904,45 +1789,6 @@ void ClientBegin( int clientNum )
 	// locate ent at a spawn point
 	ClientSpawn( ent, qfalse );
 
-	// Xian -- Changed below for team independant maxlives
-	if( g_gametype.integer != GT_WOLF_LMS ) {
-		if( ( client->sess.sessionTeam == TEAM_AXIS || client->sess.sessionTeam == TEAM_ALLIES ) ) {
-		
-			if( !client->maxlivescalced ) {
-				if(g_maxlives.integer > 0) {
-					client->ps.persistant[PERS_RESPAWNS_LEFT] = G_ComputeMaxLives(client, g_maxlives.integer);
-				} else {
-					client->ps.persistant[PERS_RESPAWNS_LEFT] = -1;
-				}
-
-				if( g_axismaxlives.integer > 0 || g_alliedmaxlives.integer > 0 ) {
-					if(client->sess.sessionTeam == TEAM_AXIS) {
-						client->ps.persistant[PERS_RESPAWNS_LEFT] = G_ComputeMaxLives(client, g_axismaxlives.integer);	
-					} else if(client->sess.sessionTeam == TEAM_ALLIES) {
-						client->ps.persistant[PERS_RESPAWNS_LEFT] = G_ComputeMaxLives(client, g_alliedmaxlives.integer);
-					} else {
-						client->ps.persistant[PERS_RESPAWNS_LEFT] = -1;
-					}
- 				}
-
-				client->maxlivescalced = qtrue;
-			} else {
-				if( g_axismaxlives.integer > 0 || g_alliedmaxlives.integer > 0 ) {
-					if( client->sess.sessionTeam == TEAM_AXIS ) {
-						if( client->ps.persistant[ PERS_RESPAWNS_LEFT ] > g_axismaxlives.integer ) {
-							client->ps.persistant[ PERS_RESPAWNS_LEFT ] = g_axismaxlives.integer;
-						}
-					} else if( client->sess.sessionTeam == TEAM_ALLIES ) {
-						if( client->ps.persistant[ PERS_RESPAWNS_LEFT ] > g_alliedmaxlives.integer ) {
-							client->ps.persistant[ PERS_RESPAWNS_LEFT ] = g_alliedmaxlives.integer;
-						}
-					}
- 				}
-			}
-		}
-	}	
-
-
 	// DHM - Nerve :: Start players in limbo mode if they change teams during the match
 	if(client->sess.sessionTeam != TEAM_SPECTATOR && (level.time - level.startTime > FRAMETIME * GAME_INIT_FRAMES) ) {
 /*	  if( (client->sess.sessionTeam != TEAM_SPECTATOR && (level.time - client->pers.connectTime) > 60000) ||
@@ -1953,12 +1799,6 @@ void ClientBegin( int clientNum )
 
 		client->ps.pm_type = PM_DEAD;
 		client->ps.stats[STAT_HEALTH] = 0;
-
-		if( g_gametype.integer != GT_WOLF_LMS ) {
-			if( g_maxlives.integer > 0 ) {
-				client->ps.persistant[PERS_RESPAWNS_LEFT]++;
-			}
-		}
 
 		limbo(ent, qfalse);
 	}
@@ -1971,22 +1811,6 @@ void ClientBegin( int clientNum )
 
 	G_LogPrintf( "ClientBegin: %i\n", clientNum );
 
-	// Xian - Check for maxlives enforcement
-	if( g_gametype.integer != GT_WOLF_LMS ) {
-		if ( g_enforcemaxlives.integer == 1 && (g_maxlives.integer > 0 || g_axismaxlives.integer > 0 || g_alliedmaxlives.integer > 0)) {
-			char *value;
-			char userinfo[MAX_INFO_STRING];
-			trap_GetUserinfo( clientNum, userinfo, sizeof( userinfo ) );
-			value = Info_ValueForKey ( userinfo, "cl_guid" );
-			G_LogPrintf( "EnforceMaxLives-GUID: %s\n", value );
-			AddMaxLivesGUID( value );
-
-			value = Info_ValueForKey (userinfo, "ip");
-			G_LogPrintf( "EnforceMaxLives-IP: %s\n", value );
-			AddMaxLivesBan( value );
-		}
-	}
-	// End Xian
 	if(!client->sess.oldPositionsLoaded) { 
 		LoadSavedPositions(client);
         client->sess.oldPositionsLoaded = qtrue;
@@ -2047,22 +1871,6 @@ gentity_t *SelectSpawnPointFromList( char *list, vec3_t spawn_origin, vec3_t spa
 // TAT 1/14/2003 - init the bot's movement autonomy pos to it's current position
 void BotInitMovementAutonomyPos(gentity_t *bot);
 
-#if 0 // rain - not used
-static char *G_CheckVersion( gentity_t *ent )
-{
-	// Prevent nasty version mismatches (or people sticking in Q3Aimbot cgames)
-
-	char userinfo[MAX_INFO_STRING];
-	char *s;
-
-	trap_GetUserinfo( ent->s.number, userinfo, sizeof( userinfo ) );
-	s = Info_ValueForKey( userinfo, "cg_etVersion" );
-	if( !s || strcmp( s, GAME_VERSION_DATED ) )
-		return( s );
-	return( NULL );
-}
-#endif
-
 /*
 ===========
 ClientSpawn
@@ -2094,18 +1902,6 @@ void ClientSpawn( gentity_t *ent, qboolean revived )
 	client->pers.lastSpawnTime = level.time;
 	client->pers.lastBattleSenseBonusTime = level.timeCurrent;
 	client->pers.lastHQMineReportTime = level.timeCurrent;
-
-/*#ifndef _DEBUG
-	if( !client->sess.versionOK ) {
-		char *clientMismatchedVersion = G_CheckVersion( ent );	// returns NULL if version is identical
-
-		if( clientMismatchedVersion ) {
-			trap_DropClient( ent - g_entities, va( "Client/Server game mismatch: '%s/%s'", clientMismatchedVersion, GAME_VERSION_DATED ) );
-		} else {
-			client->sess.versionOK = qtrue;
-		}
-	}
-#endif*/
 
 	// find a spawn point
 	// do it before setting health back up, so farthest
@@ -2339,15 +2135,6 @@ void ClientSpawn( gentity_t *ent, qboolean revived )
 		SetClientViewAngle( ent, newangle );
 	}
 
-	if( ent->r.svFlags & SVF_BOT ) {
-		// xkan, 10/11/2002 - the ideal view angle is defaulted to 0,0,0, but the 
-		// spawn_angles is the desired angle for the bots to face.
-		BotSetIdealViewAngles( index, spawn_angles );
-
-		// TAT 1/14/2003 - now that we have our position in the world, init our autonomy positions
-		BotInitMovementAutonomyPos(ent);
-	}
-
 	if( ent->client->sess.sessionTeam != TEAM_SPECTATOR ) {
 		//G_KillBox( ent );
 		trap_LinkEntity (ent);
@@ -2408,9 +2195,7 @@ void ClientSpawn( gentity_t *ent, qboolean revived )
 		}
 		// RF, call entity scripting event
 		G_Script_ScriptEvent( ent, "playerstart", "" );
-	} else if( revived && ent->r.svFlags & SVF_BOT) {
-		Bot_ScriptEvent( ent->s.number, "revived", "" );
-	}
+	} 
 }
 
 void CheckForExpiredSavedPositions() {

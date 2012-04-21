@@ -101,28 +101,6 @@ static void CG_LoadClientInfo( int clientNum ) {
 	}
 }
 
-void CG_ParseTeamXPs( int n ) {
-	int i, j;
-	char* cs = (char*)CG_ConfigString( CS_AXIS_MAPS_XP + n );
-	const char* token;
-
-	for( i = 0; i < MAX_MAPS_PER_CAMPAIGN; i++ ) {
-		for( j = 0; j < SK_NUM_SKILLS; j++ ) {
-			token = COM_ParseExt( &cs, qfalse );
-
-			if( !token || !*token ) {
-				return;
-			}
-
-			if( n == 0 ) {
-				cgs.tdbAxisMapsXP[ j ][ i ] = atoi( token );
-			} else {
-				cgs.tdbAlliedMapsXP[ j ][ i ] = atoi( token );
-			}
-		}
-	}
-}
-
 void CG_LimboPanel_SendSetupMsg( qboolean forceteam );
 
 /*

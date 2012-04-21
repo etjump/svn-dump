@@ -2209,33 +2209,7 @@ void CG_TeamDebriefingMapList_Draw( panel_button_t* button ) {
 }
 
 int CG_TeamDebriefing_CalcXP( team_t team, int mapindex, int skillindex ) {
-	int i, j, cnt = 0;
-
-	if( cg_gameType.integer == GT_WOLF_CAMPAIGN ) {
-		for( i = 0; i < cgs.campaignData.mapCount; i++ ) {
-			if( mapindex != -1 && i != mapindex ) {
-				continue;
-			}
-
-			for( j = 0; j < SK_NUM_SKILLS; j++ ) {
-				if( skillindex != -1 && j != skillindex ) {
-					continue;
-				}
-
-				cnt += team == TEAM_AXIS ? cgs.tdbAxisMapsXP[ j ][ i ] : cgs.tdbAlliedMapsXP[ j ][ i ];
-			}
-		}
-	} else if( cg_gameType.integer == GT_WOLF || cg_gameType.integer == GT_WOLF_STOPWATCH ) {
-		for( j = 0; j < SK_NUM_SKILLS; j++ ) {
-			if( skillindex != -1 && j != skillindex ) {
-				continue;
-			}
-
-			cnt += team == TEAM_AXIS ? cgs.tdbAxisMapsXP[ j ][ 0 ] : cgs.tdbAlliedMapsXP[ j ][ 0 ];
-		}
-	}
-
-	return cnt;
+	return 0; // Zero: We don't need XP
 }
 
 void CG_TeamDebriefingTeamXP_Draw( panel_button_t* button ) {

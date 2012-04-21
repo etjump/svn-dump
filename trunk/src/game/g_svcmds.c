@@ -61,13 +61,9 @@ typedef struct ipFilterList_s {
 } ipFilterList_t;
 
 static ipFilterList_t		ipFilters;
-static ipFilterList_t		ipMaxLivesFilters;
 #ifdef USEXPSTORAGE
 static ipXPStorageList_t	ipXPStorage;
 #endif
-
-static ipGUID_t		guidMaxLivesFilters[MAX_IPFILTERS];
-static int			numMaxLivesFilters = 0;
 
 /*
 =================
@@ -167,17 +163,6 @@ static void UpdateIPBans( ipFilterList_t *ipFilterList )
 	trap_Cvar_Set( ipFilterList->cvarIPList, iplist_final );
 }
 
-void PrintMaxLivesGUID ()
-{
-	int		i;
-
-	for (i = 0 ; i < numMaxLivesFilters ; i++)
-	{
-		G_LogPrintf( "%i. %s\n", i, guidMaxLivesFilters[i].compare );
-	}
-	G_LogPrintf ( "--- End of list\n");
-}
-
 /*
 =================
 G_FindIpData
@@ -257,132 +242,6 @@ qboolean G_FilterIPBanPacket( char *from )
 	return( G_FilterPacket( &ipFilters, from ) );
 }
 
-qboolean G_FilterMaxLivesIPPacket( char *from )
-{
-	return( G_FilterPacket( &ipMaxLivesFilters, from ) );
-}
-
-#ifdef USEXPSTORAGE
-ipXPStorage_t* G_FindXPBackup( char *from ) {
-	ipXPStorage_t* storage = G_FindIpData( &ipXPStorage, from );
-
-	if( storage ) {
-		storage->timeadded = 0;
-	}
-
-	return storage;
-}
-#endif // USEXPSTORAGE
-
-/*
- Check to see if the user is trying to sneak back in with g_enforcemaxlives enabled
-*/
-qboolean G_FilterMaxLivesPacket( char *from )
-{
-	int		i;
-
-	for( i = 0; i < numMaxLivesFilters; i++ )
-	{
-		if ( !Q_stricmp( guidMaxLivesFilters[i].compare, from ) )
-			return 1;
-	}
-	return 0;
-}
-
-#ifdef USEXPSTORAGE
-void G_StoreXPBackup( void ) {
-	int i;
-	char s[MAX_STRING_CHARS];
-
-	for( i = 0; i < MAX_XPSTORAGEITEMS; i++ ) {
-		if( !ipXPStorage.ipFilters[ i ].timeadded || level.time - ipXPStorage.ipFilters[ i ].timeadded > ( 5 * 60000 ) ) {
-			trap_Cvar_Set( va( "xpbackup%i", i ), "" );
-			continue;
-		}
-
-		Com_sprintf( s, sizeof( s ), "%u %u %f %f %f %f %f %f %f",
-			ipXPStorage.ipFilters[ i ].filter.compare,
-			ipXPStorage.ipFilters[ i ].filter.mask,
-			ipXPStorage.ipFilters[ i ].skills[ 0 ],
-			ipXPStorage.ipFilters[ i ].skills[ 1 ],
-			ipXPStorage.ipFilters[ i ].skills[ 2 ],
-			ipXPStorage.ipFilters[ i ].skills[ 3 ],
-			ipXPStorage.ipFilters[ i ].skills[ 4 ],
-			ipXPStorage.ipFilters[ i ].skills[ 5 ],
-			ipXPStorage.ipFilters[ i ].skills[ 6 ] );
-
-		trap_Cvar_Set( va( "xpbackup%i", i ), s );
-	}
-}
-
-void G_ReadXPBackup( void ) {
-	int i;
-	char s[MAX_STRING_CHARS];
-
-	for( i = 0; i < MAX_XPSTORAGEITEMS; i++ ) {
-		trap_Cvar_VariableStringBuffer( va( "xpbackup%i", i ), s, sizeof( s ) );
-
-		if( !*s ) {
-			continue;
-		}
-
-		sscanf( s, "%u %u %f %f %f %f %f %f %f",
-			&ipXPStorage.ipFilters[ i ].filter.compare,
-			&ipXPStorage.ipFilters[ i ].filter.mask,
-			&ipXPStorage.ipFilters[ i ].skills[ 0 ],
-			&ipXPStorage.ipFilters[ i ].skills[ 1 ],
-			&ipXPStorage.ipFilters[ i ].skills[ 2 ],
-			&ipXPStorage.ipFilters[ i ].skills[ 3 ],
-			&ipXPStorage.ipFilters[ i ].skills[ 4 ],
-			&ipXPStorage.ipFilters[ i ].skills[ 5 ],
-			&ipXPStorage.ipFilters[ i ].skills[ 6 ] );
-
-		ipXPStorage.ipFilters[ i ].timeadded = level.time;
-	}
-}
-
-void G_ClearXPBackup( void ) {
-	int i;
-
-	for( i = 0; i < MAX_XPSTORAGEITEMS; i++ ) {
-		ipXPStorage.ipFilters[ i ].timeadded = 0;
-	}
-}
-
-void G_AddXPBackup( gentity_t* ent ) {
-	int i;
-	int best = -1;
-	int besttime;
-	const char* str;
-	char userinfo[MAX_INFO_STRING];
-
-	trap_GetUserinfo( ent - g_entities, userinfo, sizeof( userinfo ) );
-	str = Info_ValueForKey( userinfo, "ip" );
-
-	for( i = 0; i < MAX_XPSTORAGEITEMS; i++ ) {
-		if( !ipXPStorage.ipFilters[ i ].timeadded ) {
-			best = i;
-			break;
-		}
-
-		if( best == -1 || ipXPStorage.ipFilters[ i ].timeadded < besttime ) {
-			besttime = ipXPStorage.ipFilters[ i ].timeadded;
-			best = i;
-			continue;
-		}
-	}
-
-	ipXPStorage.ipFilters[ best ].timeadded = level.time;
-	if( !StringToFilter( str, &ipXPStorage.ipFilters[ best ].filter ) ) {
-		ipXPStorage.ipFilters[ best ].filter.compare = 0xffffffffu;
-	}
-
-	for( i = 0; i < SK_NUM_SKILLS; i++ ) {
-		ipXPStorage.ipFilters[ best ].skills[ i ] = ent->client->sess.skillpoints[ i ];
-	}
-}
-#endif // USEXPSTORAGE
-
 
 /*
 =================
@@ -415,28 +274,6 @@ void AddIP( ipFilterList_t *ipFilterList, const char *str )
 void AddIPBan( const char *str )
 {
 	AddIP( &ipFilters, str );
-}
-
-void AddMaxLivesBan( const char *str )
-{
-	AddIP( &ipMaxLivesFilters, str );
-}
-
-/*
-=================
-AddMaxLivesGUID
-Xian - with g_enforcemaxlives enabled, this adds a client GUID to a list
-that prevents them from quitting and reconnecting
-=================
-*/
-void AddMaxLivesGUID( char *str )
-{
-	if( numMaxLivesFilters == MAX_IPFILTERS ) {
-		G_Printf( "MaxLives GUID filter list is full\n" );
-		return;
-	}
-	Q_strncpyz( guidMaxLivesFilters[numMaxLivesFilters].compare, str, 33 );
-	numMaxLivesFilters++;
 }
 
 /*
@@ -519,22 +356,6 @@ void Svcmd_RemoveIP_f (void)
 	}
 
 	G_Printf( "Didn't find %s.\n", str );
-}
-
-/*
- Xian - Clears out the entire list maxlives enforcement banlist
-*/
-void ClearMaxLivesBans ()
-{
-	int i;
-	
-	for( i = 0; i < numMaxLivesFilters; i++ ) {
-		guidMaxLivesFilters[i].compare[0] = '\0';
-	}
-	numMaxLivesFilters = 0;
-
-	ipMaxLivesFilters.numIPFilters = 0;
-	Q_strncpyz( ipMaxLivesFilters.cvarIPList, "g_maxlivesbanIPs", sizeof(ipMaxLivesFilters.cvarIPList) );
 }
 
 /*
@@ -856,11 +677,6 @@ void Svcmd_ResetMatch_f(qboolean fDoReset, qboolean fDoRestart)
 		g_entities[level.sortedClients[i]].client->pers.ready = 0;
 	}
 
-	if(fDoReset) {
-		G_resetRoundState();
-		G_resetModeState();
-	}
-
 	if(fDoRestart) {
 		trap_SendConsoleCommand(EXEC_APPEND, va("map_restart 0 %i\n", ((g_gamestate.integer != GS_PLAYING) ? GS_RESET : GS_WARMUP)));
 	}
@@ -1057,6 +873,74 @@ static void Svcmd_KickNum_f( void ) {
 	trap_DropClient(clientNum, "player kicked", timeout);
 }
 
+void G_AddIpMute( char *ip ) {
+    int i = 0;
+    for(i = 0; i < MAX_IP_MUTES; i++) {
+        if(!level.ipMutes[i].inuse) {
+            break;
+        }
+    }
+
+    if(i == MAX_IP_MUTES) {
+        return; // No free mutes, start unmuting people!
+    }
+
+    Q_strncpyz(level.ipMutes[i].ip, ip, sizeof(level.ipMutes[i].ip));
+    level.ipMutes[i].inuse = qtrue;
+}
+
+qboolean G_isIPMuted( char *ip ) {
+    int i = 0;
+
+    // Must remove port from ip
+    for(i = 0; i < strlen(ip); i++) {
+        if(ip[i] == ':') {
+            ip[i] = 0;
+        }
+    }
+
+    for(i = 0; i < MAX_IP_MUTES; i++) {
+        if(!level.ipMutes[i].inuse) {
+            continue;
+        } else {
+            if(!Q_stricmp(level.ipMutes[i].ip, ip)) {
+                return qtrue;
+            }
+        }
+    }
+    return qfalse;
+}
+
+void G_RemoveIPMute( char *ip ) {
+    int i = 0;
+    for(i = 0; i < MAX_IP_MUTES; i++) {
+        if(!level.ipMutes[i].inuse) {
+            continue;
+        } else {
+            if(!Q_strncmp(level.ipMutes[i].ip, ip, strlen(level.ipMutes[i].ip))) {
+                level.ipMutes[i].inuse = qfalse;
+                return;
+            }
+        }
+    }
+}
+
+void G_ClearIPMutes() {
+    int i;
+    for(i = 0; i < MAX_IP_MUTES; i++) 
+        level.ipMutes[i].inuse = qfalse;
+}
+
+void G_ListIPMutes() {
+    int i;
+    G_Printf("IP Mutes:\n");
+    for(i = 0; i < MAX_IP_MUTES; i++) {
+        if(level.ipMutes[i].inuse) {
+            G_Printf("%s\n", level.ipMutes[i].ip);
+        }
+    }
+}
+
 // -fretn
 
 char	*ConcatArgs( int start );
@@ -1071,42 +955,6 @@ qboolean	ConsoleCommand( void ) {
 	char	cmd[MAX_TOKEN_CHARS];
 
 	trap_Argv( 0, cmd, sizeof( cmd ) );
-
-#ifdef SAVEGAME_SUPPORT
-	if (Q_stricmp (cmd, "savegame") == 0) {
-
-		if( g_gametype.integer != GT_SINGLE_PLAYER )
-			return qtrue;
-
-		// don't allow a manual savegame command while we are waiting for the game to start/exit
-		if (g_reloading.integer)
-			return qtrue;
-		if (saveGamePending)
-			return qtrue;
-
-		trap_Argv( 1, cmd, sizeof( cmd ) );
-		if (strlen(cmd) > 0) {
-			// strip the extension if provided
-			if (strrchr(cmd, '.')) {
-				cmd[strrchr(cmd,'.')-cmd] = '\0';
-			}
-			if ( !Q_stricmp( cmd, "current") ) {		// beginning of map
-				Com_Printf("sorry, '%s' is a reserved savegame name.  please use another name.\n", cmd);
-				return qtrue;
-			}
-
-			if (G_SaveGame( cmd ))
-				trap_SendServerCommand(-1, "cp \"Game Saved\n\"");	// deletedgame
-			else
-				G_Printf( "Unable to save game.\n" );
-
-		} else {	// need a name
-			G_Printf( "syntax: savegame <name>\n" );
-		}
-
-		return qtrue;
-	}
-#endif // SAVEGAME_SUPPORT
 
 	if ( Q_stricmp (cmd, "entitylist") == 0 ) {
 		Svcmd_EntityList_f();
@@ -1143,11 +991,6 @@ qboolean	ConsoleCommand( void ) {
 
 	if (Q_stricmp (cmd, "listip") == 0) {
 		trap_SendConsoleCommand( EXEC_INSERT, "g_banIPs\n" );
-		return qtrue;
-	}
-
-	if (Q_stricmp (cmd, "listmaxlivesip") == 0) {
-		PrintMaxLivesGUID();
 		return qtrue;
 	}
 
@@ -1213,6 +1056,11 @@ qboolean	ConsoleCommand( void ) {
 	if(G_admin_cmd_check(NULL)) {
 		return qtrue;
 	}
+
+    if(!Q_stricmp(cmd, "ipmutes")) {
+        G_ListIPMutes();
+        return qfalse;
+    }
 
 	// -fretn
 

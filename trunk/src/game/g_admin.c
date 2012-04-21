@@ -1149,6 +1149,8 @@ qboolean G_admin_mute(gentity_t *ent, int skiparg) {
 	gentity_t *target;
 	char err[MAX_STRING_CHARS];
 	char name[MAX_TOKEN_CHARS];
+    char *ip;
+	char userinfo[MAX_INFO_STRING];
 
 	if(Q_SayArgc() - skiparg != 2) {
 		AIP(ent, "^3usage:^7 !mute <name>");
@@ -1180,8 +1182,13 @@ qboolean G_admin_mute(gentity_t *ent, int skiparg) {
 		AIP(ent, "^3mute:^7 target is already muted");
 		return qfalse;
 	}
-
+    
 	target->client->sess.muted = qtrue;
+					
+	trap_GetUserinfo( target->client->ps.clientNum, userinfo, sizeof( userinfo ) );
+	ip = Info_ValueForKey (userinfo, "ip");
+
+    G_AddIpMute(ip);
 
 	CPx(pids[0], "print \"^5You've been muted\n\"" );
 
@@ -1195,6 +1202,8 @@ qboolean G_admin_unmute(gentity_t *ent, int skiparg) {
 	char err[MAX_STRING_CHARS];
 	gentity_t *target;
 	char name[MAX_TOKEN_CHARS];
+    char *ip;
+	char userinfo[MAX_INFO_STRING];
 
 	if(Q_SayArgc() - skiparg != 2) {
 		AIP(ent, "^3usage:^7 !unmute <name>");
@@ -1217,6 +1226,11 @@ qboolean G_admin_unmute(gentity_t *ent, int skiparg) {
 	}
 
 	target->client->sess.muted = qfalse;
+
+    trap_GetUserinfo( target->client->ps.clientNum, userinfo, sizeof( userinfo ) );
+	ip = Info_ValueForKey (userinfo, "ip");
+
+    G_RemoveIPMute(ip);
 
 	CPx(pids[0], "print \"^5You've been unmuted\n\"" );
 
@@ -2049,7 +2063,7 @@ static const char *m8BallResponses[] = {
     "It is certain",
     "It is decidedly so",
     "Without a doubt",
-    "Yes – definitely",
+    "Yes - definitely",
     "You may rely on it",
      
     "As I see it, yes",
@@ -2081,17 +2095,14 @@ qboolean G_admin_8ball(gentity_t *ent, int skiparg) {
 	}
 
 	random = rand() % 20;
-	color[0] = '^';
-	if(random < 10) {
-		color[1] = COLOR_GREEN;
-	} else if (random < 15) {
-		color[1] = COLOR_YELLOW;
-	} else {
-		color[1] = COLOR_RED;
-	}
-	color[2] = 0;
 
-	AP(va("chat \"^3Magic 8 Ball: %s%s.\"", color, m8BallResponses[random]));
+	if(random < 10) {
+        ChatPA(va("^3Magic 8 Ball: ^2%s.", m8BallResponses[random]));
+	} else if (random < 15) {
+		ChatPA(va("^3Magic 8 Ball: ^3%s.", m8BallResponses[random]));
+	} else {
+		ChatPA(va("^3Magic 8 Ball: ^1%s.", m8BallResponses[random]));
+    }	
 	return qtrue;
 }
 
