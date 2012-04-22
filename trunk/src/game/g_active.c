@@ -1376,11 +1376,7 @@ void ClientThink_real( gentity_t *ent ) {
 		// See if we need to hop to limbo
 		if( level.timeCurrent > client->respawnTime && !(ent->client->ps.pm_flags & PMF_LIMBO) ) {
 			if( ucmd->upmove > 0 ) {
-				if( g_gametype.integer == GT_WOLF_LMS || client->ps.persistant[PERS_RESPAWNS_LEFT] >= 0 ) {
-					trap_SendServerCommand( ent-g_entities, "reqforcespawn" );
-				} else {
-					limbo( ent, ( client->ps.stats[STAT_HEALTH] > GIB_HEALTH ) );
-				}
+                trap_SendServerCommand( ent-g_entities, "reqforcespawn" );
 			}
 
 			if((g_forcerespawn.integer > 0 && level.timeCurrent - client->respawnTime > g_forcerespawn.integer * 1000) || client->ps.stats[STAT_HEALTH] <= GIB_HEALTH) {
@@ -1536,8 +1532,6 @@ void SpectatorClientEndFrame( gentity_t *ent )
 
 				if(ent->client->sess.sessionTeam != TEAM_SPECTATOR && (ent->client->ps.pm_flags & PMF_LIMBO)) {
 					int savedScore = ent->client->ps.persistant[PERS_SCORE];
-					int savedRespawns = ent->client->ps.persistant[PERS_RESPAWNS_LEFT];
-					int savedRespawnPenalty = ent->client->ps.persistant[PERS_RESPAWNS_PENALTY];
 					int savedClass = ent->client->ps.stats[STAT_PLAYER_CLASS];
 					int savedMVList = ent->client->ps.powerups[PW_MVCLIENTLIST];
 
@@ -1548,8 +1542,6 @@ void SpectatorClientEndFrame( gentity_t *ent )
 					ent->client->ps.pm_flags |= PMF_LIMBO;
 
 					ent->client->ps.pm_time = do_respawn;							// put pm_time back
-					ent->client->ps.persistant[PERS_RESPAWNS_LEFT] = savedRespawns;
-					ent->client->ps.persistant[PERS_RESPAWNS_PENALTY] = savedRespawnPenalty;
 					ent->client->ps.persistant[PERS_SCORE] = savedScore;			// put score back
 					ent->client->ps.powerups[PW_MVCLIENTLIST] = savedMVList;
 					ent->client->ps.stats[STAT_PLAYER_CLASS] = savedClass;			// NERVE - SMF - put player class back

@@ -1784,6 +1784,11 @@ qboolean G_admin_remove_saves(gentity_t *ent, int skiparg) {
 		return qfalse;
 	}
 
+    if(ent && target->client->sess.uinfo.level >= ent->client->sess.uinfo.level) {
+        AIP(ent, "^3!nosave: ^7can't remove fellow admin's saves.");
+        return qfalse;
+    }
+
 	saves[0] = target->client->sess.allies_save_pos;
 	saves[1] = target->client->sess.axis_save_pos;
 
@@ -1814,6 +1819,11 @@ qboolean G_admin_disable_goto(gentity_t *ent, int skiparg) {
 		return qfalse;
 	}
 
+    if(ent && target->client->sess.uinfo.level >= ent->client->sess.uinfo.level) {
+        AIP(ent, "^3!nosave: ^7can't disable fellow admin's goto & call");
+        return qfalse;
+    }
+
 	if(target->client->sess.goto_allowed) {
 		target->client->sess.goto_allowed = qfalse;
 		AIP(target, va("^3adminsystem: ^7%s^7 you are not allowed to use goto.", target->client->pers.netname));
@@ -1842,6 +1852,11 @@ qboolean G_admin_disable_save(gentity_t *ent, int skiparg) {
 		AIP(ent, va("^3!nosave: ^7%s", err));
 		return qfalse;
 	}
+
+    if(ent && target->client->sess.uinfo.level >= ent->client->sess.uinfo.level) {
+        AIP(ent, "^3!nosave: ^7can't disable fellow admin's save & load");
+        return qfalse;
+    }
 
 	if(target->client->sess.save_allowed) {
 		target->client->sess.save_allowed = qfalse;
@@ -2501,6 +2516,11 @@ qboolean G_admin_noclip(gentity_t *ent, int skiparg) {
 			return qfalse;
 		}
 	}
+
+    if(ent && target->client->sess.uinfo.level >= ent->client->sess.uinfo.level) {
+        AIP(ent, "^3!noclip:^7 can't noclip fellow admins.");
+        return qfalse;
+    }
 
 	if(ent->client->noclip) {
 		ent->client->noclip = qfalse;

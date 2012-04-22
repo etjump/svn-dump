@@ -495,10 +495,6 @@ void limbo( gentity_t *ent, qboolean makeCorpse )
 
 	if (!(ent->client->ps.pm_flags & PMF_LIMBO)) {
 
-		if( ent->client->ps.persistant[PERS_RESPAWNS_LEFT] == 0 ) {
-			ent->client->ps.persistant[PERS_RESPAWNS_PENALTY] = -1;
-		}
-
 		// DHM - Nerve :: First save off persistant info we'll need for respawn
 		for( i = 0; i < MAX_PERSISTANT; i++) {
 			ent->client->saved_persistant[i] = ent->client->ps.persistant[i];
@@ -618,24 +614,9 @@ respawn
 */
 void respawn( gentity_t *ent ) {
 
-#ifdef SAVEGAME_SUPPORT
-	if( g_gametype.integer == GT_SINGLE_PLAYER ) {
-		if (g_reloading.integer || saveGamePending) {
-			return;
-		}
-	}
-#endif // SAVEGAME_SUPPORT
-
 	ent->client->ps.pm_flags &= ~PMF_LIMBO; // JPW NERVE turns off limbo
 
-	G_DPrintf( "Respawning %s, %i lives left\n", ent->client->pers.netname, ent->client->ps.persistant[PERS_RESPAWNS_LEFT]);
-
 	ClientSpawn(ent, qfalse);
-
-	// DHM - Nerve :: Add back if we decide to have a spawn effect
-	// add a teleportation effect
-	//tent = G_TempEntity( ent->client->ps.origin, EV_PLAYER_TELEPORT_IN );
-	//tent->s.clientNum = ent->s.clientNum;
 }
 
 // NERVE - SMF - merge from team arena
@@ -1644,7 +1625,7 @@ char *ClientConnect( int clientNum, qboolean firstTime, qboolean isBot ) {
 														//		default to qfalse/NULL.
 														//Feen: TODO - Make sure sess vars are in InfoString and read
 														//             properly in G_ReadSessionData()
-
+       
 	}
 
 	// read or initialize the session data
@@ -1770,17 +1751,10 @@ void ClientBegin( int clientNum )
 	// world to the new position
 	// DHM - Nerve :: Also save PERS_SPAWN_COUNT, so that CG_Respawn happens
 	spawn_count = client->ps.persistant[PERS_SPAWN_COUNT];
-	//bani - proper fix for #328
-	if( client->ps.persistant[PERS_RESPAWNS_LEFT] > 0 ) {
-		lives_left = client->ps.persistant[PERS_RESPAWNS_LEFT] - 1;
-	} else {
-		lives_left = client->ps.persistant[PERS_RESPAWNS_LEFT];
-	}
 	flags = client->ps.eFlags;
 	memset( &client->ps, 0, sizeof( client->ps ) );
 	client->ps.eFlags = flags;
 	client->ps.persistant[PERS_SPAWN_COUNT] = spawn_count;
-	client->ps.persistant[PERS_RESPAWNS_LEFT] = lives_left;
 	
 
 	client->pers.complaintClient = -1;

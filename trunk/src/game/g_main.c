@@ -2120,10 +2120,6 @@ void CalculateRanks( void ) {
 							if( g_entities[i].health <= 0 || level.clients[i].ps.pm_flags & PMF_LIMBO ) {
 								level.numFinalDead[teamIndex]++;
 							}
-						} else {
-							if( level.clients[i].ps.persistant[PERS_RESPAWNS_LEFT] == 0 && g_entities[i].health <= 0 ) {
-								level.numFinalDead[teamIndex]++;
-							}
 						}
 
 						level.numTeamClients[teamIndex]++;

@@ -48,7 +48,7 @@ void G_SendScore(gentity_t *ent)
 		for (; i < numSorted ; i++)
 		{
 			int j, totalXP;
-			int		ping, playerClass, respawnsLeft;
+			int		ping, playerClass;
 
 			cl = &level.clients[level.sortedClients[i]];
 
@@ -58,13 +58,6 @@ void G_SendScore(gentity_t *ent)
 			}
 
 			playerClass = cl->ps.stats[STAT_PLAYER_CLASS];
-
-			// NERVE - SMF - number of respawns left
-			respawnsLeft = cl->ps.persistant[PERS_RESPAWNS_LEFT];
-			if ((respawnsLeft == 0 && ((cl->ps.pm_flags & PMF_LIMBO) || ((level.intermissiontime) && g_entities[level.sortedClients[i]].health <= 0))))
-			{
-				respawnsLeft = -2;
-			}
 
 
 			if (cl->pers.connected == CON_CONNECTING)
@@ -81,14 +74,13 @@ void G_SendScore(gentity_t *ent)
 				totalXP += cl->sess.skillpoints[j];
 			}
 
-			Com_sprintf(entry, sizeof(entry), " %i %i %i %i %i %i %i %i",
+			Com_sprintf(entry, sizeof(entry), " %i %i %i %i %i %i %i",
 						level.sortedClients[i],
 						totalXP,
 						ping,
 						(level.time - cl->pers.enterTime) / 60000,
 						g_entities[level.sortedClients[i]].s.powerups,
 						playerClass,
-						respawnsLeft,
 						cl->ps.clientNum);
 
 
@@ -873,7 +865,6 @@ qboolean SetTeam( gentity_t *ent, char *s, qboolean force, weapon_t w1, weapon_t
 	int					clientNum;
 	spectatorState_t	specState;
 	int					specClient;
-	int					respawnsLeft;
 
 	//
 	// see what change is requested
@@ -883,9 +874,6 @@ qboolean SetTeam( gentity_t *ent, char *s, qboolean force, weapon_t w1, weapon_t
 	clientNum = client - level.clients;
 	specClient = 0;
 	
-	// ydnar: preserve respawn count
-	respawnsLeft = client->ps.persistant[ PERS_RESPAWNS_LEFT ];
-	
 	G_TeamDataForString( s, client - level.clients, &team, &specState, &specClient );
 
 	if( team != TEAM_SPECTATOR ) {
@@ -893,11 +881,6 @@ qboolean SetTeam( gentity_t *ent, char *s, qboolean force, weapon_t w1, weapon_t
 		if(!G_teamJoinCheck(team, ent)) {
 			// Leave them where they were before the command was issued
 			return(qfalse);
-		}
-
-		if(g_noTeamSwitching.integer && (team != ent->client->sess.sessionTeam && ent->client->sess.sessionTeam != TEAM_SPECTATOR ) && g_gamestate.integer == GS_PLAYING && !force ) {
-			trap_SendServerCommand( clientNum, "cp \"You cannot switch during a match, please wait until the round ends.\n\"" );
-			return qfalse;	// ignore the request
 		}
 	}
 
@@ -913,23 +896,6 @@ qboolean SetTeam( gentity_t *ent, char *s, qboolean force, weapon_t w1, weapon_t
 		return qfalse;
 	}
 
-	// DHM - Nerve :: Force players to wait 30 seconds before they can join a new team.
-	// OSP - changed to 5 seconds
-	// Gordon: disabling if in dev mode: cuz it sucks
-	// Gordon: bleh, half of these variables don't mean what they used to, so this doesn't work
-/*	if ( !g_cheats.integer ) {
-		 if ( team != oldTeam && level.warmupTime == 0 && !client->pers.initialSpawn && ( (level.time - client->pers.connectTime) > 10000 ) && ( (level.time - client->pers.enterTime) < 5000 ) && !force ) {
-			CP(va("cp \"^3You must wait %i seconds before joining ^3a new team.\n\" 3", (int)(5 - ((level.time - client->pers.enterTime)/1000))));
-			return qfalse;
-		}
-	}*/
-	// dhm
-  
-	//
-	// execute the team change
-	//
-
-
 	// DHM - Nerve
 	// OSP
 	if(team != TEAM_SPECTATOR) {
@@ -939,12 +905,6 @@ qboolean SetTeam( gentity_t *ent, char *s, qboolean force, weapon_t w1, weapon_t
 			G_smvRemoveInvalidClients(ent, TEAM_AXIS);
 			G_smvRemoveInvalidClients(ent, TEAM_ALLIES);
 		}
-	}
-
-	// he starts at 'base'
-	// RF, in single player, bots always use regular spawn points
-	if (!((g_gametype.integer == GT_SINGLE_PLAYER || g_gametype.integer == GT_COOP) && (ent->r.svFlags & SVF_BOT))) {
-		client->pers.teamState.state = TEAM_BEGIN;
 	}
 	
 	if ( oldTeam != TEAM_SPECTATOR ) {
@@ -1015,11 +975,6 @@ qboolean SetTeam( gentity_t *ent, char *s, qboolean force, weapon_t w1, weapon_t
 	ClientUserinfoChanged( clientNum );
 
 	ClientBegin( clientNum );
-	
-	// ydnar: restore old respawn count (players cannot jump from team to team to regain lives)
-	if(respawnsLeft >= 0 && oldTeam != TEAM_SPECTATOR) {
-		client->ps.persistant[ PERS_RESPAWNS_LEFT ] = respawnsLeft;
-	}
 
 	G_verifyMatchState(oldTeam);
 	BotRecordTeamChange( clientNum );

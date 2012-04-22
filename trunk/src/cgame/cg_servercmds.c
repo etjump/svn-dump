@@ -44,8 +44,7 @@ static void CG_ParseScore( team_t team ) {
 		cg.scores[i].time = atoi(			CG_Argv( offset + 3 + (j*8)));
 		powerups = atoi(					CG_Argv( offset + 4 + (j*8)));
 		cg.scores[i].playerClass = atoi(	CG_Argv( offset + 5 + (j*8)));
-		cg.scores[i].respawnsLeft = atoi(	CG_Argv( offset + 6 + (j*8)));
-		cg.scores[i].followedClient = atoi(	CG_Argv( offset + 7 + (j*8)));
+		cg.scores[i].followedClient = atoi(	CG_Argv( offset + 6 + (j*8)));
 
 		if ( cg.scores[i].client < 0 || cg.scores[i].client >= MAX_CLIENTS ) {
 			cg.scores[i].client = 0;

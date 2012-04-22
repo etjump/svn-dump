@@ -2918,7 +2918,7 @@ static void CG_DrawLimboMessage( void ) {
 	}
 
 	// JPW NERVE
-	str = (ps->persistant[PERS_RESPAWNS_LEFT] == 0) ? CG_TranslateString("No more reinforcements this round.") : va(CG_TranslateString("Reinforcements deploy in %d seconds."), CG_CalculateReinfTime( qfalse ));
+	str = va(CG_TranslateString("Reinforcements deploy in %d seconds."), CG_CalculateReinfTime( qfalse ));
 
 	CG_DrawSmallStringColor( INFOTEXT_STARTX, y, str, color );
 	y += 18;
