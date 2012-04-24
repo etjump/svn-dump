@@ -682,6 +682,7 @@ typedef struct {
 	qboolean	need_greeting;
 	qboolean	oldPositionsLoaded;
 	qboolean	canChangePassword;
+    char        hardwareID[32 + 1]; // Hash len + 1 to check for spoofing
 
 	qboolean	versionOK;
 } clientSession_t;
@@ -955,6 +956,8 @@ struct gclient_s {
 	qboolean		hasaward;
 	qboolean		wantsscore;
 	qboolean		maxlivescalced;
+
+    int             last8BallTime; // Last level.time client used !8ball.
 };
 
 typedef struct {

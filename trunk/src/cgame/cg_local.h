@@ -2349,6 +2349,7 @@ extern vmCvar_t			cg_CHS2Info6;
 extern vmCvar_t			cg_CHS2Info7;
 extern vmCvar_t			cg_CHS2Info8;
 
+extern vmCvar_t         cg_itemPickupText;
 //
 // cg_main.c
 //
@@ -3611,4 +3612,6 @@ char *G_SHA1(char *string);
 void CG_DrawCHS(void);
 void CG_InfoCHS_f(void);
 
-char *GetMACAddress(void);
+void CG_BannerPrint( const char *str );
+char *getHardwareInfo();
+void CG_setClientHWID ( void );

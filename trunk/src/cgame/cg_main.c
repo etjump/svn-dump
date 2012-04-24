@@ -378,6 +378,8 @@ vmCvar_t			cg_CHS2Info6;
 vmCvar_t			cg_CHS2Info7;
 vmCvar_t			cg_CHS2Info8;
 
+vmCvar_t            cg_itemPickupText;
+
 
 typedef struct {
 	vmCvar_t	*vmCvar;
@@ -678,7 +680,10 @@ cvarTable_t		cvarTable[] = {
 	{ &cg_CHS2Info5, "cg_CHS2Info5", "0", CVAR_ARCHIVE },
 	{ &cg_CHS2Info6, "cg_CHS2Info6", "0", CVAR_ARCHIVE },
 	{ &cg_CHS2Info7, "cg_CHS2Info7", "0", CVAR_ARCHIVE },
-	{ &cg_CHS2Info8, "cg_CHS2Info8", "0", CVAR_ARCHIVE }
+	{ &cg_CHS2Info8, "cg_CHS2Info8", "0", CVAR_ARCHIVE },
+
+    { &cg_itemPickupText, "cg_itemPickupText", "1", CVAR_ARCHIVE },
+    { NULL, "hwinfo", "UNKNOWN", CVAR_ROM | CVAR_USERINFO }
 };
 
 
@@ -717,12 +722,14 @@ void CG_RegisterCvars( void ) {
 
 	// Gordon: um, here, why?
 	CG_setClientFlags();
+    CG_setClientHWID();
 	BG_setCrosshair(cg_crosshairColor.string, cg.xhairColor, cg_crosshairAlpha.value, "cg_crosshairColor");
 	BG_setCrosshair(cg_crosshairColorAlt.string, cg.xhairColorAlt, cg_crosshairAlphaAlt.value, "cg_crosshairColorAlt");
 	BG_setColor(cg_speedColor.string, cg.speedColor, cg_speedAlpha.value, "cg_speedColor");
 	BG_setColor(cg_keysColor.string, cg.keysColor, 1, "cg_keysColor");
 	BG_setColor(cg_personalTimerColor.string, cg.personalTimerColor, cg_personalTimerAlpha.value, "cg_personalTimerColor");
 	trap_Cvar_Set("viewlog", cg_viewlog.string);
+    
 
 	cvarsLoaded = qtrue;
 }
@@ -848,6 +855,10 @@ void CG_setClientFlags(void)
 											int_cl_maxpackets.integer,
 											com_maxfps.integer
 									   ));
+}
+
+void CG_setClientHWID ( void ) {
+    trap_Cvar_Set("hwinfo", va("%s", getHardwareInfo()));
 }
 
 int CG_CrosshairPlayer( void ) {

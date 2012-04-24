@@ -638,7 +638,7 @@ typedef enum {
 	PERS_KILLED,					// count of the number of times you died
 	// these were added for single player awards tracking
 	
-    PERS_BLEH1,
+    PERS_REVIVE_COUNT,
 	PERS_BLEH_2,
 	PERS_BLEH_3,
     PERS_BLEH_4,

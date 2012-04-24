@@ -314,6 +314,8 @@ void G_admin_writeconfig() {
 		G_admin_writeconfig_string(g_admin_bans[i]->name, f);
 		trap_FS_Write("ip       = ", 11, f);
 		G_admin_writeconfig_string(g_admin_bans[i]->ip, f);
+        trap_FS_Write("hardware = ", 11, f);
+        G_admin_writeconfig_string(g_admin_bans[i]->hardware, f);
 		trap_FS_Write("reason   = ", 11, f);
 		G_admin_writeconfig_string(g_admin_bans[i]->reason, f);
 		trap_FS_Write("made     = ", 11, f);
@@ -527,6 +529,10 @@ qboolean G_admin_readconfig(gentity_t *ent, int skiparg) {
 				G_admin_readconfig_string(&data,
 					temp_ban->ip, sizeof(temp_ban->ip));
 			}
+            else if(!Q_stricmp(t, "hardware")) {
+                G_admin_readconfig_string(&data,
+                    temp_ban->hardware, sizeof(temp_ban->hardware));
+            }
 			else if(!Q_stricmp(t, "reason")) {
 				G_admin_readconfig_string(&data,
 					temp_ban->reason, sizeof(temp_ban->reason));
@@ -1411,7 +1417,7 @@ qboolean G_admin_ban(gentity_t *ent, int skiparg) {
 	char name[MAX_NAME_LENGTH], secs[8];
 	char *reason, err[MAX_STRING_CHARS];
 	char userinfo[MAX_INFO_STRING];
-	char *ip;
+	char *ip = NULL, *hardware = NULL;
 	char tmp[MAX_NAME_LENGTH];
 	int i;
 	admin_ban_t *b = NULL;
@@ -1482,6 +1488,8 @@ qboolean G_admin_ban(gentity_t *ent, int skiparg) {
 	trap_GetUserinfo(pids[0], userinfo, sizeof(userinfo));
 	ip = Info_ValueForKey(userinfo, "ip");
 
+    hardware = Info_ValueForKey(userinfo, "hwinfo");
+
 	b = malloc(sizeof(admin_ban_t));
 
 	if(!b)
@@ -1499,6 +1507,8 @@ qboolean G_admin_ban(gentity_t *ent, int skiparg) {
 			"console",
 			sizeof(b->banner));
 	}
+
+    Q_strncpyz(b->hardware, hardware, sizeof(b->hardware));
 
 	for(i=0; *ip; ip++) {
 		if(i >= sizeof(tmp) || *ip == ':') break;
@@ -2104,7 +2114,15 @@ static const char *m8BallResponses[] = {
 qboolean G_admin_8ball(gentity_t *ent, int skiparg) {
 	int random = 0;
 	char color[3];
-	if(Q_SayArgc() < 2 + skiparg) {
+	
+#define DELAY_8BALL 3000 // in ms
+
+    if(ent && ent->client->last8BallTime + DELAY_8BALL > level.time) {
+        AIP(ent, va("^3!8ball: ^7you must wait %i seconds before using !8ball again.", (ent->client->last8BallTime + DELAY_8BALL - level.time)/1000));
+        return qfalse;
+    }
+    
+    if(Q_SayArgc() < 2 + skiparg) {
 		AIP(ent, "^3usage:^7 !8ball <question>");
 		return qfalse;
 	}
@@ -2118,6 +2136,7 @@ qboolean G_admin_8ball(gentity_t *ent, int skiparg) {
 	} else {
 		ChatPA(va("^3Magic 8 Ball: ^1%s.", m8BallResponses[random]));
     }	
+    if(ent) ent->client->last8BallTime = level.time;
 	return qtrue;
 }
 

@@ -926,7 +926,7 @@ void CG_Info_f ( void ) {
 	CG_Printf("Password has to be atleast 8 characters\n");
 }
 
-void CG_portalinfo_f () {
+void CG_portalinfo_f ( void ) {
 	CG_Printf("^7The portal gun when enabled can be found in weaponbank 9, this is found by typing /weaponbank 9 in the console or scrolling to the weapon before your knife.\n");
 	CG_Printf("^7The ^4first ^7portal is placed by using your normal fire key.\n");
 	CG_Printf("^7The ^1second ^7portal is placed using +attack2 which you will need to bind by typing '/bind key +attack2' in the console.\n");

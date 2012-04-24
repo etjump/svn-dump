@@ -2254,19 +2254,14 @@ static void CG_PortalGate( centity_t *cent ){
 		
 	polyVert_t POLYverts[4];
 	vec3_t verts[4];
-	vec3_t pointDiff, pushedOrigin, angleInverse;
+	vec3_t pushedOrigin, angleInverse;
 	vec3_t axis[3];
 	float radius = 64.0f; // TODO: Use #define instead
 	int i;
 
-	//NOTE: just a test...
-	vec4_t temp_Color, temp_Color2;
-
-
 	//Predefined colors
 	byte clrBlue[4] = { 0x00, 0x01, 0xff, 0xff };
 	byte clrOrange[4] = { 0xff, 0x7e, 0x00, 0xff };
-	byte clrGreen[4] = { 0x0b, 0xd6, 0x43, 0xff };
 	byte clrRed[4] = { 0xf3, 0x32, 0x27, 0xff };
 	byte clrLBlue[4] = { 0x27, 0x82, 0xf4, 0xff }; //This is the red complement
 	

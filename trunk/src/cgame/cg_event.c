@@ -17,9 +17,7 @@ static void CG_Obituary( entityState_t *ent ) {
 	char		*message;
 	char		*message2;
 	char		targetName[32];
-	char		attackerName[32];
 	clientInfo_t	*ci, *ca; // JPW NERVE ca = attacker
-	qhandle_t	deathShader = cgs.media.pmImages[PM_DEATH];
 
 	target = ent->otherEntityNum;
 	attacker = ent->otherEntityNum2;
@@ -405,8 +403,9 @@ static void CG_ItemPickup( int itemNum ) {
 	int wpbank_cur, wpbank_pickup;
 	
 	itemid = bg_itemlist[itemNum].giTag;
-
-	CG_AddPMItem( PM_MESSAGE, va( "Picked up %s", CG_PickupItemText( itemNum ) ), cgs.media.pmImages[PM_MESSAGE] );
+    if(cg_itemPickupText.integer) {
+	    CG_AddPMItem( PM_MESSAGE, va( "Picked up %s", CG_PickupItemText( itemNum ) ), cgs.media.pmImages[PM_MESSAGE] );
+    }
 
 //	cg.itemPickup			= itemNum;
 //	cg.itemPickupTime		= cg.time;
@@ -1675,8 +1674,6 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 
 	//Feen: PGM
 	qboolean		portalDetected = qfalse;
-	int				crashEvent = 0;
-	int				crashEventParm = 0;
 
 	es = &cent->currentState;
 	event = es->event & ~EV_EVENT_BITS;
@@ -1985,13 +1982,15 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 
 			if(event == EV_ITEM_PICKUP)	// not quiet
 			{
-				// powerups and team items will have a separate global sound, this one
-				// will be played at prediction time
-				if( item->giType == IT_TEAM) {
-					trap_S_StartSound (NULL, es->number, CHAN_AUTO,	trap_S_RegisterSound( "sound/misc/w_pkup.wav", qfalse ) );
-				} else {
-					trap_S_StartSound (NULL, es->number, CHAN_AUTO,	trap_S_RegisterSound( item->pickup_sound, qfalse ) );
-				}
+                    if(cg_itemPickupText.integer) {
+				    // powerups and team items will have a separate global sound, this one
+				    // will be played at prediction time
+				    if( item->giType == IT_TEAM) {
+					    trap_S_StartSound (NULL, es->number, CHAN_AUTO,	trap_S_RegisterSound( "sound/misc/w_pkup.wav", qfalse ) );
+				    } else {
+					    trap_S_StartSound (NULL, es->number, CHAN_AUTO,	trap_S_RegisterSound( item->pickup_sound, qfalse ) );
+				    }
+                }
 			}
 
 			// show icon and name on status bar

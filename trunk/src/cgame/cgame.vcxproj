@@ -166,6 +166,7 @@
     <ClCompile Include="cg_fireteamoverlay.c" />
     <ClCompile Include="cg_fireteams.c" />
     <ClCompile Include="cg_flamethrower.c" />
+    <ClCompile Include="cg_hardware.c" />
     <ClCompile Include="cg_info.c" />
     <ClCompile Include="cg_limbopanel.c" />
     <ClCompile Include="cg_loadpanel.c" />

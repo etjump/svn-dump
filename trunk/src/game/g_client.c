@@ -1334,6 +1334,10 @@ const char *GetParsedIP(const char *ipadd)
 	return ipge;
 }
 
+void G_admin_hardware_ban_check(gclient_t *client, char *hwinfo) {
+    // TODO: everything
+}
+
 /*
 ===========
 ClientUserInfoChanged
@@ -1355,6 +1359,9 @@ void ClientUserinfoChanged( int clientNum ) {
 	char	skillStr[16] = "";
 	char	medalStr[16] = "";
 	int		characterIndex;
+#define HASH_LEN 32
+    char    *hardwareID;
+    char    *reason;
 
 
 	ent = g_entities + clientNum;
@@ -1381,13 +1388,11 @@ void ClientUserinfoChanged( int clientNum ) {
 		G_Printf("Userinfo: %s\n", userinfo);
 	}
 
-	// check for local client
-	s = Info_ValueForKey( userinfo, "ip" );
-	if ( s && !strcmp( s, "localhost" ) ) {
-		client->pers.localClient = qtrue;
-		level.fLocalHost = qtrue;
-		client->sess.referee = RL_REFEREE;
-	}
+    hardwareID = Info_ValueForKey(userinfo, "hwinfo");
+
+    G_admin_hardware_ban_check(client, hardwareID);
+
+    // TODO: Check for hardware info spoofing
 
 	s = Info_ValueForKey(userinfo, "cg_uinfo");
 	sscanf(s, "%i %i %i %i %i",
@@ -1617,6 +1622,8 @@ char *ClientConnect( int clientNum, qboolean firstTime, qboolean isBot ) {
 		client->sess.goto_allowed = qtrue;
 		client->sess.save_allowed = qtrue;  //qfalse	//Feen: Why was this set to false?
 		client->sess.canChangePassword = qtrue;
+        client->last8BallTime = 0;
+        client->sess.hardwareID[0] = 0;
 	} else {
 		client->sess.need_greeting = qfalse;
 
@@ -1726,7 +1733,7 @@ void ClientBegin( int clientNum )
 	gentity_t	*ent;
 	gclient_t	*client;
 	int			flags;
-	int			spawn_count, lives_left;		// DHM - Nerve
+	int			spawn_count;		// DHM - Nerve
 
 	ent = g_entities + clientNum;
 
