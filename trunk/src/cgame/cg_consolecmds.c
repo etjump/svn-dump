@@ -1124,13 +1124,6 @@ void CG_InitConsoleCommands( void ) {
 	trap_AddCommand("commands");
 	trap_AddCommand("follow");
 	trap_AddCommand("lock");
-#ifdef MV_SUPPORT
-	trap_AddCommand("mvadd");
-	trap_AddCommand("mvaxis");
-	trap_AddCommand("mvallies");
-	trap_AddCommand("mvall");
-	trap_AddCommand("mvnone");
-#endif
 	trap_AddCommand("notready");
 	trap_AddCommand("pause");
 	trap_AddCommand("players");
@@ -1194,4 +1187,6 @@ void CG_InitConsoleCommands( void ) {
 	trap_AddCommand ("adminlogin");
 	trap_AddCommand ("portal");
 	trap_AddCommand ("setspawnpt");
+	trap_AddCommand ("specblock");
+	trap_AddCommand ("specunblock");
 }

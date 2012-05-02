@@ -21,13 +21,12 @@ Called on game shutdown
 */
 void G_WriteClientSessionData( gclient_t *client, qboolean restart )
 {
-	int mvc = G_smvGenerateClientList(g_entities + (client - level.clients));
 	const char	*s;
 
 	// OSP -- stats reset check
 	if(level.fResetStats) G_deleteStats(client - level.clients);
 
-	s = va("%i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i",
+	s = va("%i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i",
 		client->sess.sessionTeam,
 		client->sess.spectatorTime,
 		client->sess.spectatorState,
@@ -48,9 +47,7 @@ void G_WriteClientSessionData( gclient_t *client, qboolean restart )
 		client->sess.spec_invite,
 		client->sess.spec_team,
 		client->sess.suicides,
-		client->sess.team_kills,
-		(mvc & 0xFFFF),
-		((mvc >> 16) & 0xFFFF)
+		client->sess.team_kills
 		// Damage and rounds played rolled in with weapon stats (below)
 		// OSP
 
@@ -204,10 +201,6 @@ void G_ReadSessionData( gclient_t *client )
 		&client->pers.enterTime,
 		&client->sess.spawnObjectiveIndex
 		);
-
-	// OSP -- reinstate MV clients
-	client->pers.mvReferenceList = (mvc_h << 16) | mvc_l;
-	// OSP
 
 	// OSP -- pull and parse weapon stats
 	*s = 0;
@@ -370,15 +363,6 @@ void G_InitWorldSession( void ) {
 					G_Printf("Map changed, clearing player stats.\n");
 				}
 			}
-		}
-
-		// OSP - have to make sure spec locks follow the right teams
-		if(g_gametype.integer == GT_WOLF_STOPWATCH && g_gamestate.integer != GS_PLAYING && test) {
-			G_swapTeamLocks();
-		}
-
-		if(g_swapteams.integer) {
-			G_swapTeamLocks();
 		}
 	}
 

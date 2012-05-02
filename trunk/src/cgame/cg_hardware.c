@@ -1,11 +1,9 @@
-void Q_strcat( char *dest, int size, const char *src );
-char *G_SHA1(char *string);
-
-#define MAX_TOKEN_CHARS 1024
-#define HASH_LEN 32
+#include "cg_local.h"
 
 #ifdef WIN32
+#define Rectangle LCC_Rectangle
 #include <Windows.h>
+#undef Rectangle
 // Maybe not the best hardware ID but should do the trick, I hope.
 char *getHardwareInfo() 
 {
@@ -22,7 +20,7 @@ char *getHardwareInfo()
     systemInfoSum = systemInfo.dwProcessorType + systemInfo.wProcessorLevel + systemInfo.wProcessorArchitecture;
 
     itoa(systemInfoSum, hwId, 10);
-
+	// HDD data
     GetEnvironmentVariable("HOMEDRIVE", rootdrive, sizeof(rootdrive));
     Q_strcat(rootdrive, sizeof(rootdrive), "\\");
 

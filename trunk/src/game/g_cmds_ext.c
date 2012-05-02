@@ -9,6 +9,7 @@ int iWeap = WS_MAX;
 static void Cmd_SpecInvite_f(gentity_t *ent, unsigned int dwCommand, qboolean invite /* or uninvite */);
 static void Cmd_SpecLock_f(gentity_t *ent, unsigned int dwCommand, qboolean lock);
 static void Cmd_SpecList_f(gentity_t *ent, unsigned int dwCommand, qboolean notUsed);
+static void Cmd_SpecBlock_f(gentity_t *ent, unsigned int dwCommand, qboolean block);
 
 char *lock_status[2] = { "unlock", "lock" };
 
@@ -33,55 +34,32 @@ static const cmd_reference_t aCommandInfo[] = {
 	{ "autorecord",		qtrue,	qtrue,	NULL, ":^7 Creates a demo with a consistent naming scheme" },
 	{ "autoscreenshot",	qtrue,	qtrue,	NULL, ":^7 Creates a screenshot with a consistent naming scheme" },
 	{ "bottomshots",	qtrue,	qfalse,	G_weaponRankings_cmd, ":^7 Shows WORST player for each weapon. Add ^3<weapon_ID>^7 to show all stats for a weapon" },
-//	{ "callvote",		qtrue,	qfalse,	Cmd_CallVote_f, " <params>:^7 Calls a vote" },
 	{ "callvote",		qtrue,	qfalse,	(void(*)(gentity_t *, unsigned int, qboolean))Cmd_CallVote_f, " <params>:^7 Calls a vote" },
-//	{ "captains",		qtrue,	qtrue,	NULL, ":^7 Shows team captains" },
-//	{ "coach",			qtrue,	qtrue,	NULL, ":^7 Accepts coach invitation/restarts coach view" },
-//	{ "coachdecline",	qtrue,	qtrue,	NULL, ":^7 Declines coach invitation or resigns coach status" },
-//	{ "coachinvite",	qtrue,	qtrue,	NULL, " <player_ID>:^7 Invites a player to coach team" },
-//	{ "coachkick",		qtrue,	qtrue,	NULL, " <player_ID>:^7 Kicks active coach from team" },
 	{ "commands",		qtrue,	qtrue,	G_commands_cmd, ":^7 Gives a list of OSP-specific commands" },
 	{ "currenttime",	qtrue,	qtrue,	NULL, ":^7 Displays current local time" },
 	{ "follow",			qfalse,	qtrue,	Cmd_Follow_f, " <player_ID|allies|axis>:^7 Spectates a particular player or team" },
-//	{ "invite",			qtrue,	qtrue,	NULL, " <player_ID>:^7 Invites a player to join a team" },
 	{ "notready",		qtrue,	qfalse,	G_ready_cmd, ":^7 Sets your status to ^5not ready^7 to start a match" },
 	{ "players",		qtrue,	qtrue,	G_players_cmd, ":^7 Lists all active players and their IDs/information" },
 	{ "ready",			qtrue,	qtrue,	G_ready_cmd, ":^7 Sets your status to ^5ready^7 to start a match" },
 	{ "readyteam",		qfalse,	qtrue,	G_teamready_cmd, ":^7 Sets an entire team's status to ^5ready^7 to start a match" },
 	{ "ref",			qtrue,	qtrue,	G_ref_cmd, " <password>:^7 Become a referee (admin access)" },
-//	{ "remove",			qtrue,	qtrue,	NULL, " <player_ID>:^7 Removes a player from the team" },
-//	{ "resign",			qtrue,	qtrue,	NULL, " [player_ID]:^7 Resigns captainship.  Can optionally be given to another teammate" },
 	{ "say_teamnl",		qtrue,	qtrue,	G_say_teamnl_cmd, "<msg>:^7 Sends a team chat without location info" },
 	{ "scores",			qtrue,	qtrue,	G_scores_cmd, ":^7 Displays current match stat info" },
 	{ "specinvite",		qtrue,	qtrue,	Cmd_SpecInvite_f, ":^7 Invites a player to spectate" },
 	{ "specuninvite",	qtrue,	qfalse,	Cmd_SpecInvite_f, ":^7 Uninvites a player to spectate" },
 	{ "speclock",		qtrue,	qtrue,	Cmd_SpecLock_f, ":^7 Locks a player from spectators" },
 	{ "specunlock",		qtrue,	qfalse, Cmd_SpecLock_f, ":^7Unlocks a player from spectators" },
-//	{ "speconly",		qtrue,	qtrue,	NULL, ":^7 Toggles option to stay as a spectator in 1v1" },
+	{ "specblock",		qtrue,	qtrue,	Cmd_SpecBlock_f, ":^7Blocks a player from spectating you" },
+	{ "specunblock",	qtrue,  qfalse, Cmd_SpecBlock_f, ":^7Unblock a player from spectating you" },
+	{ "speclist",		qtrue,	qtrue,	Cmd_SpecList_f, ":^7Lists specinvited players" },
 	{ "statsall",		qtrue,	qfalse,	G_statsall_cmd, ":^7 Shows weapon accuracy stats for all players" },
 	{ "statsdump",		qtrue,	qtrue,	NULL, ":^7 Shows player stats + match info saved locally to a file" },
-	{ "team",			qtrue,	qtrue,	Cmd_Team_f, " <b|r|s|none>:^7 Joins a team (b = allies, r = axis, s = spectator)" },
-//	{ "setclass",		qtrue,	qtrue,	Cmd_SetClass_f, " <classnum>:^7 Selects a class" },
-//	{ "setweapons",		qtrue,	qtrue,	Cmd_SetWeapons_f, " <weapon|weapon2>:^7 Selects your weapon loadout" },
+	{ "team",			qtrue,	qtrue,	(void(*)(gentity_t *, unsigned int, qboolean))Cmd_Team_f, " <b|r|s|none>:^7 Joins a team (b = allies, r = axis, s = spectator)" },
 	{ "topshots",		qtrue,	qtrue,	G_weaponRankings_cmd, ":^7 Shows BEST player for each weapon. Add ^3<weapon_ID>^7 to show all stats for a weapon" },
 	{ "unready",		qtrue,	qfalse,	G_ready_cmd, ":^7 Sets your status to ^5not ready^7 to start a match" },
 	{ "weaponstats",	qtrue,	qfalse,	G_weaponStats_cmd, " [player_ID]:^7 Shows weapon accuracy stats for a player" },
-//	{ "viewcam",		qfalse,	qtrue,	NULL, ":^7 Switches to cinematic camera mode" },
-//	{ "vc_follow",		qfalse,	qtrue,	NULL, " [player_ID]:^7 Puts viewcam in follow mode.  Can optionally to follow a specific player" },
-//	{ "vc_free",		qfalse,	qtrue,	NULL, ":^7 Toggle viewcam between manual/automatic change" },
-//	{ "vc_view",		qfalse,	qtrue,	NULL, ":^7 Toggle ViewCam between static/dynamic views" },
-//	{ "viewadd",		qfalse,	qtrue,	NULL, " <player_ID>:^7 Adds a player to multi-screen view" },
-//	{ "viewall",		qfalse,	qtrue,	NULL, ":^7 Adds all active players to a multi-screen view" },
-//	{ "viewallies",		qfalse,	qtrue,	NULL, ": ^7 Views entire allies/axis team" },
-//	{ "viewaxis",		qfalse,	qtrue,	NULL, ": ^7 Views entire allies/axis team" },
-//	{ "viewcyclenext",	qfalse,	qtrue,	NULL, ":^7 Cycles through players in current view" },
-//	{ "viewfollow",		qfalse,	qtrue,	NULL, ":^7 Follows current highlighted view" },
-//	{ "viewnext",		qfalse,	qtrue,	NULL, ":^7 Moves through active screen in a multi-screen display" },
-//	{ "viewnone",		qfalse,	qtrue,	NULL, ":^7 Disables multiview mode and goes back to spectator mode" },
-//	{ "viewremove",		qfalse,	qtrue,	NULL, " [player_ID]:^7 Removes current selected or specific player from multi-screen view" },
 	{ 0,				qfalse,	qtrue,  NULL, 0 }
 };
-
 
 // OSP-specific Commands 
 qboolean G_commandCheck(gentity_t *ent, char *cmd, qboolean fDoAnytime)
@@ -97,9 +75,8 @@ qboolean G_commandCheck(gentity_t *ent, char *cmd, qboolean fDoAnytime)
 		}
 	}
 
-	return(G_smvCommands(ent, cmd));
+	return(qfalse);
 }
-
 
 // Prints specific command help info.
 qboolean G_commandHelp(gentity_t *ent, char *pszCommand, unsigned int dwCommand)
@@ -401,35 +378,6 @@ void G_specinvite_cmd(gentity_t *ent, unsigned int dwCommand, qboolean fLock)
 }
 
 
-// ************** SPECLOCK / SPECUNLOCK
-//
-// Locks/unlocks a player's team from spectators.
-void G_speclock_cmd(gentity_t *ent, unsigned int dwCommand, qboolean fLock)
-{
-	int tteam;
-
-	if(team_nocontrols.integer) {
-		G_noTeamControls(ent);
-		return;
-	}
-
-	if(!G_cmdDebounce(ent, aCommandInfo[dwCommand].pszCommandName)) return;
-
-	tteam = G_teamID(ent);
-	if(tteam == TEAM_AXIS || tteam == TEAM_ALLIES) {
-		if(teamInfo[tteam].spec_lock == fLock) {
-			CP(va("print \"\n^3Your team is already %sed from spectators!\n\n\"", lock_status[fLock]));
-		} else {
-			G_printFull(va("The %s team is now %sed from spectators", aTeams[tteam], lock_status[fLock]), NULL);
-			G_updateSpecLock(tteam, fLock);
-			if(fLock) CP("cpm \"Use ^3specinvite^7 to invite people to spectate.\n\"");
-		}
-	} else {
-		CP(va("print \"Spectators can't %s a team from spectators!\n\"", lock_status[fLock]));
-	}
-}
-
-
 // ************** WEAPONSTATS
 //
 // Shows a player's stats to the requesting client.
@@ -716,9 +664,7 @@ static void Cmd_SpecInvite_f(gentity_t *ent, unsigned int dwCommand, qboolean in
 		}
 
 		COM_BitClear(ent->client->sess.specInvitedClients, clientNum);
-		if (other->client->pers.mvCount > 0)
-			G_smvLocateEntityInMVList(other, ent - g_entities, qtrue);
-		else if (other->client->sess.spectatorState == SPECTATOR_FOLLOW
+		if (other->client->sess.spectatorState == SPECTATOR_FOLLOW
 				 && other->client->sess.spectatorClient == ent - g_entities
 				 && !G_AllowFollow(other, ent))
 			StopFollowing(other);
@@ -766,12 +712,74 @@ static void Cmd_SpecLock_f(gentity_t *ent, unsigned int dwCommand, qboolean lock
 		if (other->client->sess.sessionTeam != TEAM_SPECTATOR)
 			continue;
 
-		if (other->client->pers.mvCount > 0)
-			G_smvLocateEntityInMVList(other, ent - g_entities, qtrue);
-		else if (other->client->sess.spectatorState == SPECTATOR_FOLLOW
-				 && other->client->sess.spectatorClient == ent - g_entities
+		if (other->client->sess.spectatorState == SPECTATOR_FOLLOW
+			&& other->client->sess.spectatorClient == ent->client->ps.clientNum
 				 && !G_AllowFollow(other, ent))
 			StopFollowing(other);
+	}
+}
+// is ent spectating target
+static qboolean isSpectating(gentity_t *ent, gentity_t *target) {
+	if(ent->client->sess.spectatorState != SPECTATOR_FOLLOW) {
+		return qfalse;
+	}
+
+	if(ent->client->sess.spectatorClient == target->client->ps.clientNum) {
+		return qtrue;
+	}
+	return qfalse;
+}
+
+void Cmd_SpecBlock_f ( gentity_t *ent, unsigned int dwCommand, qboolean block ) {
+	int			clientNum = MAX_CLIENTS;
+	gentity_t	*other = NULL;
+	char		arg[MAX_TOKEN_CHARS] = "\0";
+	char		error[MAX_STRING_CHARS] = "\0";
+
+	if(ClientIsFlooding(ent)) {
+		CP("print \"^1Spam Protection:^7 Specblock ignored\n\"");
+		return;
+	}
+
+	if(trap_Argc() != 2) {
+		CP("print \"^5Usage:^7 /specblock <player>\n\"");
+		return;
+	}
+
+	trap_Argv(1, arg, sizeof(arg));
+
+	other = getPlayerForName(arg, error, sizeof(error));
+	clientNum = other->client->ps.clientNum;
+	if(!other) {
+		CP(va("print \"%s\n\"", error));
+		return;
+	}
+
+	if(other == ent) {
+		CP("print \"^7Can't specblock self.\n\"");
+		return;
+	}
+
+	if(block) {
+		if(COM_BitCheck(ent->client->sess.specBlockedClients, clientNum)) {
+			CP(va("print \"%s ^7is already specblocked.\n\"", other->client->pers.netname));
+			return;
+		}
+		COM_BitSet(ent->client->sess.specBlockedClients, clientNum);
+		CP(va("print \"%s ^7has been blocked from spectating you.\n\"", other->client->pers.netname));
+		// FIXME: if client is spectating adding client to specblockedclients list does not seem to work. 
+		// it just stops following but client can just do /follow
+		if(isSpectating(other, ent) &&
+			!G_AllowFollow(other, ent)) {
+				StopFollowing(other);
+		}
+	} else {
+		if(!COM_BitCheck(ent->client->sess.specBlockedClients, clientNum)) {
+			CP(va("print \"%s ^7is not specblocked.\n\"", other->client->pers.netname));
+			return;
+		}
+		COM_BitClear(ent->client->sess.specBlockedClients, clientNum);
+		CP(va("print \"%s ^7can now spectate you.\n\"", other->client->pers.netname));
 	}
 }
 

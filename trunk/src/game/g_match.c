@@ -122,22 +122,6 @@ void G_delayPrint(gentity_t *dpent)
 			break;
 		}
 
-		case DP_MVSPAWN:
-		{
-			int i;
-			gentity_t *ent;
-			
-			for(i=0; i<level.numConnectedClients; i++) {
-				ent = g_entities + level.sortedClients[i];
-
-				if(ent->client->pers.mvReferenceList == 0) continue;
-				if(ent->client->sess.sessionTeam != TEAM_SPECTATOR) continue;
-				G_smvRegenerateClients(ent, ent->client->pers.mvReferenceList);
-			}
-
-			break;
-		}
-
 		default:
 			break;
 	}
@@ -571,7 +555,7 @@ void G_matchInfoDump(unsigned int dwDumpType)
 		if(dwDumpType == EOM_WEAPONSTATS) {
 			// If client wants to write stats to a file, don't auto send this stuff
 			if(!(cl->pers.clientFlags & CGF_STATSDUMP)) {
-				if((cl->pers.autoaction & AA_STATSALL) || cl->pers.mvCount > 0) {
+				if(cl->pers.autoaction & AA_STATSALL) {
 					G_statsall_cmd(ent, 0, qfalse);
 				} else if(cl->sess.sessionTeam != TEAM_SPECTATOR) {
 					if(cl->pers.autoaction & AA_STATSTEAM) G_statsall_cmd(ent, cl->sess.sessionTeam, qfalse);	// Currently broken.. need to support the overloading of dwCommandID

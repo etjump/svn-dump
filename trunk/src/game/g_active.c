@@ -521,31 +521,29 @@ void SpectatorThink( gentity_t *ent, usercmd_t *ucmd ) {
 //----(SA)	added
 	client->oldwbuttons = client->wbuttons;
 	client->wbuttons = ucmd->wbuttons;
-
-	// MV clients use these buttons locally for other things
-	if(client->pers.mvCount < 1) {
-		// attack button cycles through spectators
-		if ( ( client->buttons & BUTTON_ATTACK ) && ! ( client->oldbuttons & BUTTON_ATTACK ) ) {
-			Cmd_FollowCycle_f( ent, 1 );
-		}
-		// activate button swaps places with bot
-		else if( client->sess.sessionTeam != TEAM_SPECTATOR &&
-				( ( client->buttons & BUTTON_ACTIVATE ) && ! ( client->oldbuttons & BUTTON_ACTIVATE ) ) &&
-				( g_entities[ent->client->sess.spectatorClient].client ) &&
-				( g_entities[ent->client->sess.spectatorClient].r.svFlags & SVF_BOT ) )
-		{
-			Cmd_SwapPlacesWithBot_f( ent, ent->client->sess.spectatorClient );
-		} else if ( 
-			( client->sess.sessionTeam == TEAM_SPECTATOR ) && // don't let dead team players do free fly
-			( client->sess.spectatorState == SPECTATOR_FOLLOW ) && 
-			( ( ( client->buttons & BUTTON_ACTIVATE ) && 
-			! ( client->oldbuttons & BUTTON_ACTIVATE )) || ucmd->upmove > 0 ) &&
-			G_allowFollow(ent, TEAM_AXIS) && G_allowFollow(ent, TEAM_ALLIES) )
-		{
-			// code moved to StopFollowing
-			StopFollowing(ent);
-		}
+	
+	// attack button cycles through spectators
+	if ( ( client->buttons & BUTTON_ATTACK ) && ! ( client->oldbuttons & BUTTON_ATTACK ) ) {
+		Cmd_FollowCycle_f( ent, 1 );
 	}
+	// activate button swaps places with bot
+	else if( client->sess.sessionTeam != TEAM_SPECTATOR &&
+			( ( client->buttons & BUTTON_ACTIVATE ) && ! ( client->oldbuttons & BUTTON_ACTIVATE ) ) &&
+			( g_entities[ent->client->sess.spectatorClient].client ) &&
+			( g_entities[ent->client->sess.spectatorClient].r.svFlags & SVF_BOT ) )
+	{
+		Cmd_SwapPlacesWithBot_f( ent, ent->client->sess.spectatorClient );
+	} else if ( 
+		( client->sess.sessionTeam == TEAM_SPECTATOR ) && // don't let dead team players do free fly
+		( client->sess.spectatorState == SPECTATOR_FOLLOW ) && 
+		( ( ( client->buttons & BUTTON_ACTIVATE ) && 
+		! ( client->oldbuttons & BUTTON_ACTIVATE )) || ucmd->upmove > 0 ) &&
+		G_allowFollow(ent, TEAM_AXIS) && G_allowFollow(ent, TEAM_ALLIES) )
+	{
+		// code moved to StopFollowing
+		StopFollowing(ent);
+	}
+	
 }
 
 
@@ -1489,13 +1487,6 @@ SpectatorClientEndFrame
 */
 void SpectatorClientEndFrame( gentity_t *ent )
 {
-	// OSP - specs periodically get score updates for useful demo playback info
-	if(/*ent->client->pers.mvCount > 0 &&*/ ent->client->pers.mvScoreUpdate < level.time) {
-		ent->client->pers.mvScoreUpdate = level.time + MV_SCOREUPDATE_INTERVAL;
-		ent->client->wantsscore = qtrue;
-//		G_SendScore(ent);
-	}
-
 	// if we are doing a chase cam or a remote view, grab the latest info
 	if((ent->client->sess.spectatorState == SPECTATOR_FOLLOW) || (ent->client->ps.pm_flags & PMF_LIMBO)) {
 		int clientNum;
@@ -1507,11 +1498,6 @@ void SpectatorClientEndFrame( gentity_t *ent )
 
 		if ( do_respawn ) {
 			reinforce(ent);
-			return;
-		}
-
-		// Limbos aren't following while in MV
-		if((ent->client->ps.pm_flags & PMF_LIMBO) && ent->client->pers.mvCount > 0) {
 			return;
 		}
 
@@ -1574,10 +1560,8 @@ void SpectatorClientEndFrame( gentity_t *ent )
 	// we are at a free-floating spec state for a player,
 	// set speclock status, as appropriate
 	//	 --> Can we use something besides a powerup slot?
-	if(ent->client->pers.mvCount < 1) {
-		ent->client->ps.powerups[PW_BLACKOUT] = (G_blockoutTeam(ent, TEAM_AXIS) * TEAM_AXIS) |
-												(G_blockoutTeam(ent, TEAM_ALLIES) * TEAM_ALLIES);
-	}
+	ent->client->ps.powerups[PW_BLACKOUT] = (G_blockoutTeam(ent, TEAM_AXIS) * TEAM_AXIS) |
+											(G_blockoutTeam(ent, TEAM_ALLIES) * TEAM_ALLIES);
 }
 
 
@@ -1620,7 +1604,6 @@ extern vec3_t	playerMins, playerMaxs;
 #define WR_PUSHAMOUNT 25
 
 void WolfRevivePushEnt( gentity_t *self, gentity_t *other ) {
-	/* Vanilla TJ Ghost */
 	
 	if(!g_ghostPlayers.integer) {
 
@@ -1785,14 +1768,6 @@ void ClientEndFrame( gentity_t *ent ) {
 			ent->pain_debounce_time += time_delta;
 			ent->s.onFireEnd += time_delta;
 		}
-
-	// save network bandwidth
-#if 0
-	if ( !g_synchronousClients->integer && ent->client->ps.pm_type == PM_NORMAL ) {
-		// FIXME: this must change eventually for non-sync demo recording
-		VectorClear( ent->client->ps.viewangles );
-	}
-#endif
 
 	//
 	// If the end of unit layout is displayed, don't give

@@ -637,7 +637,6 @@ typedef struct {
 	weapon_stat_t aWeaponStats[WS_MAX+1];	// Weapon stats.  +1 to avoid invalid weapon check
 	// OSP
 
-	// VanillaTJ
 	save_position_t allies_save_pos[MAX_SAVE_POSITIONS];
 	save_position_t axis_save_pos[MAX_SAVE_POSITIONS];
 
@@ -664,24 +663,25 @@ typedef struct {
 
 	qboolean	specLocked;
 	int			specInvitedClients[MAX_CLIENTS / (sizeof(int) * 8)];
-
-	// Challenge group
-
+	int			specBlockedClients[MAX_CLIENTS / (sizeof(int) * 8)];
+	// Fireteam save limit
 	int			savelimit;
-
+	// Map ident
 	int			clientident;
-
+	// Can client send the setlevel register command to server
 	qboolean	allowRegister;
-
-	// adminlevel
+	// Cached adminlevel data
 	admin_t		uinfo;
-
 	int			password_change_count;
+	// How long since last !listmaps
 	int			lastListmapsTime;
-
+	// Print greeting on connect or not
 	qboolean	need_greeting;
+	// Have we loaded old positions already
 	qboolean	oldPositionsLoaded;
+	// Can client change password
 	qboolean	canChangePassword;
+	// Client hardware ID
     char        hardwareID[32 + 1]; // Hash len + 1 to check for spoofing
 
 	qboolean	versionOK;
@@ -784,10 +784,6 @@ typedef struct {
 	unsigned int	clientTimeNudge;	// Client cl_timenudge settings
 	int				cmd_debounce;		// Dampening of command spam
 	unsigned int	invite;				// Invitation to a team to join
-	mview_t			mv[MULTIVIEW_MAXVIEWS];	// Multiview portals
-	int				mvCount;			// Number of active portals
-	int				mvReferenceList;	// Reference list used to generate views after a map_restart
-	int				mvScoreUpdate;		// Period to send score info to MV clients
 	int				panzerDropTime;		// Time which a player dropping panzer still "has it" if limiting panzer counts
 	int				panzerSelectTime;	// *when* a client selected a panzer as spawn weapon
 	qboolean		ready;				// Ready state to begin play
@@ -2453,7 +2449,6 @@ void G_wipeCvars(void);
 ///////////////////////
 // g_cmds_ext.c
 //
-qboolean G_commandCheck(gentity_t *ent, char *cmd, qboolean fDoAnytime);
 qboolean G_commandHelp(gentity_t *ent, char *pszCommand, unsigned int dwCommand);
 qboolean G_cmdDebounce(gentity_t *ent, const char *pszCommand);
 void G_commands_cmd(gentity_t *ent, unsigned int dwCommand, qboolean fValue);
@@ -2462,7 +2457,6 @@ void G_ready_cmd(gentity_t *ent, unsigned int dwCommand, qboolean fDump);
 void G_say_teamnl_cmd(gentity_t *ent, unsigned int dwCommand, qboolean fValue);
 void G_scores_cmd(gentity_t *ent, unsigned int dwCommand, qboolean fValue);
 void G_specinvite_cmd(gentity_t *ent, unsigned int dwCommand, qboolean fLock);
-void G_speclock_cmd(gentity_t *ent, unsigned int dwCommand, qboolean fLock);
 void G_statsall_cmd(gentity_t *ent, unsigned int dwCommand, qboolean fDump);
 void G_teamready_cmd(gentity_t *ent, unsigned int dwCommand, qboolean fDump);
 void G_weaponRankings_cmd(gentity_t *ent, unsigned int dwCommand, qboolean state);
@@ -2496,26 +2490,6 @@ void G_statsPrint(gentity_t *ent, int nType);
 unsigned int G_weapStatIndex_MOD(unsigned int iWeaponMOD);
 
 ///////////////////////
-// g_multiview.c
-//
-qboolean G_smvCommands(gentity_t *ent, char *cmd);
-void G_smvAdd_cmd(gentity_t *ent);
-void G_smvAddTeam_cmd(gentity_t *ent, int nTeam);
-void G_smvDel_cmd(gentity_t *ent);
-//
-void G_smvAddView(gentity_t *ent, int pID);
-void G_smvAllRemoveSingleClient(int pID);
-unsigned int G_smvGenerateClientList(gentity_t *ent);
-qboolean G_smvLocateEntityInMVList(gentity_t *ent, int pID, qboolean fRemove);
-void G_smvRegenerateClients(gentity_t *ent, int clientList);
-void G_smvRemoveEntityInMVList(gentity_t *ent, mview_t *ref);
-void G_smvRemoveInvalidClients(gentity_t *ent, int nTeam);
-qboolean G_smvRunCamera(gentity_t *ent);
-void G_smvUpdateClientCSList(gentity_t *ent);
-
-
-
-///////////////////////
 // g_referee.c
 //
 void Cmd_AuthRcon_f(gentity_t *ent);
@@ -2524,7 +2498,6 @@ qboolean G_refCommandCheck(gentity_t *ent, char *cmd);
 void G_refHelp_cmd(gentity_t *ent);
 void G_refPlayerPut_cmd(gentity_t *ent, int team_id);
 void G_refRemove_cmd(gentity_t *ent);
-void G_refSpeclockTeams_cmd(gentity_t *ent, qboolean fLock);
 void G_refWarning_cmd(gentity_t* ent);
 void G_refMute_cmd(gentity_t *ent, qboolean mute);
 int  G_refClientnumForName(gentity_t *ent, const char *name);
@@ -2550,13 +2523,11 @@ qboolean G_checkReady(void);
 qboolean G_readyMatchState(void);
 void G_removeSpecInvite(int team);
 void G_shuffleTeams(void);
-void G_swapTeamLocks(void);
 void G_swapTeams(void);
 qboolean G_teamJoinCheck(int team_num, gentity_t *ent);
 int  G_teamID(gentity_t *ent);
 void G_teamReset(int team_num, qboolean fClearSpecLock);
 void G_verifyMatchState(int team_id);
-void G_updateSpecLock(int nTeam, qboolean fLock);
 
 
 
@@ -2659,6 +2630,8 @@ void G_AddIpMute( char *ip );
 void G_RemoveIPMute( char *ip );
 qboolean G_isIPMuted( char *ip );
 void G_ClearIPMutes();
+gentity_t *getPlayerForName(char *name, char *err, int size);
+qboolean G_commandCheck(gentity_t *ent, char *cmd, qboolean fDoAnytime);
 // g_admin.c
 // These are in g_cmds.c but they're needed in
 // adminsys
@@ -2681,6 +2654,7 @@ void G_admin_register_client(gentity_t *ent);
 qboolean G_admin_8ball(gentity_t *ent, int skiparg);
 qboolean G_admin_admintest(gentity_t *ent, int skiparg);
 qboolean G_admin_ban_check(char *userinfo, char *reason);
+qboolean G_admin_hardware_ban_check(char *hwinfo, char *reason);
 qboolean G_admin_ban(gentity_t *ent, int skiparg);
 qboolean G_admin_cancelvote(gentity_t *ent, int skiparg);
 qboolean G_admin_disable_goto(gentity_t *ent, int skiparg);

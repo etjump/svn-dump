@@ -44,7 +44,7 @@ static const struct g_admin_cmd g_admin_cmds[] = {
 	{"editcmds",	G_admin_editcommands,'A',	"Edits command permissions of target admin level.", "Syntax: !editcmds <level> <+cmd|-cmd> <+cmd2|-cmd>..."},
 	{"finger",		G_admin_finger,		'f',	"Displays target's admin level.", "Syntax: !finger <target>"},
 	{"help",		G_admin_help,		'h',	"Prints useful information about commands.", "Syntax: !help <command>"},
-	{"kick",		G_admin_kick,		'k',	"Kicks target.", "Syntax: !kick <player>"},
+	{"kick",		G_admin_kick,		'k',	"Kicks target.", "Syntax: !kick <player> <time> <reason>"},
 	{"levadd",		G_admin_levadd,		'A',	"Adds admin level to admin level database.", "Syntax: !levadd <level>"},
 	{"levedit",		G_admin_levedit,	'A',	"Edits admin level.", "Syntax: !levedit <level> <name|gtext|cmds> <third parameter>"},
 	{"levinfo",		G_admin_levinfo,	'A',	"Prints information about admin levels.", "Syntax: !levinfo or !levinfo <level>"},
@@ -650,6 +650,19 @@ qboolean G_admin_permission(gentity_t *ent, char flag) {
 	}
 	return qfalse;
 }
+
+qboolean G_admin_hardware_ban_check(char *hwinfo, char *reason) {
+	int i = 0;
+	while(g_admin_bans[i++]) {
+		if(!Q_stricmp(g_admin_bans[i]->hardware, hwinfo)) {
+			// Found ban
+			// TODO: reason
+			return qtrue;
+		}
+	}
+	return qfalse;	
+}
+
 
 qboolean G_admin_ban_check(char *userinfo, char *reason)
 {
@@ -2234,7 +2247,7 @@ qboolean G_admin_editcommands(gentity_t *ent, int skiparg) {
 		AIP(ent, "^3usage: ^7!editcmds <level> <+command|-command> <+another|-another> ...");
 		return qfalse;
 	}
-	// Let's copy all args to an array
+	// Let's copy all the args to an array
 	for( i = 2 + skiparg; i < Q_SayArgc(); i++) {
 		char arg[MAX_TOKEN_CHARS];
 		// Just in case.. should never happen tho.
@@ -2321,7 +2334,8 @@ qboolean G_admin_listmaps(gentity_t *ent, int skiparg) {
 
 	if(ent) {
 		if(ent->client->sess.lastListmapsTime != 0 && level.time - ent->client->sess.lastListmapsTime < 60000) {
-			AIP(ent, "^3!listmaps:^7 you must wait atleast 60 seconds before using !listmaps again.");
+			AIP(ent, va("^3!listmaps:^7 you must wait atleast %d seconds before using !listmaps again.", 
+				((ent->client->sess.lastListmapsTime + 60000 - level.time)/1000)));
 			return qfalse;
 		}
 	}
@@ -2346,13 +2360,14 @@ qboolean G_admin_removeuser( gentity_t *ent, int skiparg ) {
 	int levindex = -1;
 	qboolean found = qfalse;
 	char arg[MAX_TOKEN_CHARS] = "\0";
+	// Invalid argc
 	if(Q_SayArgc() != 2 + skiparg) {
 		AIP(ent, "^3usage: ^7!removeuser <username>");
 		return qfalse;
 	}
 	
 	Q_SayArgv(1 + skiparg, arg, sizeof(arg));
-	
+	// Let's see if we can find the user
 	for(i = 0; g_admin_users[i]; i++) {
 
 		if(!Q_stricmp(g_admin_users[i]->username, arg)) {
@@ -2361,14 +2376,14 @@ qboolean G_admin_removeuser( gentity_t *ent, int skiparg ) {
 			break;
 		}
 	}
-	
+	// Didn't find
     if(!found) {
 		AIP(ent, "^3!removeuser:^7 player not found.");
 		return qfalse;
 	}
-	
+	// Set the user 0
 	g_admin_users[levindex]->level = 0;
-
+	// See if there's anyone with the same username on the server and set his level to 0
 	for(i = 0; i < level.numConnectedClients; i++) {
 		gentity_t *target = NULL;
 		int id = level.sortedClients[i];
@@ -2378,6 +2393,7 @@ qboolean G_admin_removeuser( gentity_t *ent, int skiparg ) {
 		}
 	}
 	AIP(ent, va("^3!removeuser: ^7removed user %s^7.", g_admin_users[levindex]->username));
+	// Write the modified data to config
 	G_admin_writeconfig();
 	return qtrue;
 }
@@ -2419,11 +2435,11 @@ qboolean G_admin_removelevel( gentity_t *ent, int skiparg ) {
 		AIP(ent, "^3!editcommands: ^7you can't edit levels higher than yours.");
 		return qfalse;
 	}
-
+	// Get the level count
 	for(levelcount = 0; g_admin_levels[levelcount]; levelcount++) {
 		;
 	}
-	
+	// Try to find the level
 	for(i = 0; g_admin_levels[i]; i++) {
 		if(g_admin_levels[i]->level == lvl && lvl != 0) {
 			found = qtrue;
@@ -2431,30 +2447,31 @@ qboolean G_admin_removelevel( gentity_t *ent, int skiparg ) {
 			break;
 		}
 	}
-	
+	// Didn't find
 	if(!found) {
 		AIP(ent, "^3!removelevel: ^7level not found.");
 		return qfalse;
 	}
 	
-	
+	// Free the allocated space & set to point to null
 	free(g_admin_levels[levindex]);
 	g_admin_levels[levindex] = NULL;
 	levelcount--;
-	
+	// Swap the deleted level and the last level on array
+	// and sort the array
 	if(levindex != levelcount) {
 		g_admin_levels[levindex] = g_admin_levels[levelcount];
 		g_admin_levels[levelcount] = NULL;
 
 		qsort(g_admin_levels, levelcount, sizeof(admin_level_t*), adminComparator);
 	}
-	
+	// If there's anyone with the level, set their admin level to 0
 	for(i = 0; g_admin_users[i]; i++) {
 		if(g_admin_users[i]->level == lvl) {
 			g_admin_users[i]->level = 0;
 		}
 	}
-
+	// If there's anyone on server with the level, set their admin level to 0 aswell
 	for(i = 0; i < level.numConnectedClients; i++) {
 		gentity_t *target = NULL;
 		int id = level.sortedClients[i];
@@ -2464,6 +2481,7 @@ qboolean G_admin_removelevel( gentity_t *ent, int skiparg ) {
 	}
 	
 	AIP(ent, va("^3!removelevel: ^7level %d removed.", lvl));
+	// write data to admin config
 	G_admin_writeconfig();
 	
 	return qtrue;
@@ -2536,15 +2554,20 @@ qboolean G_admin_noclip(gentity_t *ent, int skiparg) {
 		}
 	}
 
-    if(ent && target->client->sess.uinfo.level >= ent->client->sess.uinfo.level) {
+    if(ent && target != ent && target->client->sess.uinfo.level >= ent->client->sess.uinfo.level) {
         AIP(ent, "^3!noclip:^7 can't noclip fellow admins.");
         return qfalse;
     }
 
-	if(ent->client->noclip) {
-		ent->client->noclip = qfalse;
+	if( !target ) {
+		// Shouldn't happen
+		return qfalse;
+	}
+
+	if(target->client->noclip) {
+		target->client->noclip = qfalse;
 	} else {
-		ent->client->noclip = qtrue;
+		target->client->noclip = qtrue;
 	}
 }
 

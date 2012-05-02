@@ -580,11 +580,6 @@ void reinforce(gentity_t *ent) {
 		return;
 	}
 
-	if(ent->client->pers.mvCount > 0) {
-		G_smvRemoveInvalidClients(ent, TEAM_AXIS);
-		G_smvRemoveInvalidClients(ent, TEAM_ALLIES);
-	}
-
 	// get team to deploy from passed entity
 	team = ent->client->sess.sessionTeam;
 
@@ -1334,10 +1329,6 @@ const char *GetParsedIP(const char *ipadd)
 	return ipge;
 }
 
-void G_admin_hardware_ban_check(gclient_t *client, char *hwinfo) {
-    // TODO: everything
-}
-
 /*
 ===========
 ClientUserInfoChanged
@@ -1390,7 +1381,9 @@ void ClientUserinfoChanged( int clientNum ) {
 
     hardwareID = Info_ValueForKey(userinfo, "hwinfo");
 
-    G_admin_hardware_ban_check(client, hardwareID);
+    if(G_admin_hardware_ban_check(hardwareID, reason)) {
+		
+	}
 
     // TODO: Check for hardware info spoofing
 
@@ -1713,6 +1706,7 @@ void LoadSavedPositions(gclient_t *cl) {
 					cl->sess.clientident = level.persSavedPositions[i].mapident;
 					trap_SendServerCommand(cl->ps.clientNum, "cpm \"^5Server:^7 Loaded old saved positions.\n\"");
 					level.persSavedPositions[i].inUse = qfalse;
+					cl->sess.oldPositionsLoaded = qtrue;
 					return;
 			}
 		}
@@ -1794,7 +1788,6 @@ void ClientBegin( int clientNum )
 
 	if(!client->sess.oldPositionsLoaded) { 
 		LoadSavedPositions(client);
-        client->sess.oldPositionsLoaded = qtrue;
     }
 
 	// count current clients and rank for scoreboard
@@ -1802,10 +1795,6 @@ void ClientBegin( int clientNum )
 
 	// No surface determined yet.	
 	ent->surfaceFlags = 0;
-
-	// OSP
-	G_smvUpdateClientCSList(ent);
-	// OSP
 }
 
 gentity_t *SelectSpawnPointFromList( char *list, vec3_t spawn_origin, vec3_t spawn_angles )
@@ -2252,10 +2241,6 @@ void ClientDisconnect( int clientNum ) {
 		return;
 	}
 
-#ifdef USEXPSTORAGE
-	G_AddXPBackup( ent );
-#endif // USEXPSTORAGE
-
 	G_RemoveClientFromFireteams( clientNum, qtrue, qfalse );
 	G_RemoveFromAllIgnoreLists( clientNum );
 	G_LeaveTank( ent, qfalse );
@@ -2386,7 +2371,6 @@ void ClientDisconnect( int clientNum ) {
 
 	// OSP
 	G_verifyMatchState(i);
-	G_smvAllRemoveSingleClient(ent - g_entities);
 	// OSP
 }
 

@@ -820,7 +820,7 @@ void CG_UpdateCvars( void ) {
 			}
 		}
 	}
-
+	
 	// Send any relevent updates
 	if(fSetFlags) {
 		CG_setClientFlags();

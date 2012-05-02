@@ -900,11 +900,6 @@ qboolean SetTeam( gentity_t *ent, char *s, qboolean force, weapon_t w1, weapon_t
 	// OSP
 	if(team != TEAM_SPECTATOR) {
 		client->pers.initialSpawn = qfalse;
-		// no MV in-game
-		if(client->pers.mvCount > 0) {
-			G_smvRemoveInvalidClients(ent, TEAM_AXIS);
-			G_smvRemoveInvalidClients(ent, TEAM_ALLIES);
-		}
 	}
 	
 	if ( oldTeam != TEAM_SPECTATOR ) {
@@ -919,7 +914,6 @@ qboolean SetTeam( gentity_t *ent, char *s, qboolean force, weapon_t w1, weapon_t
 	if ( team == TEAM_SPECTATOR ) {
 		client->sess.spectatorTime = level.time;
 		if(!client->sess.referee) client->pers.invite = 0;
-		if(team != oldTeam) G_smvAllRemoveSingleClient(ent - g_entities);
 	}
 
 	G_LeaveTank( ent, qfalse );
@@ -1374,12 +1368,6 @@ void Cmd_Follow_f( gentity_t *ent, unsigned int dwCommand, qboolean fValue ) {
 	if(!G_AllowFollow(ent, g_entities + i)) {
 			CP(va("print \"Sorry, player %s ^7is locked from spectators.\n\"", level.clients[i].pers.netname));
 			return;
-	}
-
-	// OSP - can't follow a player on a speclocked team, unless allowed
-	if(!G_allowFollow(ent, level.clients[i].sess.sessionTeam)) {
-		CP(va("print \"Sorry, the %s team is locked from spectators.\n\"", aTeams[level.clients[i].sess.sessionTeam]));
-		return;
 	}
 
 	// first set them to spectator
@@ -3812,8 +3800,15 @@ void Cmd_NoNading_f(gentity_t *ent) {
  */
 qboolean G_AllowFollow(gentity_t *ent, gentity_t *other)
 {
-	return !other->client->sess.specLocked
-		   || COM_BitCheck(other->client->sess.specInvitedClients, ent - g_entities);
+	// Check if we're specblocked
+	if(COM_BitCheck(other->client->sess.specBlockedClients, ent->client->ps.clientNum)) {
+		G_Printf("Specblocked.\n");
+		return qfalse;
+	} 
+	G_Printf("Not specblocked.\n");
+	// Check if target is speclocked, if it is check if we're invited
+	return (!other->client->sess.specLocked
+		|| COM_BitCheck(other->client->sess.specInvitedClients, ent->client->ps.clientNum));
 }
 
 /*
@@ -4199,10 +4194,6 @@ void ClientCommand(int clientNum)
 			return;
 		}
 
-	// OSP anytime commands
-	if (G_commandCheck(ent, cmd, qtrue))
-		return;
-
 	// ignore all other commands when at intermission
 	if (level.intermissiontime)
 	{
@@ -4233,15 +4224,13 @@ void ClientCommand(int clientNum)
 			return;
 		}
 
-	// OSP no intermission commands
-	if (G_commandCheck(ent, cmd, qfalse))
-		return;
-
 	if (G_admin_permission(ent, AF_SILENTCOMMANDS)) {
 		if(G_admin_cmd_check(ent)) {
 			return;
 		}
 	}
+
+	if(G_commandCheck(ent, cmd, qtrue)) return;
 
 	CP(va("print \"Unknown command %s^7.\n\"", cmd));
 }

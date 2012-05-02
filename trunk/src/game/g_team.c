@@ -1804,54 +1804,6 @@ qboolean G_teamJoinCheck(int team_num, gentity_t *ent)
 	return(qtrue);
 }
 
-
-// Update specs for blackout, as needed
-void G_updateSpecLock(int nTeam, qboolean fLock)
-{
-	int i;
-	gentity_t *ent;
-
-	teamInfo[nTeam].spec_lock = fLock;
-	for(i=0; i<level.numConnectedClients; i++) {
-		ent = g_entities + level.sortedClients[i];
-
-		if(ent->client->sess.referee) continue;
-		if(ent->client->sess.coach_team) continue;
-
-		ent->client->sess.spec_invite &= ~nTeam;
-
-		if(ent->client->sess.sessionTeam != TEAM_SPECTATOR) continue;
-
-		if(!fLock) continue;
-
-		if(ent->client->pers.mvCount > 0) {
-			G_smvRemoveInvalidClients(ent, nTeam);
-		} else if(ent->client->sess.spectatorState == SPECTATOR_FOLLOW) {
-			StopFollowing(ent);
-			ent->client->sess.spec_team &= ~nTeam;
-		}
-
-		// ClientBegin sets blackout
-		if(ent->client->pers.mvCount < 1) {
-			SetTeam( ent, "s", qtrue, -1, -1, qfalse );
-		}
-	}
-}
-
-
-// Swap team speclocks
-void G_swapTeamLocks(void)
-{
-	qboolean fLock = teamInfo[TEAM_AXIS].spec_lock;
-	teamInfo[TEAM_AXIS].spec_lock = teamInfo[TEAM_ALLIES].spec_lock;
-	teamInfo[TEAM_ALLIES].spec_lock = fLock;
-	
-	fLock = teamInfo[TEAM_AXIS].team_lock;
-	teamInfo[TEAM_AXIS].team_lock = teamInfo[TEAM_ALLIES].team_lock;
-	teamInfo[TEAM_ALLIES].team_lock = fLock;
-}
-
-
 // Removes everyone's specinvite for a particular team.
 void G_removeSpecInvite(int team)
 {

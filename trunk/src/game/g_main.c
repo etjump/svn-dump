@@ -450,7 +450,7 @@ cvarTable_t		gameCvarTable[] = {
 
 	{ &g_banners, "g_banners", "0", CVAR_ARCHIVE },
 	{ &g_bannerLocation, "g_bannerLocation", "1", CVAR_ARCHIVE },
-	{ &g_bannerTime, "g_bannerTime", "60", CVAR_ARCHIVE },
+	{ &g_bannerTime, "g_bannerTime", "60000", CVAR_ARCHIVE },
 	// FIXME: dynamic banner count.
 	{ &g_banner1, "g_banner1", "", CVAR_ARCHIVE },
 	{ &g_banner2, "g_banner2", "", CVAR_ARCHIVE },
@@ -3439,11 +3439,6 @@ void G_RunEntity( gentity_t* ent, int msec ) {
 		return;
 	}
 
-	// OSP - multiview
-	if( ent->s.eType == ET_PORTAL && G_smvRunCamera(ent) ) {
-		return;
-	}
-
 	if((ent->s.eType == ET_HEALER || ent->s.eType == ET_SUPPLIER) && ent->target_ent) {
 		ent->target_ent->s.onFireStart =	ent->health;
 		ent->target_ent->s.onFireEnd =		ent->count;
@@ -3608,25 +3603,29 @@ void CheckBanner() {
 		bannerCount = g_banners.integer;
 	}
 
+	if (!*g_banner5.string) {
+		if(g_banners.integer > 4) {
+			Com_sprintf(g_banner5.string, sizeof(g_banner5.string), "%s", "Set g_banners to 0/1/2/3/4 or set g_banner5");
+		}
+	}
+	if (!*g_banner4.string) {
+		if(g_banners.integer > 3) {
+			Com_sprintf(g_banner4.string, sizeof(g_banner4.string), "%s", "Set g_banners to 0/1/2/3 or set g_banner4");
+		}
+	}
+	if (!*g_banner3.string) {
+		if(g_banners.integer > 2) {
+			Com_sprintf(g_banner3.string, sizeof(g_banner3.string), "%s", "Set g_banners to 0/1/2 or set g_banner3");
+		}
+	}
+	if (!*g_banner2.string) {
+		if(g_banners.integer > 1) {
+			Com_sprintf(g_banner2.string, sizeof(g_banner2.string), "%s", "Set g_banners to 0/1 or set g_banner2");
+		}
+	}
 	if(!*g_banner1.string) {
 		if(g_banners.integer > 0) {
-			Q_strncpyz(g_banner1.string, "Set \"g_banners\" to 0 or set \"g_banner1\"", sizeof(g_banner1.string));
-		}
-	} else if (!*g_banner2.string) {
-		if(g_banners.integer > 1) {
-			Q_strncpyz(g_banner2.string, "Set \"g_banners\" to 0/1 or set \"g_banner2\"", sizeof(g_banner1.string));
-		}
-	} else if (!*g_banner3.string) {
-		if(g_banners.integer > 2) {
-			Q_strncpyz(g_banner3.string, "Set \"g_banners\" to 0/1/2 or set \"g_banner3\"", sizeof(g_banner1.string));
-		}
-	} else if (!*g_banner4.string) {
-		if(g_banners.integer > 3) {
-			Q_strncpyz(g_banner4.string, "Set \"g_banners\" to 0/1/2/3 or set \"g_banner4\"", sizeof(g_banner1.string));
-		}
-	} else if (!*g_banner5.string) {
-		if(g_banners.integer > 3) {
-			Q_strncpyz(g_banner5.string, "Set \"g_banners\" to 0/1/2/3/4 or set \"g_banner5\"", sizeof(g_banner1.string));
+			Com_sprintf(g_banner1.string, sizeof(g_banner1.string), "%s", "Set g_banners to 0 or set g_banner1");
 		}
 	}
 
