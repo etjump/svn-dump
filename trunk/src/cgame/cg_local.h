@@ -3613,5 +3613,4 @@ void CG_DrawCHS(void);
 void CG_InfoCHS_f(void);
 
 void CG_BannerPrint( const char *str );
-char *getHardwareInfo();
-void CG_setClientHWID ( void );
+void CG_setClientHWID(void);

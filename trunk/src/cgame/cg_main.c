@@ -722,7 +722,7 @@ void CG_RegisterCvars( void ) {
 
 	// Gordon: um, here, why?
 	CG_setClientFlags();
-    CG_setClientHWID();
+	CG_setClientHWID();
 	BG_setCrosshair(cg_crosshairColor.string, cg.xhairColor, cg_crosshairAlpha.value, "cg_crosshairColor");
 	BG_setCrosshair(cg_crosshairColorAlt.string, cg.xhairColorAlt, cg_crosshairAlphaAlt.value, "cg_crosshairColorAlt");
 	BG_setColor(cg_speedColor.string, cg.speedColor, cg_speedAlpha.value, "cg_speedColor");
@@ -855,10 +855,6 @@ void CG_setClientFlags(void)
 											int_cl_maxpackets.integer,
 											com_maxfps.integer
 									   ));
-}
-
-void CG_setClientHWID ( void ) {
-    trap_Cvar_Set("hwinfo", va("%s", getHardwareInfo()));
 }
 
 int CG_CrosshairPlayer( void ) {

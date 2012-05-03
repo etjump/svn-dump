@@ -651,16 +651,32 @@ qboolean G_admin_permission(gentity_t *ent, char flag) {
 	return qfalse;
 }
 
-qboolean G_admin_hardware_ban_check(char *hwinfo, char *reason) {
+qboolean G_admin_hardware_ban_check(char *hwinfo) {
 	int i = 0;
-	while(g_admin_bans[i++]) {
-		if(!Q_stricmp(g_admin_bans[i]->hardware, hwinfo)) {
+	qboolean found = qfalse;
+	time_t t;
+	if(!time(&t)) return qfalse;
+
+	t = t - ADMIN_BAN_EXPIRE_OFFSET;
+
+	if(!hwinfo) return qfalse;
+
+	for(i = 0; g_admin_bans[i]; i++) {
+		if(g_admin_bans[i]->expires != 0 &&
+			(g_admin_bans[i]->expires - t) < 1)
+			continue;
+		if(!Q_strncmp(g_admin_bans[i]->hardware, hwinfo, sizeof(g_admin_bans[i]->hardware))) {
 			// Found ban
-			// TODO: reason
-			return qtrue;
+			found = qtrue;
+			break;
 		}
 	}
-	return qfalse;	
+
+	if(!found) {
+		return qfalse;
+	}
+
+	return qtrue;
 }
 
 
@@ -1502,6 +1518,8 @@ qboolean G_admin_ban(gentity_t *ent, int skiparg) {
 	ip = Info_ValueForKey(userinfo, "ip");
 
     hardware = Info_ValueForKey(userinfo, "hwinfo");
+
+	G_Printf("adding hardware info: %s\n", hardware);
 
 	b = malloc(sizeof(admin_ban_t));
 

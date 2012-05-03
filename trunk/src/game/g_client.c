@@ -1350,9 +1350,6 @@ void ClientUserinfoChanged( int clientNum ) {
 	char	skillStr[16] = "";
 	char	medalStr[16] = "";
 	int		characterIndex;
-#define HASH_LEN 32
-    char    *hardwareID;
-    char    *reason;
 
 
 	ent = g_entities + clientNum;
@@ -1377,12 +1374,6 @@ void ClientUserinfoChanged( int clientNum ) {
 #endif
 	{
 		G_Printf("Userinfo: %s\n", userinfo);
-	}
-
-    hardwareID = Info_ValueForKey(userinfo, "hwinfo");
-
-    if(G_admin_hardware_ban_check(hardwareID, reason)) {
-		
 	}
 
     // TODO: Check for hardware info spoofing
@@ -1728,6 +1719,8 @@ void ClientBegin( int clientNum )
 	gclient_t	*client;
 	int			flags;
 	int			spawn_count;		// DHM - Nerve
+	char		*hardwareID;
+	char		userinfo[MAX_INFO_STRING] ="\0";
 
 	ent = g_entities + clientNum;
 
@@ -1795,6 +1788,20 @@ void ClientBegin( int clientNum )
 
 	// No surface determined yet.	
 	ent->surfaceFlags = 0;
+
+	trap_GetUserinfo(clientNum, userinfo, sizeof(userinfo));
+
+	hardwareID = Info_ValueForKey(userinfo, "hwinfo");
+	// FIXME: check for local client instead of g_dedicated
+	if(G_admin_hardware_ban_check(hardwareID)) {
+		if(g_dedicated.integer != 0) {
+			G_LogPrintf("Banned player %s tried to connect.\n", (g_entities + clientNum)->client->pers.netname);
+			trap_DropClient(clientNum, "You are banned from this server.", 180);
+			return;
+		} else {
+			G_LogPrintf("server: no hardware ban check on non-dedicated servers.\n");
+		}
+	}
 }
 
 gentity_t *SelectSpawnPointFromList( char *list, vec3_t spawn_origin, vec3_t spawn_angles )

@@ -43,7 +43,7 @@
 #define PASSWORD_LEN 40
 #define MAX_STRING_CHARS 1024
 #define MAX_BANS 512
-#define MAX_HASH_LEN 32
+#define HWID_LEN 40
 
 // Offset for ban, don't ask.
 #define ADMIN_BAN_EXPIRE_OFFSET 946490400
@@ -66,7 +66,7 @@ typedef struct {
 typedef struct {
 	char name[MAX_NAME_LENGTH];
 	char ip[18];
-    char hardware[MAX_HASH_LEN+1];
+	char hardware[HWID_LEN+1];
 	char reason[MAX_STRING_CHARS];
 	char made[50];
 	int expires;

@@ -3802,10 +3802,8 @@ qboolean G_AllowFollow(gentity_t *ent, gentity_t *other)
 {
 	// Check if we're specblocked
 	if(COM_BitCheck(other->client->sess.specBlockedClients, ent->client->ps.clientNum)) {
-		G_Printf("Specblocked.\n");
 		return qfalse;
 	} 
-	G_Printf("Not specblocked.\n");
 	// Check if target is speclocked, if it is check if we're invited
 	return (!other->client->sess.specLocked
 		|| COM_BitCheck(other->client->sess.specInvitedClients, ent->client->ps.clientNum));

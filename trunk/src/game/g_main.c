@@ -43,9 +43,6 @@ vmCvar_t	g_debugDamage;
 vmCvar_t	g_debugAlloc;
 vmCvar_t	g_debugBullets;	//----(SA)	added
 vmCvar_t	g_motd;
-#ifdef ALLOW_GSYNC
-vmCvar_t	g_synchronousClients;
-#endif // ALLOW_GSYNC
 vmCvar_t	g_warmup;
 
 // NERVE - SMF

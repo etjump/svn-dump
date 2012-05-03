@@ -2654,7 +2654,7 @@ void G_admin_register_client(gentity_t *ent);
 qboolean G_admin_8ball(gentity_t *ent, int skiparg);
 qboolean G_admin_admintest(gentity_t *ent, int skiparg);
 qboolean G_admin_ban_check(char *userinfo, char *reason);
-qboolean G_admin_hardware_ban_check(char *hwinfo, char *reason);
+qboolean G_admin_hardware_ban_check(char *hwinfo);
 qboolean G_admin_ban(gentity_t *ent, int skiparg);
 qboolean G_admin_cancelvote(gentity_t *ent, int skiparg);
 qboolean G_admin_disable_goto(gentity_t *ent, int skiparg);
