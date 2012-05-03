@@ -15,6 +15,7 @@ cgame/cg_event.c
 cgame/cg_fireteamoverlay.c
 cgame/cg_fireteams.c
 cgame/cg_flamethrower.c
+cgame/cg_hardware.c
 cgame/cg_info.c
 cgame/cg_limbopanel.c
 cgame/cg_loadpanel.c

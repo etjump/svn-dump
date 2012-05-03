@@ -31,7 +31,6 @@ game/g_client.c
 game/g_cmds.c
 game/g_cmds_ext.c
 game/g_combat.c
-game/g_config.c
 game/g_fireteams.c
 game/g_items.c
 game/g_main.c
@@ -40,10 +39,8 @@ game/g_mem.c
 game/g_misc.c
 game/g_missile.c
 game/g_mover.c
-game/g_multiview.c
 game/g_props.c
 game/g_referee.c
-game/g_save.c
 game/g_script.c
 game/g_script_actions.c
 game/g_session.c
