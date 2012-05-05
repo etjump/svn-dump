@@ -3228,8 +3228,8 @@ void Cmd_WeaponStat_f ( gentity_t* ent ) {
 	}
 	trap_Argv( 1, buffer, 16 );
 	stat = atoi(buffer);
-
-	trap_SendServerCommand( ent-g_entities, va( "rws %i %i", ent->client->sess.aWeaponStats[stat].atts, ent->client->sess.aWeaponStats[stat].hits ) );
+	if(stat >= 0 && stat < WS_MAX) 
+		trap_SendServerCommand( ent-g_entities, va( "rws %i %i", ent->client->sess.aWeaponStats[stat].atts, ent->client->sess.aWeaponStats[stat].hits ) );
 }
 
 void Cmd_IntermissionWeaponStats_f ( gentity_t* ent ) {
@@ -4094,6 +4094,25 @@ void ClientCommand(int clientNum)
 	if (!Q_stricmp(cmd, "request_greeting"))
 	{
 		G_admin_greeting(ent);
+		return;
+	}
+	// Very random name for hwid check
+	if (!Q_stricmp(cmd, "sc2")) {
+		char *reason = 0;
+		char hardware_id[MAX_TOKEN_CHARS];
+
+		if(trap_Argc() != 2) {
+			G_LogPrintf("%s was kicked for hardware spoofing.\n", ent->client->pers.netname);
+			trap_DropClient( clientNum, "you were kicked for spoofing hardware id", 0 );
+			return;
+		}
+
+		trap_Argv(1, hardware_id, sizeof(hardware_id));
+
+		reason = CheckSpoofing( ent->client, hardware_id );
+		if(reason) {
+			trap_DropClient( clientNum, va("^1%s", reason), 0 );
+		}
 		return;
 	}
 

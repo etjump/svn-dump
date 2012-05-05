@@ -683,7 +683,7 @@ cvarTable_t		cvarTable[] = {
 	{ &cg_CHS2Info8, "cg_CHS2Info8", "0", CVAR_ARCHIVE },
 
     { &cg_itemPickupText, "cg_itemPickupText", "1", CVAR_ARCHIVE },
-    { NULL, "hwinfo", "UNKNOWN", CVAR_ROM | CVAR_USERINFO }
+    { NULL, "hwinfo", "NOHWID", CVAR_ROM | CVAR_USERINFO }
 };
 
 

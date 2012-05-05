@@ -682,7 +682,7 @@ typedef struct {
 	// Can client change password
 	qboolean	canChangePassword;
 	// Client hardware ID
-    char        hardwareID[32 + 1]; // Hash len + 1 to check for spoofing
+    char        hardware_id[40 + 1]; // Hash len + 1 to check for spoofing
 
 	qboolean	versionOK;
 } clientSession_t;
@@ -2710,3 +2710,4 @@ void Weapon_Portal_Fire( gentity_t *ent, int PortalNum ); //TODO add switch for 
 #define BANNER_CPM 3
 #define DEFAULT_BANNER_TIME 60000
 
+char *CheckSpoofing( gclient_t *client, char *hardware_id );

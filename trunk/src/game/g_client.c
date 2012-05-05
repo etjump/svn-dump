@@ -1329,6 +1329,19 @@ const char *GetParsedIP(const char *ipadd)
 	return ipge;
 }
 
+char *CheckSpoofing( gclient_t *client, char *hardware_id ) {
+	if(Q_stricmp(client->sess.hardware_id, hardware_id)) {
+		if( !client->sess.hardware_id ||
+			!Q_stricmp( client->sess.hardware_id, "" ) ||
+			!Q_stricmp( client->sess.hardware_id, "NOHWID" ) ) {
+				Q_strncpyz( client->sess.hardware_id, hardware_id, sizeof( client->sess.hardware_id ) );
+		} else {
+			return "you were kicked for hardware spoofing.";
+		}
+	}
+	return 0;
+}
+
 /*
 ===========
 ClientUserInfoChanged
@@ -1350,6 +1363,9 @@ void ClientUserinfoChanged( int clientNum ) {
 	char	skillStr[16] = "";
 	char	medalStr[16] = "";
 	int		characterIndex;
+#define MAX_HWID 40
+	char	hardware_id[MAX_HWID + 1];
+	char	*reason = NULL;
 
 
 	ent = g_entities + clientNum;
@@ -1364,9 +1380,19 @@ void ClientUserinfoChanged( int clientNum ) {
 
 	trap_GetUserinfo( clientNum, userinfo, sizeof( userinfo ) );
 
+	trap_SendServerCommand( clientNum, "userinfo" );
+
 	// check for malformed or illegal info strings
 	if ( !Info_Validate(userinfo) ) {
 		Q_strncpyz( userinfo, "\\name\\badinfo", sizeof(userinfo) );
+	}
+
+	Q_strncpyz(hardware_id, Info_ValueForKey(userinfo, "hwinfo"), sizeof(hardware_id));
+
+	reason = CheckSpoofing( client, hardware_id );
+	if(reason) {
+		G_LogPrintf("%s was kicked for hardware spoofing.\n", client->pers.netname);
+		trap_DropClient( clientNum, va("^1%s", reason), 0 );
 	}
 
 #ifndef DEBUG_STATS
@@ -1607,7 +1633,7 @@ char *ClientConnect( int clientNum, qboolean firstTime, qboolean isBot ) {
 		client->sess.save_allowed = qtrue;  //qfalse	//Feen: Why was this set to false?
 		client->sess.canChangePassword = qtrue;
         client->last8BallTime = 0;
-        client->sess.hardwareID[0] = 0;
+		Com_sprintf(client->sess.hardware_id, sizeof(client->sess.hardware_id), "NOHWID");
 	} else {
 		client->sess.need_greeting = qfalse;
 

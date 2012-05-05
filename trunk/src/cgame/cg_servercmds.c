@@ -1966,7 +1966,6 @@ void CG_dumpStats(void)
 }
 // -OSP
 
-
 /*
 =================
 CG_ServerCommand
@@ -2029,6 +2028,12 @@ static void CG_ServerCommand( void ) {
 			cgs.teamobjectiveStats[i] = atoi(CG_Argv(start++));
 		}
 
+		return;
+	}
+
+	if ( !Q_stricmp( cmd, "userinfo" ) ) {
+		CG_setClientHWID();
+		CG_sendClientHWID();
 		return;
 	}
 

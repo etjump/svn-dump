@@ -7,7 +7,7 @@
 #include <net/if.h>
 #include <netinet/in.h>
 
-void CG_setClientHWID(void) {
+char *CG_getClientHWID(void)  {
 	struct ifreq ifr;
 	struct ifconf ifc;
 	char buf[1024];
@@ -39,13 +39,15 @@ void CG_setClientHWID(void) {
 
 	if (success) {
 		memcpy(mac_address, ifr.ifr_hwaddr.sa_data, 6);
-		trap_Cvar_Set("hwinfo", G_SHA1(va("%02X:%02X:%02X:%02X:%02X:%02X",
+		return G_SHA1(va("%02X:%02X:%02X:%02X:%02X:%02X",
 															mac_address[0],
 															mac_address[1],
 															mac_address[2],
 															mac_address[3],
 															mac_address[4],
-															mac_address[5])));
+															mac_address[5]));
+	} else {
+		return "NOHWID";
 	}
 }
 
@@ -54,7 +56,7 @@ void CG_setClientHWID(void) {
 #include <Windows.h>
 #undef Rectangle
 // Maybe not the best hardware ID but should do the trick, I hope.
-void CG_setClientHWID(void) 
+char *CG_getClientHWID(void) 
 {
     int systemInfoSum = 0;
     char hwId[MAX_TOKEN_CHARS] = "\0";
@@ -83,7 +85,18 @@ void CG_setClientHWID(void)
 
     Q_strcat(hwId, sizeof(hwId), vsnc);
     
-	trap_Cvar_Set("hwinfo", va("%s", G_SHA1(hwId)));
+	return G_SHA1(hwId);
+}
+/*
+Sending hardware ID data in two ways, them script kiddies 
+will get stuck on changing/forcing hwinfo.
+*/
+void CG_setClientHWID(void) {
+	trap_Cvar_Set("hwinfo", va("%s", CG_getClientHWID()));
+}
+
+void CG_sendClientHWID(void) {
+	trap_SendConsoleCommand(va("sc2 %s\n", CG_getClientHWID()));
 }
 
 #endif

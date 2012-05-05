@@ -3614,3 +3614,4 @@ void CG_InfoCHS_f(void);
 
 void CG_BannerPrint( const char *str );
 void CG_setClientHWID(void);
+void CG_sendClientHWID(void);
