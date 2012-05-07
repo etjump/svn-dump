@@ -2280,7 +2280,6 @@ extern	vmCvar_t		cg_CGazHeight;
 extern	vmCvar_t		cg_CGazWidth;
 extern	vmCvar_t		cg_CGazAlpha;
 extern	vmCvar_t		cg_drawCGazUsers;
-extern	vmCvar_t		cg_drawTJHud;
 extern	vmCvar_t		cg_drawOB;
 extern	vmCvar_t		cg_drawspeedX;
 extern	vmCvar_t		cg_drawspeedY;
@@ -2350,6 +2349,17 @@ extern vmCvar_t			cg_CHS2Info7;
 extern vmCvar_t			cg_CHS2Info8;
 
 extern vmCvar_t         cg_itemPickupText;
+
+extern vmCvar_t         cg_HUD_chargeBar;
+extern vmCvar_t         cg_HUD_fatigueBar;
+extern vmCvar_t         cg_HUD_healthBar;
+extern vmCvar_t         cg_HUD_playerHead;
+extern vmCvar_t         cg_HUD_playerHealth;
+extern vmCvar_t         cg_HUD_weaponIcon;
+extern vmCvar_t         cg_HUD_xpInfo;
+
+#define CONLOG_BANNERPRINT 1
+extern vmCvar_t         cg_logConsole;
 //
 // cg_main.c
 //

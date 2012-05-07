@@ -363,7 +363,8 @@ struct gentity_s {
 
 	// Rafael - sniper variable
 	// sniper uses delay, random, radius
-	int			radius;
+	int			radius; // Zero: also for vortex
+	int			force;
 	float		delay;
 
 	// JOSEPH 10-11-99
@@ -667,11 +668,11 @@ typedef struct {
 	// Fireteam save limit
 	int			savelimit;
 	// Map ident
-	int			clientident;
+	int			client_map_id;
 	// Can client send the setlevel register command to server
 	qboolean	allowRegister;
 	// Cached adminlevel data
-	admin_t		uinfo;
+	admin_t		admin_data;
 	int			password_change_count;
 	// How long since last !listmaps
 	int			lastListmapsTime;
@@ -2630,7 +2631,7 @@ void G_AddIpMute( char *ip );
 void G_RemoveIPMute( char *ip );
 qboolean G_isIPMuted( char *ip );
 void G_ClearIPMutes();
-gentity_t *getPlayerForName(char *name, char *err, int size);
+gentity_t *getPlayerPtrForName(char *name, char *err, int size);
 qboolean G_commandCheck(gentity_t *ent, char *cmd, qboolean fDoAnytime);
 // g_admin.c
 // These are in g_cmds.c but they're needed in
@@ -2650,7 +2651,7 @@ void G_admin_identify(gentity_t *ent);
 void G_admin_identify_all();
 void G_admin_login(gentity_t *ent);
 void G_admin_register_client(gentity_t *ent);
-
+qboolean G_admin_hasPermission(gentity_t *ent, char flag);
 qboolean G_admin_8ball(gentity_t *ent, int skiparg);
 qboolean G_admin_admintest(gentity_t *ent, int skiparg);
 qboolean G_admin_ban_check(char *userinfo, char *reason);
@@ -2678,7 +2679,6 @@ qboolean G_admin_setlevel(gentity_t *ent, int skiparg);
 qboolean G_admin_spec(gentity_t *ent, int skiparg);
 qboolean G_admin_unban(gentity_t *ent, int skiparg);
 qboolean G_admin_unmute(gentity_t *ent, int skiparg);
-qboolean G_admin_permission(gentity_t *ent, char flag);
 qboolean G_admin_editcommands(gentity_t *ent, int skiparg);
 qboolean G_admin_listflags( gentity_t *ent, int skiparg );
 qboolean G_admin_levinfo( gentity_t *ent, int skiparg );
@@ -2711,3 +2711,13 @@ void Weapon_Portal_Fire( gentity_t *ent, int PortalNum ); //TODO add switch for 
 #define DEFAULT_BANNER_TIME 60000
 
 char *CheckSpoofing( gclient_t *client, char *hardware_id );
+
+void ChatPrintTo(gentity_t *ent, char *message);
+void ChatPrintAll(char *message);
+void CPMPrintTo(gentity_t *ent, char *message);
+void CPMPrintAll(char *message);
+void CPPrintAll(char *message, qboolean toConsole);
+void CPPrintTo(gentity_t *ent, char *message);
+void CPPrintAll(char *message);
+void PrintTo(gentity_t *ent, char *message);
+void PrintAll(gentity_t *ent, char *message);

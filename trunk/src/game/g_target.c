@@ -1276,7 +1276,7 @@ void target_set_ident_use( gentity_t *ent, gentity_t *other, gentity_t *activato
 	if(!activator->client)
 		return;
 	
-	activator->client->sess.clientident = ent->ident;
+	activator->client->sess.client_map_id = ent->ident;
 }
 
 void SP_target_set_ident( gentity_t *ent ) {
@@ -1297,19 +1297,19 @@ void target_activate_use ( gentity_t *self, gentity_t *other, gentity_t *activat
 	qboolean activate = qfalse;
 
 	if(self->spawnflags & 1) {
-		if(self->reqident < activator->client->sess.clientident) {
+		if(self->reqident < activator->client->sess.client_map_id) {
 			activate = qtrue;
 		}
 	} else if (self->spawnflags & 2) {
-		if(self->reqident != activator->client->sess.clientident) {
+		if(self->reqident != activator->client->sess.client_map_id) {
 			activate = qtrue;
 		}
 	} else if (self->spawnflags & 4) {
-		if(self->reqident > activator->client->sess.clientident) {
+		if(self->reqident > activator->client->sess.client_map_id) {
 			activate = qtrue;
 		}
 	} else {
-		if(self->reqident == activator->client->sess.clientident) {
+		if(self->reqident == activator->client->sess.client_map_id) {
 			activate = qtrue;
 		}
 	}
@@ -1444,13 +1444,13 @@ void target_increase_ident_use ( gentity_t *self, gentity_t *other, gentity_t *a
 	} 
 
 	if(inc < 0) {
-		if(activator->client->sess.clientident + inc < 0) {
-			activator->client->sess.clientident = 0;
+		if(activator->client->sess.client_map_id + inc < 0) {
+			activator->client->sess.client_map_id = 0;
 		} else {
-			activator->client->sess.clientident += inc;
+			activator->client->sess.client_map_id += inc;
 		}
 	} else {
-		activator->client->sess.clientident += inc;
+		activator->client->sess.client_map_id += inc;
 	}
 }
 

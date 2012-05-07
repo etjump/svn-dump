@@ -748,7 +748,7 @@ void Cmd_SpecBlock_f ( gentity_t *ent, unsigned int dwCommand, qboolean block ) 
 
 	trap_Argv(1, arg, sizeof(arg));
 
-	other = getPlayerForName(arg, error, sizeof(error));
+	other = getPlayerPtrForName(arg, error, sizeof(error));
 	clientNum = other->client->ps.clientNum;
 	if(!other) {
 		CP(va("print \"%s\n\"", error));

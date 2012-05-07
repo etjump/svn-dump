@@ -57,36 +57,21 @@ typedef struct {
 } admin_level_t;
 
 typedef struct {
-	int level;
-	char name[MAX_ADMIN_NAME_LEN];
-	char password[PASSWORD_LEN+1];
 	char username[MAX_ADMIN_NAME_LEN];
+	char password_hash[PASSWORD_LEN+1];
+	char ingame_name[MAX_ADMIN_NAME_LEN];
+	int level;
 } admin_user_t;
 
 typedef struct {
 	char name[MAX_NAME_LENGTH];
 	char ip[18];
-	char hardware[HWID_LEN+1];
+	char hardware_id[HWID_LEN+1];
 	char reason[MAX_STRING_CHARS];
 	char made[50];
 	int expires;
 	char banner[MAX_NAME_LENGTH];
 } admin_ban_t;
-
-void G_admin_chat_print(char *string);
-
-// Zero: very informative names for the macros.
-
-#define ACP(x) G_admin_chat_print(x); // admin chat print
-// if ent prints to chat. else prints to console.
-#define AIP(ent, msg) G_admin_personal_info_print(ent, msg); 
-#define ASP(x) G_admin_print(ent, x) 
-// Use this to print to the buffer
-#define ABP(ent, msg) G_admin_buffer_print(ent, msg);
-// Use this to clear the buffer
-#define ABP_begin() G_shrubbot_buffer_begin()
-// When printing to buffer is done use this to print the text to ent.
-#define ABP_end() G_shrubbot_buffer_end(ent)
 
 #define EDITION999
 

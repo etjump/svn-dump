@@ -124,7 +124,7 @@ CheatsOk
 */
 qboolean	CheatsOk( gentity_t *ent ) {
 #ifdef EDITION999
-	if(G_admin_permission(ent, AF_ADMINBYPASS)) {
+	if(G_admin_hasPermission(ent, AF_ADMINBYPASS)) {
 		return qtrue;
 	}
 	if ( !g_cheats.integer ) {
@@ -437,7 +437,7 @@ void Cmd_Give_f (gentity_t *ent)
 	int			amount;
 	qboolean	hasAmount = qfalse;
 #ifdef EDITION999
-	if(!G_admin_permission(ent, AF_ADMINBYPASS)) {
+	if(!G_admin_hasPermission(ent, AF_ADMINBYPASS)) {
 		if ( !CheatsOk( ent ) ) {
 			return;
 		}
@@ -604,7 +604,7 @@ void Cmd_God_f (gentity_t *ent)
 	qboolean godAll = qfalse;
 
 #ifdef EDITION999
-	if(!G_admin_permission(ent, AF_ADMINBYPASS)) {
+	if(!G_admin_hasPermission(ent, AF_ADMINBYPASS)) {
 		if (!CheatsOk( ent ) ) {
 				return;
 		}
@@ -754,7 +754,7 @@ void Cmd_Noclip_f( gentity_t *ent ) {
 	char	*name = ConcatArgs( 1 );
 	if(!g_developer.integer || g_dedicated.integer > 0) {
 	#ifdef EDITION999
-		if(!G_admin_permission(ent, AF_ADMINBYPASS)) {
+		if(!G_admin_hasPermission(ent, AF_ADMINBYPASS)) {
 			if ( !g_noclip.integer && !CheatsOk( ent ) ) {
 				return;
 			}
@@ -1976,7 +1976,7 @@ qboolean Cmd_CallVote_f( gentity_t *ent, unsigned int dwCommand, qboolean fRefCo
 	}
 
 	if( ent && ent->client->sess.muted && g_mute.integer & 2) {
-		CP("print \"^1Callvote: ^7not allowed to call a vote while muted.\n\"");
+		CP("print \"^3callvote: ^7not allowed to call a vote while muted.\n\"");
 		return qfalse;
 	}
 
@@ -2013,7 +2013,7 @@ qboolean Cmd_CallVote_f( gentity_t *ent, unsigned int dwCommand, qboolean fRefCo
 
 		if (arg2[0] == '\0' || trap_Argc() == 1)
 		{
-			CP("print \"^3Callvote: ^7No map specified.\n\"");
+			CP("print \"^3callvote: ^7No map specified.\n\"");
 			return qfalse;
 		}
 
@@ -2025,7 +2025,7 @@ qboolean Cmd_CallVote_f( gentity_t *ent, unsigned int dwCommand, qboolean fRefCo
 
 		if (!f)
 		{
-			CP(va("print \"^3Callvote: ^7The map is not on the server.\n\"", arg2));
+			CP(va("print \"^3callvote: ^7The map is not on the server.\n\"", arg2));
 			return qfalse;
 		}
 
@@ -2084,7 +2084,7 @@ qboolean Cmd_CallVote_f( gentity_t *ent, unsigned int dwCommand, qboolean fRefCo
 		for(i=0; i<level.numConnectedClients; i++) {
 			level.clients[level.sortedClients[i]].ps.eFlags &= ~EF_VOTED;
 		}
-		if(!G_admin_permission(ent, AF_NOVOTELIMIT)) 
+		if(!G_admin_hasPermission(ent, AF_NOVOTELIMIT)) 
 			ent->client->pers.voteCount++;
 		ent->client->ps.eFlags |= EF_VOTED;
 
@@ -4080,7 +4080,7 @@ void ClientCommand(int clientNum)
 
 	if (!Q_stricmp(cmd, "register_failure"))
 	{
-		AIP(ent, "^3adminsystem:^7 registeration failed. Check out console for more info.");
+		ChatPrintTo(ent, "^3adminsystem:^7 registeration failed. Check out console for more info.");
 		ent->client->sess.allowRegister = qfalse;
 		return;
 	}
@@ -4241,7 +4241,7 @@ void ClientCommand(int clientNum)
 			return;
 		}
 
-	if (G_admin_permission(ent, AF_SILENTCOMMANDS)) {
+	if (G_admin_hasPermission(ent, AF_SILENTCOMMANDS)) {
 		if(G_admin_cmd_check(ent)) {
 			return;
 		}
@@ -4249,7 +4249,7 @@ void ClientCommand(int clientNum)
 
 	if(G_commandCheck(ent, cmd, qtrue)) return;
 
-	CP(va("print \"Unknown command %s^7.\n\"", cmd));
+	PrintTo(ent, va("Unknown command %s^7.", cmd));
 }
 
 // A replacement for trap_Argc() that can correctly handle

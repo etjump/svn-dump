@@ -258,7 +258,7 @@ int G_Kick_v( gentity_t *ent, unsigned int dwVoteIndex, char *arg, char *arg2, q
 			return G_INVALID;
 		}
 
-		if(G_admin_permission( &g_entities[pid], AF_IMMUNITY )) {
+		if(G_admin_hasPermission( &g_entities[pid], AF_IMMUNITY )) {
 			G_refPrintf( ent, "Can't vote to kick admins!" );
 			return G_INVALID;
 		}
@@ -308,7 +308,7 @@ int G_Mute_v(gentity_t *ent, unsigned int dwVoteIndex, char *arg, char *arg2, qb
 			return(G_INVALID);
 		}
 
-		if(G_admin_permission( &g_entities[pid], AF_IMMUNITY )) {
+		if(G_admin_hasPermission( &g_entities[pid], AF_IMMUNITY )) {
 			G_refPrintf( ent, "Can't vote to mute admins!" );
 			return G_INVALID;
 		}

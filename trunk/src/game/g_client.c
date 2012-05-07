@@ -1365,7 +1365,7 @@ void ClientUserinfoChanged( int clientNum ) {
 	int		characterIndex;
 #define MAX_HWID 40
 	char	hardware_id[MAX_HWID + 1];
-	char	*reason = NULL;
+	char	*kick_reason = NULL;
 
 
 	ent = g_entities + clientNum;
@@ -1389,10 +1389,10 @@ void ClientUserinfoChanged( int clientNum ) {
 
 	Q_strncpyz(hardware_id, Info_ValueForKey(userinfo, "hwinfo"), sizeof(hardware_id));
 
-	reason = CheckSpoofing( client, hardware_id );
-	if(reason) {
+	kick_reason = CheckSpoofing( client, hardware_id );
+	if(kick_reason) {
 		G_LogPrintf("%s was kicked for hardware spoofing.\n", client->pers.netname);
-		trap_DropClient( clientNum, va("^1%s", reason), 0 );
+		trap_DropClient( clientNum, va("^1%s", kick_reason), 0 );
 	}
 
 #ifndef DEBUG_STATS
@@ -1446,14 +1446,14 @@ void ClientUserinfoChanged( int clientNum ) {
 		if ( strcmp( oldname, client->pers.netname ) ) {
 			trap_SendServerCommand( -1, va("print \"[lof]%s" S_COLOR_WHITE " [lon]renamed to[lof] %s\n\"", oldname, 
 				client->pers.netname) );
-			if(!G_admin_permission( ent, AF_NONAMECHANGELIMIT )) {
+			if(!G_admin_hasPermission( ent, AF_NONAMECHANGELIMIT )) {
 				client->sess.nameChangeCount++;
 				client->sess.lastNameChangeTime = level.time;
-				G_refPrintf(ent, "You have %d name changes left.", (g_nameChangeLimit.integer - client->sess.nameChangeCount));
+				G_refPrintf(ent, "^3WARNING: ^7You have %d name changes left.", (g_nameChangeLimit.integer - client->sess.nameChangeCount));
 				if(5 - client->sess.nameChangeCount == 0)
-					G_refPrintf(ent, "You must wait atleast 1 minute to rename again.");
+					PrintTo(ent, "^3WARNING: ^7You must wait atleast 1 minute to rename again.");
 				if(client->sess.nameChangeCount > g_nameChangeLimit.integer) {
-					trap_DropClient(client->ps.clientNum, "You were kicked for rename spamming.", 0);
+					trap_DropClient(client->ps.clientNum, "you were kicked for spamming rename.", 0);
 				}
 			}
 		}
@@ -1684,7 +1684,7 @@ char *ClientConnect( int clientNum, qboolean firstTime, qboolean isBot ) {
 	client->sess.nameChangeCount = 0;
 	client->sess.oldPositionsLoaded = qfalse;
 	// Zero: target_set_ident id.
-	client->sess.clientident = 0;
+	client->sess.client_map_id = 0;
 	client->sess.allowRegister = qfalse;
 
 	if(firstTime) {
@@ -1709,18 +1709,18 @@ char *ClientConnect( int clientNum, qboolean firstTime, qboolean isBot ) {
 
 void LoadSavedPositions(gclient_t *cl) {
 	int i = 0;
-	if( !cl->sess.uinfo.username[0] ||
-		!cl->sess.uinfo.password[0] ) {
+	if( !cl->sess.admin_data.username[0] ||
+		!cl->sess.admin_data.password[0] ) {
 			return;
 	}
 
 	for(i = 0; i < MAX_SERVER_SAVED_POSITIONS; i++) {
 		if(level.persSavedPositions[i].inUse) {
-			if( !Q_stricmp(level.persSavedPositions[i].username, cl->sess.uinfo.username) &&
-				!Q_stricmp(level.persSavedPositions[i].password, cl->sess.uinfo.password) ) {
+			if( !Q_stricmp(level.persSavedPositions[i].username, cl->sess.admin_data.username) &&
+				!Q_stricmp(level.persSavedPositions[i].password, cl->sess.admin_data.password) ) {
 					cl->sess.allies_save_pos[0] = level.persSavedPositions[i].pos[0];
 					cl->sess.axis_save_pos[0] = level.persSavedPositions[i].pos[1];
-					cl->sess.clientident = level.persSavedPositions[i].mapident;
+					cl->sess.client_map_id = level.persSavedPositions[i].mapident;
 					trap_SendServerCommand(cl->ps.clientNum, "cpm \"^5Server:^7 Loaded old saved positions.\n\"");
 					level.persSavedPositions[i].inUse = qfalse;
 					cl->sess.oldPositionsLoaded = qtrue;
@@ -2220,13 +2220,13 @@ void saveSavedPositions(gentity_t *ent) {
 	pos[0] = ent->client->sess.allies_save_pos[0];
 	pos[1] = ent->client->sess.axis_save_pos[0];
 
-	if( !ent->client->sess.uinfo.username[0] ||
-		!ent->client->sess.uinfo.password[0] ) {
+	if( !ent->client->sess.admin_data.username[0] ||
+		!ent->client->sess.admin_data.password[0] ) {
 			return;
 	}
 
-	Q_strncpyz(username, ent->client->sess.uinfo.username, sizeof(username));
-	Q_strncpyz(password, ent->client->sess.uinfo.password, sizeof(password));
+	Q_strncpyz(username, ent->client->sess.admin_data.username, sizeof(username));
+	Q_strncpyz(password, ent->client->sess.admin_data.password, sizeof(password));
 
 	CheckForExpiredSavedPositions();
 	
@@ -2244,7 +2244,7 @@ void saveSavedPositions(gentity_t *ent) {
 	level.persSavedPositions[i].dcTime = level.time;
 	level.persSavedPositions[i].pos[0] = pos[0];
 	level.persSavedPositions[i].pos[1] = pos[1];
-	level.persSavedPositions[i].mapident = ent->client->sess.clientident;
+	level.persSavedPositions[i].mapident = ent->client->sess.client_map_id;
 	Q_strncpyz(level.persSavedPositions[i].username, username, sizeof(level.persSavedPositions[i].username));
 	Q_strncpyz(level.persSavedPositions[i].password, password, sizeof(level.persSavedPositions[i].password));
 }
@@ -2388,10 +2388,10 @@ void ClientDisconnect( int clientNum ) {
 	i = ent->client->sess.sessionTeam;
 	ent->client->sess.sessionTeam = TEAM_FREE;
 	ent->active = 0;
-	ent->client->sess.uinfo.level = 0;
-	ent->client->sess.uinfo.name[0] = '\0';
-	ent->client->sess.uinfo.password[0] = '\0';
-	ent->client->sess.uinfo.username[0] = '\0';
+	ent->client->sess.admin_data.level = 0;
+	ent->client->sess.admin_data.name[0] = '\0';
+	ent->client->sess.admin_data.password[0] = '\0';
+	ent->client->sess.admin_data.username[0] = '\0';
 
 	trap_SetConfigstring( CS_PLAYERS + clientNum, "");
 

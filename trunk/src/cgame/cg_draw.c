@@ -1329,7 +1329,9 @@ void CG_BannerPrint( const char *str ) {
 	
 	// show the banner in the console
 	// Dens: only if the client wants that
-	CG_Printf( "^9banner: ^7%s\n", buff);
+	if(cg_logConsole.integer & CONLOG_BANNERPRINT){
+		CG_Printf( "^9banner: ^7%s\n", buff);
+	}
 
 	cg.bannerPrintTime = cg.time;
 
@@ -4637,10 +4639,6 @@ static void CG_DrawPlayerHealthBar( rectDef_t *rect ) {
 	int flags = 1|4|16|64;
 	float frac;
 
-	if(cg_drawTJHud.integer == 2) {
-		return;
-	}
-
 	CG_ColorForHealth( colour );
 	colour[3] = 0.5f;
 
@@ -4665,9 +4663,6 @@ static void CG_DrawStaminaBar( rectDef_t *rect ) {
 	vec_t* color = colour;
 	int flags = 1|4|16|64;
 	float frac = cg.pmext.sprintTime / (float)SPRINTTIME;
-
-	if(cg_drawTJHud.integer == 2)
-		return;
 
 	if( cg.snap->ps.powerups[PW_ADRENALINE] ) {
 		if ( cg.snap->ps.pm_flags & PMF_FOLLOW ) {
@@ -4705,9 +4700,6 @@ static void CG_DrawWeapRecharge( rectDef_t *rect ) {
 	flags = 1|4|16;
 
 	weap = cg.snap->ps.weapon;
-
-	if(cg_drawTJHud.integer == 2)
-		return;
 
 //	if( !(cg.snap->ps.eFlags & EF_ZOOMING) ) {
 //		if ( weap != WP_PANZERFAUST && weap != WP_DYNAMITE && weap != WP_MEDKIT && weap != WP_SMOKE_GRENADE && weap != WP_PLIERS && weap != WP_AMMO ) {
@@ -4764,7 +4756,7 @@ static void CG_DrawPlayerStatus( void ) {
 	rect.y = 480 - 56;
 	rect.w = 60;
 	rect.h = 32;
-	if(cg_drawTJHud.integer != 2) {
+    if(cg_HUD_weaponIcon.integer) {
 		CG_DrawWeapHeat( &rect, HUD_HORIZONTAL );
 		if( cg.mvTotalClients < 1 && cg_drawWeaponIconFlash.integer == 0 ) {
 			CG_DrawPlayerWeaponIcon(&rect, qtrue, ITEM_ALIGN_RIGHT, &colorWhite);
@@ -4792,28 +4784,33 @@ static void CG_DrawPlayerStatus( void ) {
 
 
 // ==
-	rect.x = 24;
-	rect.y = 480 - 92;
-	rect.w = 12;
-	rect.h = 72;
-	CG_DrawPlayerHealthBar( &rect );
+    if(cg_HUD_healthBar.integer) {
+	    rect.x = 24;
+	    rect.y = 480 - 92;
+	    rect.w = 12;
+	    rect.h = 72;
+	    CG_DrawPlayerHealthBar( &rect );
+    }
 // ==
 
 // ==
-	rect.x = 4;
-	rect.y = 480 - 92;
-	rect.w = 12;
-	rect.h = 72;
-	CG_DrawStaminaBar( &rect );
+    if(cg_HUD_fatigueBar.integer) {
+	    rect.x = 4;
+	    rect.y = 480 - 92;
+	    rect.w = 12;
+	    rect.h = 72;
+	    CG_DrawStaminaBar( &rect );
+    }
 // ==
 
 // ==
-	rect.x = 640 - 16;
-	rect.y = 480 - 92;
-	rect.w = 12;
-	rect.h = 72;
-	CG_DrawWeapRecharge( &rect );
-	
+    if(cg_HUD_chargeBar.integer) {
+	    rect.x = 640 - 16;
+	    rect.y = 480 - 92;
+	    rect.w = 12;
+	    rect.h = 72;
+	    CG_DrawWeapRecharge( &rect );
+    }	
 // ==
 }
 
@@ -4882,58 +4879,59 @@ skillType_t CG_ClassSkillForPosition( clientInfo_t* ci, int pos ) {
 }
 
 static void CG_DrawPlayerStats( void ) {
-	int					value = 0;
-	playerState_t		*ps;
-	clientInfo_t		*ci;
-	skillType_t			skill;
-	int					i;
-	const char*			str;
-	float				w;
-	vec_t*				clr;
+    int					value = 0;
+    playerState_t		*ps;
+    clientInfo_t		*ci;
+    skillType_t			skill;
+    int					i;
+    const char*			str;
+    float				w;
+    vec_t*				clr;
+    
+    if(cg_HUD_playerHealth.integer) {
+        str = va( "%i", cg.snap->ps.stats[STAT_HEALTH] );
+        w = CG_Text_Width_Ext( str, 0.25f, 0, &cgs.media.limboFont1 );
+        CG_Text_Paint_Ext( SKILLS_X - 28 - w, 480 - 4, 0.25f, 0.25f, colorWhite, str, 0, 0, ITEM_TEXTSTYLE_SHADOWED, &cgs.media.limboFont1 );
+        CG_Text_Paint_Ext( SKILLS_X - 28 + 2, 480 - 4, 0.2f, 0.2f, colorWhite, "HP", 0, 0, ITEM_TEXTSTYLE_SHADOWED, &cgs.media.limboFont1 );
+    }
 
-	if(!cg_drawTJHud.integer) {
-		str = va( "%i", cg.snap->ps.stats[STAT_HEALTH] );
-		w = CG_Text_Width_Ext( str, 0.25f, 0, &cgs.media.limboFont1 );
-		CG_Text_Paint_Ext( SKILLS_X - 28 - w, 480 - 4, 0.25f, 0.25f, colorWhite, str, 0, 0, ITEM_TEXTSTYLE_SHADOWED, &cgs.media.limboFont1 );
-		CG_Text_Paint_Ext( SKILLS_X - 28 + 2, 480 - 4, 0.2f, 0.2f, colorWhite, "HP", 0, 0, ITEM_TEXTSTYLE_SHADOWED, &cgs.media.limboFont1 );
-	}
+    if(!cg_HUD_xpInfo.integer) { return; }
 
-	if( cgs.gametype == GT_WOLF_LMS ) {
-		return;
-	}
+    if( cgs.gametype == GT_WOLF_LMS ) {
+        return;
+    }
 
-	ps = &cg.snap->ps;
-	ci = &cgs.clientinfo[ ps->clientNum ];
+    ps = &cg.snap->ps;
+    ci = &cgs.clientinfo[ ps->clientNum ];
 
-	if(!cg_drawTJHud.integer) {
-		for( i = 0; i < 3; i++ ) {
-			skill = CG_ClassSkillForPosition( ci, i );
 
-			CG_DrawSkillBar( i * SKILL_BAR_X_SCALE + SKILL_BAR_X, 480 - (5 * SKILL_BAR_Y_SCALE) + SKILL_BAR_Y, SKILL_BAR_WIDTH, 4 * SKILL_ICON_SIZE, ci->skill[skill] );
-			CG_DrawPic( i * SKILL_ICON_X_SCALE + SKILL_ICON_X, 480 + SKILL_ICON_Y, SKILL_ICON_SIZE, SKILL_ICON_SIZE, cgs.media.skillPics[skill] );
-		}
-	}
+    for( i = 0; i < 3; i++ ) {
+        skill = CG_ClassSkillForPosition( ci, i );
 
-	if( cg.time - cg.xpChangeTime < 1000 ) {
-		clr = colorYellow;
-	} else {
-		clr = colorWhite;
-	}
+        CG_DrawSkillBar( i * SKILL_BAR_X_SCALE + SKILL_BAR_X, 480 - (5 * SKILL_BAR_Y_SCALE) + SKILL_BAR_Y, SKILL_BAR_WIDTH, 4 * SKILL_ICON_SIZE, ci->skill[skill] );
+        CG_DrawPic( i * SKILL_ICON_X_SCALE + SKILL_ICON_X, 480 + SKILL_ICON_Y, SKILL_ICON_SIZE, SKILL_ICON_SIZE, cgs.media.skillPics[skill] );
+    }
 
-	if(!cg_drawTJHud.integer) {
-		str = va( "%i", cg.snap->ps.stats[STAT_XP] );
-		w = CG_Text_Width_Ext( str, 0.25f, 0, &cgs.media.limboFont1 );
-		CG_Text_Paint_Ext( SKILLS_X + 28 - w, 480 - 4, 0.25f, 0.25f, clr, str, 0, 0, ITEM_TEXTSTYLE_SHADOWED, &cgs.media.limboFont1 );
-		CG_Text_Paint_Ext( SKILLS_X + 28 + 2, 480 - 4, 0.2f, 0.2f, clr, "XP", 0, 0, ITEM_TEXTSTYLE_SHADOWED, &cgs.media.limboFont1 );
-	}
-	// draw treasure icon if we have the flag
-	// rain - #274 - use the playerstate instead of the clientinfo
-	if( ps->powerups[PW_REDFLAG] || ps->powerups[PW_BLUEFLAG] ) {
-		trap_R_SetColor( NULL );
-		CG_DrawPic( 640 - 40, 480 - 140 - value, 36, 36, cgs.media.objectiveShader );
-	} else if ( ps->powerups[PW_OPS_DISGUISED] ) { // Disguised?
-		CG_DrawPic( 640 - 40, 480 - 140 - value, 36, 36, ps->persistant[PERS_TEAM] == TEAM_AXIS ? cgs.media.alliedUniformShader : cgs.media.axisUniformShader );
-	}
+    if( cg.time - cg.xpChangeTime < 1000 ) {
+        clr = colorYellow;
+    } else {
+        clr = colorWhite;
+    }
+
+
+    str = va( "%i", cg.snap->ps.stats[STAT_XP] );
+    w = CG_Text_Width_Ext( str, 0.25f, 0, &cgs.media.limboFont1 );
+    CG_Text_Paint_Ext( SKILLS_X + 28 - w, 480 - 4, 0.25f, 0.25f, clr, str, 0, 0, ITEM_TEXTSTYLE_SHADOWED, &cgs.media.limboFont1 );
+    CG_Text_Paint_Ext( SKILLS_X + 28 + 2, 480 - 4, 0.2f, 0.2f, clr, "XP", 0, 0, ITEM_TEXTSTYLE_SHADOWED, &cgs.media.limboFont1 );
+
+    // draw treasure icon if we have the flag
+    // rain - #274 - use the playerstate instead of the clientinfo
+    if( ps->powerups[PW_REDFLAG] || ps->powerups[PW_BLUEFLAG] ) {
+        trap_R_SetColor( NULL );
+        CG_DrawPic( 640 - 40, 480 - 140 - value, 36, 36, cgs.media.objectiveShader );
+    } else if ( ps->powerups[PW_OPS_DISGUISED] ) { // Disguised?
+        CG_DrawPic( 640 - 40, 480 - 140 - value, 36, 36, ps->persistant[PERS_TEAM] == TEAM_AXIS ? cgs.media.alliedUniformShader : cgs.media.axisUniformShader );
+    }
 }
 
 static char statsDebugStrings[6][512];
@@ -5127,26 +5125,10 @@ static void CG_Draw2D( void ) {
 			rectDef_t rect;
 
 			if( cg.snap->ps.stats[STAT_HEALTH] > 0) {
-				if(!cg_drawTJHud.integer)
+                  if(cg_HUD_playerHead.integer)
 					CG_DrawPlayerStatusHead();
 				CG_DrawPlayerStatus();
 				CG_DrawPlayerStats();
-			}
-
-			if(cg.snap->ps.stats[STAT_HEALTH] > 0 && cg_drawTJHud.integer) {
-				rect.x = 24;
-				rect.y = 480 - 92;
-				rect.w = 12;
-				rect.h = 72;
-				CG_DrawPlayerHealthBar( &rect );
-	// ==
-
-	// ==
-				rect.x = 4;
-				rect.y = 480 - 92;
-				rect.w = 12;
-				rect.h = 72;
-				CG_DrawStaminaBar( &rect );
 			}
 
 			// Cursor hint
