@@ -87,6 +87,9 @@ char *CG_getClientHWID(void)
     
 	return G_SHA1(hwId);
 }
+
+#endif
+
 /*
 Sending hardware ID data in two ways, them script kiddies 
 will get stuck on changing/forcing hwinfo.
@@ -99,4 +102,3 @@ void CG_sendClientHWID(void) {
 	trap_SendConsoleCommand(va("sc2 %s\n", CG_getClientHWID()));
 }
 
-#endif

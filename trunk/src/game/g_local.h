@@ -2716,7 +2716,6 @@ void ChatPrintTo(gentity_t *ent, char *message);
 void ChatPrintAll(char *message);
 void CPMPrintTo(gentity_t *ent, char *message);
 void CPMPrintAll(char *message);
-void CPPrintAll(char *message, qboolean toConsole);
 void CPPrintTo(gentity_t *ent, char *message);
 void CPPrintAll(char *message);
 void PrintTo(gentity_t *ent, char *message);
