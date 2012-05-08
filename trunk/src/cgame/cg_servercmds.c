@@ -2114,19 +2114,6 @@ static void CG_ServerCommand( void ) {
 		return;
 	}
 
-	if( !Q_stricmp( cmd, "reqforcespawn" ) ) {
-		if( cg_instanttapout.integer ) {
-			CG_ForceTapOut_f();
-		} else {
-			if( cgs.gametype == GT_WOLF_LMS ) {
-				trap_UI_Popup( UIMENU_WM_TAPOUT_LMS );
-			} else {
-				trap_UI_Popup( UIMENU_WM_TAPOUT );
-			}
-		}
-		return;
-	}
-
 	if( !Q_stricmp( cmd, "sdbg" ) ) {
 		CG_StatsDebugAddText( CG_Argv(1) );
 		return;

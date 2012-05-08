@@ -1405,7 +1405,7 @@ void ClientUserinfoChanged( int clientNum ) {
     // TODO: Check for hardware info spoofing
 
 	s = Info_ValueForKey(userinfo, "cg_uinfo");
-	sscanf(s, "%i %i %i %i %i",
+	sscanf(s, "%i %i %i %i %i %i",
 							&client->pers.clientFlags,
 							&client->pers.clientTimeNudge,
 							&client->pers.clientMaxPackets,
@@ -1686,6 +1686,7 @@ char *ClientConnect( int clientNum, qboolean firstTime, qboolean isBot ) {
 	// Zero: target_set_ident id.
 	client->sess.client_map_id = 0;
 	client->sess.allowRegister = qfalse;
+    ent->client->sess.muted = qfalse;
 
 	if(firstTime) {
 		client->sess.password_change_count = 0;
@@ -2392,6 +2393,7 @@ void ClientDisconnect( int clientNum ) {
 	ent->client->sess.admin_data.name[0] = '\0';
 	ent->client->sess.admin_data.password[0] = '\0';
 	ent->client->sess.admin_data.username[0] = '\0';
+    ent->client->sess.muted = qfalse;
 
 	trap_SetConfigstring( CS_PLAYERS + clientNum, "");
 

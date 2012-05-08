@@ -1371,12 +1371,12 @@ void ClientThink_real( gentity_t *ent ) {
 		// DHM - Nerve
 		WolfFindMedic( ent );
 
+        if( ucmd->upmove > 0 ) {
+            limbo( ent, ( client->ps.stats[STAT_HEALTH] > GIB_HEALTH ) );
+        }
+
 		// See if we need to hop to limbo
 		if( level.timeCurrent > client->respawnTime && !(ent->client->ps.pm_flags & PMF_LIMBO) ) {
-			if( ucmd->upmove > 0 ) {
-                trap_SendServerCommand( ent-g_entities, "reqforcespawn" );
-			}
-
 			if((g_forcerespawn.integer > 0 && level.timeCurrent - client->respawnTime > g_forcerespawn.integer * 1000) || client->ps.stats[STAT_HEALTH] <= GIB_HEALTH) {
 				limbo(ent, (client->ps.stats[STAT_HEALTH] > GIB_HEALTH));
 			}

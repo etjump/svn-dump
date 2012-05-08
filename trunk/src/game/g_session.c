@@ -166,7 +166,7 @@ void G_ReadSessionData( gclient_t *client )
 
 	trap_Cvar_VariableStringBuffer( va( "session%i", client - level.clients ), s, sizeof(s) );
 
-	sscanf( s, "%i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i",
+	sscanf( s, "%i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i",
 		(int *)&client->sess.sessionTeam,
 		&client->sess.spectatorTime,
 		(int *)&client->sess.spectatorState,
@@ -188,12 +188,8 @@ void G_ReadSessionData( gclient_t *client )
 		&client->sess.spec_team,
 		&client->sess.suicides,
 		&client->sess.team_kills,
-		&mvc_l,
-		&mvc_h
 		// Damage and round count rolled in with weapon stats (below)
 		// OSP
-
-		, 
 //		&client->sess.experience,
 		(int *)&client->sess.muted,
 		&client->sess.ignoreClients[0],
