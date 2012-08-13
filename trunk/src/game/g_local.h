@@ -826,6 +826,12 @@ typedef struct debrisChunk_s {
 } debrisChunk_t;
 
 #define MAX_DEBRISCHUNKS		256
+
+typedef struct runData_s {
+    int startTime;
+    int stopTime;
+} runData_t;
+
 // ===================
 
 // this structure is cleared on each ClientSpawn(),
@@ -955,6 +961,7 @@ struct gclient_s {
 	qboolean		maxlivescalced;
 
     int             last8BallTime; // Last level.time client used !8ball.
+    runData_t       runData;
 };
 
 typedef struct {
@@ -1027,6 +1034,10 @@ typedef struct {
 
 	fileHandle_t	logFile;
 	fileHandle_t	adminLogFile; 
+
+#ifdef BETATEST
+    fileHandle_t    bugReportFile;
+#endif // BETATEST
 
 	char		rawmapname[MAX_QPATH];
 
@@ -1580,6 +1591,7 @@ void FindIntermissionPoint( void );
 void G_RunThink (gentity_t *ent);
 void QDECL G_LogPrintf( const char *fmt, ... )_attribute((format(printf,1,2)));
 void QDECL G_ALog( const char *fmt, ... )_attribute((format(printf,1,2)));
+void QDECL G_BugPrintf( const char *fmt, ... )_attribute((format(printf,1,2)));
 void SendScoreboardMessageToAllClients( void );
 void QDECL G_Printf( const char *fmt, ... )_attribute((format(printf,1,2)));
 void QDECL G_DPrintf( const char *fmt, ... )_attribute((format(printf,1,2)));
@@ -1919,7 +1931,6 @@ extern vmCvar_t	bot_debug_anim;		// what animation is the bot playing?
 extern vmCvar_t	g_dailyLogs;
 
 extern vmCvar_t g_save;
-extern vmCvar_t g_endround;
 extern vmCvar_t g_floodprotection;
 extern vmCvar_t g_floodlimit;
 extern vmCvar_t g_floodwait;
@@ -1953,6 +1964,7 @@ extern vmCvar_t g_portalMode;
 
 extern vmCvar_t g_maxConnsPerIP;
 extern vmCvar_t	g_mute;
+extern vmCvar_t g_goto;
 
 void	trap_Printf( const char *fmt );
 void	trap_Error( const char *fmt );
@@ -2688,6 +2700,7 @@ qboolean G_admin_removeuser( gentity_t *ent, int skiparg );
 qboolean G_admin_removelevel( gentity_t *ent, int skiparg );
 qboolean G_admin_listusers(gentity_t *ent, int skiparg);
 qboolean G_admin_removelevel( gentity_t *ent, int skiparg );
+qboolean G_admin_listMutedIps( gentity_t *ent, int skiparg );
 
 //Feen: PGM
 
@@ -2719,4 +2732,8 @@ void CPMPrintAll(char *message);
 void CPPrintTo(gentity_t *ent, char *message);
 void CPPrintAll(char *message);
 void PrintTo(gentity_t *ent, char *message);
-void PrintAll(gentity_t *ent, char *message);
+void PrintAll(char *message);
+
+#ifdef BETATEST
+qboolean G_admin_report_bug( gentity_t *ent, int skiparg );
+#endif

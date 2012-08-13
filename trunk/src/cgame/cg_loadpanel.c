@@ -356,6 +356,131 @@ void CG_DrawConnectScreen( qboolean interactive, qboolean forcerefresh ) {
 	inside = qfalse;
 }
 
+#define MAX_BRIEFING_LINE_LEN 40
+
+void CG_PrintMapDetailsBriefing()
+{
+
+/*
+MapDetails UI menu size
+*/
+#define WINDOW_X        276
+#define WINDOW_Y        16
+#define WINDOW_WIDTH    252
+#define WINDOW_HEIGHT   360
+
+	int lineCount = 0;
+
+	const char *p1 = 0;
+	char *p2 = 0;
+
+	char briefing[MAX_CVAR_VALUE_STRING];
+	char lineToPrint[MAX_BRIEFING_LINE_LEN + 1];
+
+	// Get briefing
+	trap_Cvar_LatchedVariableStringBuffer("ui_details_briefing", briefing, sizeof(briefing));
+
+	p1 = briefing;
+	p2 = lineToPrint;
+
+	*p2 = 0;
+
+	for(; *p1; p1++)
+	{
+		if( *p1 == '*' || (p2 - lineToPrint) == MAX_BRIEFING_LINE_LEN)
+		{
+			if(lineCount > 8)
+			{
+				break;
+			}
+			if(*lineToPrint)
+			{
+				*p2 = 0;
+				CG_Text_Paint_Ext( WINDOW_X + 32, WINDOW_Y + WINDOW_WIDTH + (10*lineCount), 0.15, 0.15,
+				colorWhite, lineToPrint,
+				0, 0, ITEM_TEXTSTYLE_SHADOWED,
+				&cgs.media.limboFont2);
+				lineCount++;
+				p1--;
+			}
+
+			p2 = lineToPrint;
+			continue;
+		}
+		if(*p1 == '*') continue;
+		*p2++ = *p1;
+	}
+
+	if( *lineToPrint )
+	{
+		*p2 = 0;
+		CG_Text_Paint_Ext( WINDOW_X + 32, WINDOW_Y + WINDOW_WIDTH + (10*lineCount), 0.15, 0.15,
+				colorWhite, lineToPrint,
+				0, 0, ITEM_TEXTSTYLE_SHADOWED,
+				&cgs.media.limboFont2);
+	}
+
+	if( lineCount > 8 )
+	{
+		CG_Text_Paint_Ext( WINDOW_X + 32, WINDOW_Y + WINDOW_WIDTH + (10*lineCount), 0.15, 0.15,
+				colorWhite, "...",
+				0, 0, ITEM_TEXTSTYLE_SHADOWED,
+				&cgs.media.limboFont2);
+	}
+
+}
+
+void CG_DrawMapDetails(  )
+{
+	char isUIopen_str[MAX_CVAR_VALUE_STRING];
+	char mapName[128] = "\0";
+
+	trap_Cvar_LatchedVariableStringBuffer( "ui_map_details", isUIopen_str, sizeof(isUIopen_str) );
+
+	if(atoi(isUIopen_str) != 1)
+	{
+		return;
+	}
+
+	trap_Cvar_LatchedVariableStringBuffer( "ui_details_map_name", mapName, sizeof(mapName) );
+
+	/*
+	map levelshot
+	*/
+
+	bg_mappic = DC->registerShaderNoMip( va( "levelshots/%s", mapName ) );
+
+	if( !bg_mappic ) {
+		bg_mappic = DC->registerShaderNoMip( "levelshots/unknownmap" );	
+	}
+
+#define WINDOW_X        276
+#define WINDOW_Y        16
+#define WINDOW_WIDTH    252
+#define WINDOW_HEIGHT   360
+
+	trap_R_SetColor( colorBlack );
+	CG_DrawPic(	WINDOW_X + 32, WINDOW_Y + 32, WINDOW_WIDTH - 64, WINDOW_WIDTH - 64, bg_mappic );
+	//CG_DrawPic( button->rect.x, button->rect.y, button->rect.w, button->rect.h, bg_mappic );
+
+	trap_R_SetColor( NULL );
+	CG_DrawPic(	WINDOW_X + 32, WINDOW_Y + 32, WINDOW_WIDTH - 64, WINDOW_WIDTH - 64, bg_mappic );
+	//CG_DrawPic( button->rect.x, button->rect.y, button->rect.w, button->rect.h, bg_mappic );
+
+	/*
+	map briefing
+	*/
+	
+	CG_PrintMapDetailsBriefing();
+
+	// Print mapn name
+	CG_Text_Paint_Ext( WINDOW_X + 32, WINDOW_Y + WINDOW_WIDTH - 16, 0.25, 0.25,
+				colorWhite, mapName,
+				0, 0, ITEM_TEXTSTYLE_SHADOWED,
+				&cgs.media.limboFont1);
+
+}
+
 void CG_LoadPanel_RenderLoadingBar( panel_button_t* button ) {
 	int hunkused, hunkexpected;
 	float frac;

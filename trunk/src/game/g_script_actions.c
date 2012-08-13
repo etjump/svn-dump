@@ -3090,18 +3090,7 @@ extern void LogExit( const char *string );
 
 qboolean G_ScriptAction_EndRound( gentity_t *ent, char *params )
 {
-	if( !g_endround.integer ) {
-		return qfalse;
-	}
-	else {
-		if ( g_gamestate.integer == GS_INTERMISSION ) {
-			return qtrue;
-		}
-
-		LogExit( "Wolf EndRound." );
-
-		return qtrue;
-	}
+	return qfalse;
 }
 
 /*
@@ -3113,40 +3102,7 @@ G_ScriptAction_SetRoundTimelimit
 */
 qboolean G_ScriptAction_SetRoundTimelimit( gentity_t *ent, char *params )
 {
-	char *pString, *token;
-	float nextTimeLimit;
-
-	pString = params;
-	token = COM_Parse(&pString);
-	if (!token[0]) {
-		G_Error( "G_ScriptAction_SetRoundTimelimit: number parameter required\n" );
-	}
-
-	// NERVE - SMF
-	nextTimeLimit = g_nextTimeLimit.value;
-
-	if (!g_endround.integer)
-	{
-		trap_Cvar_Set("timelimit", 0);
-		return qtrue;
-	}
-
-	if ( g_gametype.integer == GT_WOLF_STOPWATCH && nextTimeLimit ) {
-		trap_Cvar_Set( "timelimit", va( "%f", nextTimeLimit ) );
-	} else if( g_gametype.integer == GT_WOLF_LMS ) {
-		if( g_userTimeLimit.integer ) {
-			int timelimit = g_userTimeLimit.integer < 3 ? 3 : g_userTimeLimit.integer;
-			trap_Cvar_Set( "timelimit", va( "%i", timelimit ) );
-		} else {
-			trap_Cvar_Set( "timelimit", token );
-		}
-	} else {
-		if ( g_userTimeLimit.integer )
-			trap_Cvar_Set( "timelimit", va( "%i", g_userTimeLimit.integer ) );
-		else
-			trap_Cvar_Set( "timelimit", token );
-	}
-
+	trap_Cvar_Set("timelimit", 0);
 	return qtrue;
 }
 

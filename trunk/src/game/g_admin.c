@@ -52,6 +52,7 @@ static const struct g_admin_cmd g_admin_cmds[] = {
 	{"listcmds",	G_admin_help,		'h',	"Prints useful information about commands.", "Syntax: !help <command>"},
 	{"listflags",	G_admin_listflags,	'A',	"Prints of list of all admin command flags.", "Syntax: !listflags"},
 	{"listmaps",	G_admin_listmaps,	'a',	"Prints a list of all maps on the server.", "Syntax: !listmaps"},
+	{"listmutedips",G_admin_listMutedIps,'m',	"Prints a list of all muted ips on the server.", "Syntax: !listmutedips"},
 	{"listplayers",	G_admin_listplayers,'l',	"Displays admin level information about all players on the server.", "Syntax: !listplayers"},
 	{"listusers",	G_admin_listusers,	'A',	"Prints a list of all users in the admin database.", "Syntax: !listusers"},
 	{"map",			G_admin_map,		'M',	"Changes map.", "Syntax: !map <mapname>"},
@@ -76,6 +77,9 @@ static const struct g_admin_cmd g_admin_cmds[] = {
 	{"spec",		G_admin_spec,		'S',	"Spectates target.", "Syntax: !spec <target>"},
 	{"unban",		G_admin_unban,		'b',	"Unbans ban ID.", "Syntax: !unban <number>"},
 	{"unmute",		G_admin_unmute,		'm',	"Unmutes target player.", "Syntax: !unmute <target>"},
+#ifdef BETATEST
+    {"bug",         G_admin_report_bug, 'a',    "Report a bug", "Syntax: !bug <description>"},
+#endif //BETATEST
 	{"\0",			NULL,				'\0',	"", ""}
 };
 
@@ -102,6 +106,7 @@ void ChatPrintTo(gentity_t *ent, char *message) {
     if(ent) CP(va("chat \"%s\"", message));
     else G_Printf("%s\n", message);
 }
+
 // Print message to all players on chat
 void ChatPrintAll(char *message) {
     AP(va("chat \"%s\"", message));
@@ -134,13 +139,13 @@ void PrintTo(gentity_t *ent, char *message) {
 	else { 
 		char no_color_message[MAX_STRING_CHARS];
 		DecolorString(message, no_color_message);
-		G_Printf("%s\n", no_color_message);
+		G_Printf("%s", no_color_message);
 	} 
 }
 // Print message to all players on console
-void PrintAll(gentity_t *ent, char *message) {
-	if(ent) AP(va("print \"%s\n\"", message));
-	else G_Printf("%s\n", message);
+void PrintAll(char *message) {
+	AP(va("print \"%s\n\"", message));
+	G_Printf("%s\n", message);
 }
 
 void beginBufferPrint() {
@@ -169,6 +174,7 @@ void bufferPrint(gentity_t *ent, char *string) {
 		Q_strcat(bigTextBuffer, sizeof(bigTextBuffer), string);
 	}
 }
+
 // Is target's adminlevel higher than ents
 static qboolean isTargetHigher( gentity_t *ent, gentity_t *target, /* is equal level "higher" */ qboolean is_equal_higher ) {
 	// Console always wins
@@ -189,6 +195,10 @@ static qboolean isTargetHigher( gentity_t *ent, gentity_t *target, /* is equal l
 			return qfalse;
 		}
 	}
+}
+
+static qboolean isEntHigher( gentity_t *ent, gentity_t *target, qboolean is_equal_higher ) {
+    return isTargetHigher( target, ent, is_equal_higher );
 }
 
 // Create an admin config template
@@ -841,7 +851,7 @@ qboolean G_admin_setlevel(gentity_t *ent, int skiparg) {
 
 	target = g_entities + pids[0];
 
-	if(ent != target && !isTargetHigher(ent, target, qfalse)) {
+	if(ent != target && isTargetHigher(ent, target, qfalse)) {
 		ChatPrintTo(ent, "^3setlevel: ^7you can't set the level of a fellow admin");
 		return qfalse;
 	}
@@ -1050,7 +1060,7 @@ qboolean G_admin_kick(gentity_t *ent, int skiparg) {
 	target = g_entities + pids[0];
 
 	if(ent) {
-		if(ent != target && !isTargetHigher(ent, target, qtrue)) {
+		if(ent != target && isTargetHigher(ent, target, qtrue)) {
 			ChatPrintTo(ent, "^3kick:^7 you can't kick a fellow admin");
 			return qfalse;
 		} else if(target == ent) {
@@ -1192,7 +1202,7 @@ qboolean G_admin_mute(gentity_t *ent, int skiparg) {
 	target = g_entities + pids[0];
 
 	if(ent) {
-		if(ent != target && !isTargetHigher(ent, target, qtrue)) {
+		if(ent != target && isTargetHigher(ent, target, qtrue)) {
 			ChatPrintTo(ent, "^3mute: ^7you cannot mute a fellow admin");
 			return qfalse;
 		}
@@ -1313,7 +1323,7 @@ qboolean G_admin_rename(gentity_t *ent, int skiparg) {
 	target = g_entities + pids[0];
 
 	if(ent) {
-		if(ent != target && !isTargetHigher(ent, target, qtrue)) {
+		if(ent != target && isTargetHigher(ent, target, qtrue)) {
 			ChatPrintTo(ent, "^3rename: ^7you cannot rename a fellow admin");
 			return qfalse;
 		}
@@ -1358,7 +1368,7 @@ qboolean G_admin_putteam(gentity_t *ent, int skiparg) {
 	target = g_entities + pids[0];
 
 	if(ent) {
-		if(!isTargetHigher(ent, target, qtrue)) {
+		if(isTargetHigher(ent, target, qtrue)) {
 			ChatPrintTo(ent, "^3putteam:^7 you can't putteam a fellow admin");
 			return qfalse;
 		}
@@ -1492,7 +1502,7 @@ qboolean G_admin_ban(gentity_t *ent, int skiparg) {
 
 	target = &g_entities[pids[0]];
 	if(ent) {
-		if(ent != target && !isTargetHigher(ent, target, qtrue)) {
+		if(ent != target && isTargetHigher(ent, target, qtrue)) {
 			ChatPrintTo(ent, "^3ban: ^7you can't ban a fellow admin");
 			return qfalse;
 		}
@@ -2577,3 +2587,34 @@ qboolean G_admin_noclip(gentity_t *ent, int skiparg) {
 }
 
 #endif
+
+qboolean G_admin_listMutedIps(gentity_t *ent, int skipargs)
+{
+	int i = 0;
+	ChatPrintTo(ent, "^3listmutedips:^7 check console for more information.");
+	PrintTo(ent, "^7Muted IPs:\n");
+	for(i = 0; i < MAX_IP_MUTES; i++)
+	{
+		if(level.ipMutes[i].inuse)
+		{
+			PrintTo(ent, va("%s\n", level.ipMutes[i].ip));
+		}
+	}
+}
+
+#ifdef BETATEST
+
+qboolean G_admin_report_bug( gentity_t *ent, int skiparg ) {
+    char *bug_report;
+    if(Q_SayArgc() < 2 + skiparg) {
+        ChatPrintTo(ent, "^3usage: ^7!bug <description>");
+        return qfalse;
+    }
+
+    bug_report = Q_SayConcatArgs(1 + skiparg);
+
+    G_BugPrintf("%s : %s\n", ent->client->pers.netname, bug_report);
+    return qtrue;
+}
+
+#endif // BETATEST

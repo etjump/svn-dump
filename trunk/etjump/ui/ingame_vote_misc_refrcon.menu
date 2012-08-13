@@ -47,6 +47,6 @@ menuDef {
 	
 // Buttons //
 	
-	BUTTON( 6, 32, (WINDOW_WIDTH-12), 14, "RESTART MAP", .24, 11, exec "cmd ref maprestart"; uiScript closeingame )	
+	BUTTON( 6, 32, (WINDOW_WIDTH-18), 14, "RESTART MAP", .24, 11, exec "cmd ref maprestart"; uiScript closeingame )	
 	BUTTON( 6, WINDOW_HEIGHT-24, WINDOW_WIDTH-12, 18, "BACK", .3, 14, close ingame_vote_misc_refrcon ; open ingame_vote )
 }

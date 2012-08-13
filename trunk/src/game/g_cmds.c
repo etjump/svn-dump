@@ -364,7 +364,7 @@ qboolean G_MatchOnePlayer(int *plist, char *err, int len)
 			"be more specific or use the slot #:");
 		for(p = plist;*p != -1; p++) {
 			cl = &level.clients[*p];
-			if(cl->pers.connected == CON_CONNECTED) {
+			if(cl->pers.connected == CON_CONNECTED || cl->pers.connected == CON_CONNECTING) {
 				Com_sprintf(line, MAX_NAME_LENGTH + 10,
 					"\n%2i - %s^7",
 					*p,	
@@ -1551,7 +1551,7 @@ void G_SayTo(gentity_t *ent, gentity_t *other, int mode, int color,
 	}
 }
 
-void G_Say(gentity_t *ent, gentity_t *target, int mode, qboolean encoded, const char *chatText)
+void G_Say(gentity_t *ent, gentity_t *target, int mode, qboolean encoded, char *chatText)
 {
 	int			j;
 	gentity_t	*other;
@@ -1635,7 +1635,7 @@ void Cmd_Say_f(gentity_t *ent, int mode, qboolean arg0, qboolean encoded)
 extern void BotRecordVoiceChat( int client, int destclient, const char *id, int mode, qboolean noResponse );
 
 // NERVE - SMF
-void G_VoiceTo( gentity_t *ent, gentity_t *other, int mode, const char *id, qboolean voiceonly ) {
+void	G_VoiceTo( gentity_t *ent, gentity_t *other, int mode, const char *id, qboolean voiceonly, char *customVsayText ) {
 	int color;
 	char *cmd;
 
@@ -1693,14 +1693,26 @@ void G_VoiceTo( gentity_t *ent, gentity_t *other, int mode, const char *id, qboo
 		voiceonly = qfalse;
 	}
 
-	if( mode == SAY_TEAM || mode == SAY_BUDDY ) {
-		CPx( other-g_entities, va("%s %d %d %d %s %i %i %i", cmd, voiceonly, ent - g_entities, color, id, (int)ent->s.pos.trBase[0], (int)ent->s.pos.trBase[1], (int)ent->s.pos.trBase[2] ));
-	} else {
-		CPx( other-g_entities, va("%s %d %d %d %s", cmd, voiceonly, ent - g_entities, color, id ));
+	if(customVsayText)
+	{
+		// REMEMBER TO CHECK FOR OVERFLOW ON TOO LONG VSAYTEXT
+		if( mode == SAY_TEAM || mode == SAY_BUDDY ) {
+			CPx( other-g_entities, va("%s %d %d %d %s %i %i %i %s", cmd, voiceonly, ent - g_entities, color, id, (int)ent->s.pos.trBase[0], (int)ent->s.pos.trBase[1], (int)ent->s.pos.trBase[2], customVsayText ));
+		} else {
+			CPx( other-g_entities, va("%s %d %d %d %s %s %s", cmd, voiceonly, ent - g_entities, color, id, customVsayText ));
+		}
+	}
+	else
+	{
+		if( mode == SAY_TEAM || mode == SAY_BUDDY ) {
+			CPx( other-g_entities, va("%s %d %d %d %s %i %i %i", cmd, voiceonly, ent - g_entities, color, id, (int)ent->s.pos.trBase[0], (int)ent->s.pos.trBase[1], (int)ent->s.pos.trBase[2] ));
+		} else {
+			CPx( other-g_entities, va("%s %d %d %d %s", cmd, voiceonly, ent - g_entities, color, id ));
+		}
 	}
 }
 
-void G_Voice( gentity_t *ent, gentity_t *target, int mode, const char *id, qboolean voiceonly ) {
+void G_Voice( gentity_t *ent, gentity_t *target, int mode, const char *id, qboolean voiceonly, const char *customVsayText ) {
 	int			j;
 
 	// DHM - Nerve :: Don't allow excessive spamming of voice chats
@@ -1728,13 +1740,14 @@ void G_Voice( gentity_t *ent, gentity_t *target, int mode, const char *id, qbool
 	}*/
 
 	if ( target ) {
-		G_VoiceTo( ent, target, mode, id, voiceonly );
+		G_VoiceTo( ent, target, mode, id, voiceonly, customVsayText );
 		return;
 	}
 
 	// echo the text to the console
 	if ( g_dedicated.integer ) {
 		G_Printf( "voice: %s %s\n", ent->client->pers.netname, id);
+		G_LogPrintf( "voice: %s %s %s\n", ent->client->pers.netname, id, customVsayText );
 	}
 
 	if( mode == SAY_BUDDY ) {
@@ -1782,13 +1795,13 @@ void G_Voice( gentity_t *ent, gentity_t *target, int mode, const char *id, qbool
 				}
 			}
 
-			G_VoiceTo(ent, &g_entities[level.sortedClients[j]], mode, id, voiceonly);
+			G_VoiceTo(ent, &g_entities[level.sortedClients[j]], mode, id, voiceonly, customVsayText);
 		}
 	} else {
 
 		// send it to all the apropriate clients
 		for( j = 0; j < level.numConnectedClients; j++ ) {
-			G_VoiceTo(ent, &g_entities[level.sortedClients[j]], mode, id, voiceonly);
+			G_VoiceTo(ent, &g_entities[level.sortedClients[j]], mode, id, voiceonly, customVsayText);
 		}
 	}
 }
@@ -1799,11 +1812,33 @@ Cmd_Voice_f
 ==================
 */
 static void Cmd_Voice_f( gentity_t *ent, int mode, qboolean arg0, qboolean voiceonly ) {
+	char *customVsayText = 0;
+	char vsayId[MAX_TOKEN_CHARS];
+	// Custom text for vsay if argc != 2
+	if(trap_Argc() > 2)
+	{
+		// /vsay <id> <custom vsay text>
+		customVsayText = ConcatArgs(((arg0) ? 1 : 2));
+		if(strlen(customVsayText) > 256)
+		{
+			// Text does not have to be over 256 chars
+			customVsayText[256] = 0;
+		}
+	}
+
+	// Get the vsay ID to a char array
+	if(arg0)
+	{
+		trap_Argv(0, vsayId, sizeof(vsayId));
+	} else {
+		trap_Argv(1, vsayId, sizeof(vsayId));
+	}
+
 	if( mode != SAY_BUDDY ) {
 		if(trap_Argc() < 2 && !arg0) {
 			return;
 		}
-		G_Voice(ent, NULL, mode, ConcatArgs(((arg0) ? 0 : 1)), voiceonly);
+		G_Voice(ent, NULL, mode, vsayId, voiceonly, customVsayText);
 	} else {
 		char buffer[16];
 		int index;
@@ -1817,7 +1852,7 @@ static void Cmd_Voice_f( gentity_t *ent, int mode, qboolean arg0, qboolean voice
 		if( trap_Argc() < 3 + index && !arg0 ) {
 			return;
 		}
-		G_Voice(ent, NULL, mode, ConcatArgs(((arg0) ? 2 + index : 3 + index)), voiceonly);
+		G_Voice(ent, NULL, mode, vsayId, voiceonly, customVsayText);
 	}
 }
 
@@ -1968,7 +2003,9 @@ qboolean Cmd_CallVote_f( gentity_t *ent, unsigned int dwCommand, qboolean fRefCo
 			if( voteFlags.integer == VOTING_DISABLED ) {
 				CP("cpm \"Voting not enabled on this server.\n\"");
 				return qfalse;
-			} else if( vote_limit.integer > 0 && ent->client->pers.voteCount >= vote_limit.integer ) {
+            } else if( !G_admin_hasPermission(ent, AF_NOVOTELIMIT) && 
+                vote_limit.integer > 0 && 
+                ent->client->pers.voteCount >= vote_limit.integer ) {
 				CP(va("cpm \"You have already called the maximum number of votes (%d).\n\"", vote_limit.integer));
 				return qfalse;
 			}
@@ -2084,8 +2121,8 @@ qboolean Cmd_CallVote_f( gentity_t *ent, unsigned int dwCommand, qboolean fRefCo
 		for(i=0; i<level.numConnectedClients; i++) {
 			level.clients[level.sortedClients[i]].ps.eFlags &= ~EF_VOTED;
 		}
-		if(!G_admin_hasPermission(ent, AF_NOVOTELIMIT)) 
-			ent->client->pers.voteCount++;
+		
+		ent->client->pers.voteCount++;
 		ent->client->ps.eFlags |= EF_VOTED;
 
 		trap_SetConfigstring(CS_VOTE_YES,	 va("%i", level.voteInfo.voteYes));
@@ -3602,6 +3639,11 @@ void Cmd_Goto_f(gentity_t *ent) {
 	char cmd[MAX_TOKEN_CHARS];
 	gentity_t *other;
 
+    if(!g_goto.integer) {
+        CP("print \"Goto is disabled on this server.\n\"");
+        return;
+    }
+
 	if(level.noGoto) {
 		CP("print \"Goto is disabled on this map.\n\"");
 		return;
@@ -3635,6 +3677,12 @@ void Cmd_Goto_f(gentity_t *ent) {
 		return;
 	}
 
+	if (other->client->sess.sessionTeam == TEAM_SPECTATOR)
+	{
+		CP("cpm \"^7You can not ^3goto^7 a spectator!\n\"");
+		return;
+	}
+
 	if (VectorLengthSquared(other->client->ps.velocity) > 0)
 	{
 		CP("cpm \" ^7You can not ^3goto ^7 moving player!\n\"");
@@ -3657,6 +3705,11 @@ void Cmd_Call_f(gentity_t *ent)
 	int clientNum;
 	char cmd[MAX_TOKEN_CHARS];
 	gentity_t *other;
+
+    if(!g_goto.integer) {
+        CP("print \"Call is disabled on this server.\n\"");
+        return;
+    }
 
 	if(level.noGoto) {
 		CP("print \"Call is disabled on this map.\n\"");
@@ -3723,7 +3776,7 @@ void Cmd_PrivateMessage_f(gentity_t *ent)
 	}
 
 	if(ent && ent->client->sess.muted && g_mute.integer & 1) {
-		CP("print \"^1PM: ^7you're muted.\n\"");
+		CP("print \"^3WARNING: ^7You are muted.\n\"");
 		return;
 	}
 
@@ -4096,8 +4149,8 @@ void ClientCommand(int clientNum)
 		G_admin_greeting(ent);
 		return;
 	}
-	// Very random name for hwid check
-	if (!Q_stricmp(cmd, "sc2")) {
+	// hardware ban check
+	if (!Q_stricmp(cmd, "hwC")) {
 		char *reason = 0;
 		char hardware_id[MAX_TOKEN_CHARS];
 
@@ -4111,7 +4164,15 @@ void ClientCommand(int clientNum)
 
 		reason = CheckSpoofing( ent->client, hardware_id );
 		if(reason) {
-			trap_DropClient( clientNum, va("^1%s", reason), 0 );
+			char *userinfo;
+			char *userinfoValue;
+			trap_GetUserinfo( clientNum, userinfo, sizeof( userinfo ) );
+			// trap_DropClient( clientNum, va("^1%s", reason), 0 );
+			if(G_admin_ban_check(userinfo, reason)) {
+				userinfoValue = Info_ValueForKey(userinfo, "name");
+				AP(va("cpm \"Banned player: %s^7, tried to connect.\"", userinfoValue));
+				return va("You are banned from this server.\n%s\n", reason);
+			}
 		}
 		return;
 	}

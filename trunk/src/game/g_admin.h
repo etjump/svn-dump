@@ -74,6 +74,7 @@ typedef struct {
 } admin_ban_t;
 
 #define EDITION999
+#define BETATEST
 
 #ifdef EDITION999
 #define AF_ADMINBYPASS 'Z'

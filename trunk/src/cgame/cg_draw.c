@@ -2944,25 +2944,48 @@ static void CG_DrawPersonalTimer( void ) {
 	if(!cg_drawPersonalTimer.integer)
 		return;
 
-	if(cg.activeTimer)
-		msec = cg.time - cg.startTime;
-	else
-		msec = cg.stopTime - cg.startTime;
+	if((cg.snap->ps.pm_flags & PMF_FOLLOW))
+	{
+		if(cgs.clientinfo[cg.snap->ps.clientNum].personalTimerActive)
+			msec = cg.time - cgs.clientinfo[cg.snap->ps.clientNum].personalStartTime;
+		else
+			msec = cg.stopTime - cgs.clientinfo[cg.snap->ps.clientNum].personalStopTime;
 
-	min = msec / 60000;
-	msec -= min * 60000;
-	sec = msec / 1000;
-	msec -= sec * 1000;
+		min = msec / 60000;
+		msec -= min * 60000;
+		sec = msec / 1000;
+		msec -= sec * 1000;
 	
-	x = cg_personalTimerX.value;
-	y = cg_personalTimerY.value;
+		x = cg_personalTimerX.value;
+		y = cg_personalTimerY.value;
 
-	Com_sprintf(time, sizeof(time), va("%02d:%02d.%03d", min, sec, msec));
+		Com_sprintf(time, sizeof(time), va("%02d:%02d.%03d", min, sec, msec));
 
-	w = CG_Text_Width_Ext( time, 3, 0, &cgs.media.limboFont1 ) / 2;
+		w = CG_Text_Width_Ext( time, 3, 0, &cgs.media.limboFont1 ) / 2;
 
-	CG_Text_Paint_Ext(x - w, y, 0.3, 0.3, cg.personalTimerColor, time, 0, 0, 0, &cgs.media.limboFont1);
+		CG_Text_Paint_Ext(x - w, y, 0.3, 0.3, cg.personalTimerColor, time, 0, 0, 0, &cgs.media.limboFont1);
+	} else
+	{
 
+		if(cg.activeTimer)
+			msec = cg.time - cg.startTime;
+		else
+			msec = cg.stopTime - cg.startTime;
+
+		min = msec / 60000;
+		msec -= min * 60000;
+		sec = msec / 1000;
+		msec -= sec * 1000;
+	
+		x = cg_personalTimerX.value;
+		y = cg_personalTimerY.value;
+
+		Com_sprintf(time, sizeof(time), va("%02d:%02d.%03d", min, sec, msec));
+
+		w = CG_Text_Width_Ext( time, 3, 0, &cgs.media.limboFont1 ) / 2;
+
+		CG_Text_Paint_Ext(x - w, y, 0.3, 0.3, cg.personalTimerColor, time, 0, 0, 0, &cgs.media.limboFont1);
+	}
 }
 
 /*
@@ -3505,7 +3528,7 @@ static qboolean CG_DrawFollow(void)
 	{
 		// Show in colors
 		CG_DrawStringExt(INFOTEXT_STARTX, 118,
-			CG_TranslateString(va("Following %s", cgs.clientinfo[cg.snap->ps.clientNum].cleanname)),
+			CG_TranslateString(va("^7Following %s^7", cgs.clientinfo[cg.snap->ps.clientNum].name)),
 				colorWhite, qtrue, qtrue, BIGCHAR_WIDTH / 2, BIGCHAR_HEIGHT, 0);
 	}
 
@@ -5172,7 +5195,7 @@ static void CG_Draw2D( void ) {
 		CG_DrawLimboMessage();
 
 		CG_DrawCGazHUD();
-
+		CG_DrawMapDetails();
 		CG_DrawOB();
 
 		CG_DrawCHS();

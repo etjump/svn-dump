@@ -568,6 +568,9 @@ typedef struct clientInfo_s {
 	int				weaponState;
 	int				weaponState_last;
 	int				hideMe;
+	qboolean		personalTimerActive;
+	int				personalStartTime;
+	int				personalStopTime;
 } clientInfo_t;
 
 typedef enum {
@@ -3533,7 +3536,6 @@ qboolean CG_Debriefing_QCButton_KeyDown( panel_button_t* button, int key );
 qboolean CG_Debriefing_NextButton_KeyDown( panel_button_t* button, int key );
 
 void CG_PanelButtonsRender_Button_Ext( rectDef_t* r, const char* text );
-
 void CG_Debriefing_PlayerName_Draw( panel_button_t* button );
 void CG_Debriefing_PlayerRank_Draw( panel_button_t* button );
 void CG_Debriefing_PlayerMedals_Draw( panel_button_t* button );
@@ -3586,6 +3588,7 @@ void CG_LoadPanel_RenderLoadingBar( panel_button_t* button );
 void CG_LoadPanel_KeyHandling( int key, qboolean down );
 qboolean CG_LoadPanel_ContinueButtonKeyDown( panel_button_t* button, int key );
 void CG_DrawConnectScreen( qboolean interactive, qboolean forcerefresh );
+void CG_DrawMapDetails();
 
 qboolean CG_Debriefing2_Maps_KeyDown( panel_button_t* button, int key );
 void CG_Debriefing2TeamSkillHeaders_Draw( panel_button_t* button );

@@ -1325,7 +1325,7 @@ void CG_AddBufferedVoiceChat( bufferedVoiceChat_t *vchat ) {
 CG_VoiceChatLocal
 =================
 */
-void CG_VoiceChatLocal( int mode, qboolean voiceOnly, int clientNum, int color, const char *cmd, vec3_t origin ) {
+void CG_VoiceChatLocal( int mode, qboolean voiceOnly, int clientNum, int color, const char *cmd, vec3_t origin, char *customVsayText ) {
 	char *chat;
 	voiceChatList_t *voiceChatList;
 	clientInfo_t *ci;
@@ -1352,6 +1352,10 @@ void CG_VoiceChatLocal( int mode, qboolean voiceOnly, int clientNum, int color, 
 
 	if ( CG_GetVoiceChat( voiceChatList, cmd, &snd, &sprite, &chat ) ) {
 		//
+		if(customVsayText)
+		{
+			chat = customVsayText;
+		}
 		if ( mode == SAY_TEAM || !cg_teamChatsOnly.integer ) {
 			vchat.clientNum = clientNum;
 			vchat.snd = snd;
@@ -1384,6 +1388,41 @@ void CG_VoiceChatLocal( int mode, qboolean voiceOnly, int clientNum, int color, 
 }
 
 /*
+==================
+ConcatArgs
+==================
+*/
+// DO NOT use this anywhere but voice. Seems to be bugged. trap_argc() returns
+// wrong values.
+char	*ConcatArgs( int start ) {
+	int		i, c, tlen;
+	static char	line[MAX_STRING_CHARS];
+	int		len;
+	char	arg[MAX_STRING_CHARS];
+
+	len = 0;
+	// For some reason trap_Argc() returns argc + 1 on cgame
+	c = trap_Argc() - 1;
+	for ( i = start ; i < c ; i++ ) {
+		trap_Argv( i, arg, sizeof( arg ) );
+		tlen = strlen( arg );
+		if ( len + tlen >= MAX_STRING_CHARS - 1 ) {
+			break;
+		}
+		memcpy( line + len, arg, tlen );
+		len += tlen;
+		if ( i != c - 1 ) {
+			line[len] = ' ';
+			len++;
+		}
+	}
+
+	line[len] = 0;
+
+	return line;
+}
+
+/*
 =================
 CG_VoiceChat
 =================
@@ -1393,16 +1432,24 @@ void CG_VoiceChat( int mode ) {
 	int clientNum, color;
 	qboolean voiceOnly;
 	vec3_t origin;			// NERVE - SMF
-
+	char *customVsayText = 0;
 	voiceOnly = atoi(CG_Argv(1));
 	clientNum = atoi(CG_Argv(2));
 	color = atoi(CG_Argv(3));
-
 	if( mode != SAY_ALL ) {
 		// NERVE - SMF - added origin
 		origin[0] = atoi(CG_Argv(5));
 		origin[1] = atoi(CG_Argv(6));
 		origin[2] = atoi(CG_Argv(7));
+		if(trap_Argc() > 8)
+		{
+			customVsayText = ConcatArgs(8);
+		}
+	} else {
+		if(trap_Argc() > 5)
+		{
+			customVsayText = ConcatArgs(5);
+		}
 	}
 
 	cmd = CG_Argv(4);
@@ -1415,7 +1462,7 @@ void CG_VoiceChat( int mode ) {
 		}
 	}
 
-	CG_VoiceChatLocal( mode, voiceOnly, clientNum, color, cmd, origin );
+	CG_VoiceChatLocal( mode, voiceOnly, clientNum, color, cmd, origin, customVsayText );
 }
 // -NERVE - SMF
 

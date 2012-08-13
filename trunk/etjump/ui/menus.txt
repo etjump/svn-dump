@@ -76,4 +76,5 @@
 	loadMenu { "ui/trickjump_info.menu" }
 	loadMenu { "ui/trickjump_view.menu" }
 	loadMenu { "ui/trickjump_settings.menu" }
+	loadMenu { "ui/ingame_map_details.menu" }
 }

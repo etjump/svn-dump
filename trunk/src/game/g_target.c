@@ -1460,3 +1460,30 @@ void SP_target_increase_ident( gentity_t *self ) {
 
 	self->use = target_increase_ident_use;
 }
+
+void target_save_use( gentity_t *self, gentity_t *other, gentity_t *activator )
+{
+	if( activator->client->sess.sessionTeam == TEAM_SPECTATOR )
+	{
+		return;
+	} 
+	else if ( activator->client->sess.sessionTeam == TEAM_ALLIES )
+	{
+		VectorCopy( self->s.origin, activator->client->sess.allies_save_pos->origin );
+		VectorCopy( self->s.angles, activator->client->sess.allies_save_pos->vangles );
+		activator->client->sess.allies_save_pos->isValid = qtrue;
+	} 
+	else if ( activator->client->sess.sessionTeam == TEAM_AXIS )
+	{
+		VectorCopy( self->s.origin, activator->client->sess.axis_save_pos->origin );
+		VectorCopy( self->s.angles, activator->client->sess.axis_save_pos->vangles );
+		activator->client->sess.allies_save_pos->isValid = qtrue;
+	}
+
+	CPPrintTo(activator, g_savemsg.string);
+}
+
+void SP_target_save( gentity_t *self )
+{
+	self->use = target_save_use;
+}

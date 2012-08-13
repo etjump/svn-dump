@@ -271,13 +271,23 @@ void G_refMute_cmd(gentity_t *ent, qboolean mute)
 	}
 
 	if( mute ) {
+		char *ip;
+		char userinfo[MAX_INFO_STRING];
 		CPx(pid, "print \"^5You've been muted\n\"" );
 		player->client->sess.muted = qtrue;
+		trap_GetUserinfo( player->client->ps.clientNum, userinfo, sizeof( userinfo ) );
+		ip = Info_ValueForKey (userinfo, "ip");
+		G_AddIpMute(ip);
 		G_Printf( "\"%s^*\" has been muted\n",  player->client->pers.netname );
 		ClientUserinfoChanged( pid );
 	} else {
+		char *ip;
+		char userinfo[MAX_INFO_STRING];
 		CPx(pid, "print \"^5You've been unmuted\n\"" );
 		player->client->sess.muted = qfalse;
+		trap_GetUserinfo( player->client->ps.clientNum, userinfo, sizeof( userinfo ) );
+		ip = Info_ValueForKey (userinfo, "ip");
+		G_RemoveIPMute(ip);
 		G_Printf( "\"%s^*\" has been unmuted\n",  player->client->pers.netname );
 		ClientUserinfoChanged( pid );
 	}

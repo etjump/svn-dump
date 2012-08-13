@@ -183,7 +183,6 @@ vmCvar_t		g_disableComplaints;
 vmCvar_t		g_dailyLogs;
 
 // Trickjump cvars.
-vmCvar_t		g_endround;
 vmCvar_t		g_save;
 vmCvar_t		g_floodprotection;
 vmCvar_t		g_floodlimit;
@@ -227,6 +226,7 @@ vmCvar_t		g_portalMode;  //Defines portal mode.
 vmCvar_t		g_maxConnsPerIP;
 
 vmCvar_t		g_mute;
+vmCvar_t        g_goto;
 
 cvarTable_t		gameCvarTable[] = {
 	// don't override the cheat state set by the system
@@ -424,7 +424,6 @@ cvarTable_t		gameCvarTable[] = {
 	// Trickjump cvars
 
 	{ &g_save, "g_save", "1", CVAR_ARCHIVE },
-	{ &g_endround, "g_endround", "0", CVAR_ARCHIVE},
 
 	{ &g_floodprotection, "g_floodprotection", "1", CVAR_ARCHIVE },
 	{ &g_floodlimit, "g_floodlimit", "5", CVAR_ARCHIVE },
@@ -449,11 +448,11 @@ cvarTable_t		gameCvarTable[] = {
 	{ &g_bannerLocation, "g_bannerLocation", "1", CVAR_ARCHIVE },
 	{ &g_bannerTime, "g_bannerTime", "60000", CVAR_ARCHIVE },
 	// FIXME: dynamic banner count.
-	{ &g_banner1, "g_banner1", "", CVAR_ARCHIVE },
-	{ &g_banner2, "g_banner2", "", CVAR_ARCHIVE },
-	{ &g_banner3, "g_banner3", "", CVAR_ARCHIVE },
-	{ &g_banner4, "g_banner4", "", CVAR_ARCHIVE },
-	{ &g_banner5, "g_banner5", "", CVAR_ARCHIVE },
+	{ &g_banner1, "g_banner1", "www.etjump.com", CVAR_ARCHIVE },
+	{ &g_banner2, "g_banner2", "www.etjump.com", CVAR_ARCHIVE },
+	{ &g_banner3, "g_banner3", "www.etjump.com", CVAR_ARCHIVE },
+	{ &g_banner4, "g_banner4", "www.etjump.com", CVAR_ARCHIVE },
+	{ &g_banner5, "g_banner5", "www.etjump.com", CVAR_ARCHIVE },
 
 	//Feen: PGM
 	{ &g_portalDebug, "g_portalDebug", "0", CVAR_CHEAT | CVAR_ARCHIVE },
@@ -461,6 +460,7 @@ cvarTable_t		gameCvarTable[] = {
 
 	{ &g_maxConnsPerIP, "g_maxConnsPerIP", "2", CVAR_ARCHIVE },
 	{ &g_mute, "g_mute", "0", CVAR_ARCHIVE },
+    { &g_goto, "g_goto", "1", CVAR_ARCHIVE }
 };
 
 // bk001129 - made static to avoid aliasing
@@ -1701,6 +1701,10 @@ void G_InitGame( int levelTime, int randomSeed, int restart ) {
 			G_Printf( "Not logging to disk.\n" );
 	}
 
+#ifdef BETATEST
+    trap_FS_FOpenFile( "bug_report.txt", &level.bugReportFile, FS_APPEND_SYNC );
+#endif //BETATEST
+
 	G_InitWorldSession();
 
 	// DHM - Nerve :: Clear out spawn target config strings
@@ -1837,7 +1841,7 @@ void G_InitGame( int levelTime, int randomSeed, int restart ) {
 	G_spawnPrintf(DP_MVSPAWN, level.time + 2000, NULL);
 
     // Zero: some people decided to replace YCN logo with some shit :C
-	CheckForValidIngameMain();
+	// CheckForValidIngameMain();
 }
 
 
@@ -1878,6 +1882,13 @@ void G_ShutdownGame( int restart ) {
 		trap_FS_FCloseFile( level.adminLogFile );
 		level.adminLogFile = 0;
 	}
+
+#ifdef BETATEST
+    if(level.bugReportFile) {
+        trap_FS_FCloseFile( level.bugReportFile );
+        level.bugReportFile = 0;
+    }
+#endif
 
 	// write all the client session data so we can get it back
 	G_WriteSessionData( restart );
@@ -2512,6 +2523,45 @@ void QDECL G_ALog( const char *fmt, ...) {
 	trap_FS_Write( string, strlen( string ), level.adminLogFile );
 }
 void QDECL G_ALog( const char *fmt, ... )_attribute((format(printf,1,2)));
+
+#ifdef BETATEST
+
+void QDECL G_BugPrintf( const char *fmt, ...) {
+	va_list		argptr;
+	char		string[1024];
+	qtime_t     rt;
+	int			min, hour, sec, l;
+    trap_RealTime(&rt);
+
+    hour = rt.tm_hour;
+    min = rt.tm_min;
+    sec = rt.tm_sec;
+
+	Com_sprintf( string, sizeof(string), "%02i:%02i:%02i ", hour, min, sec );
+
+	l = strlen( string );
+	
+	va_start( argptr, fmt );
+	Q_vsnprintf( string + l, sizeof( string ) - l, fmt, argptr );
+	va_end( argptr );
+
+	/*
+	if ( g_dedicated.integer ) {
+		G_Printf( "%s\n", string + l );
+	} 
+	*/
+
+    if ( !level.bugReportFile ) {
+		return;
+	}
+
+	Q_strcat(string, sizeof(string), "\n");
+
+	trap_FS_Write( string, strlen( string ), level.bugReportFile );
+}
+void QDECL G_BugPrintf( const char *fmt, ... )_attribute((format(printf,1,2)));
+
+#endif // BETATEST
 
 /*
 ================

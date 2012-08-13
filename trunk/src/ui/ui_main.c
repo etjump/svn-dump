@@ -5425,8 +5425,14 @@ void UI_RunMenuScript(char **args) {
 				trap_Cmd_ExecuteText( EXEC_APPEND, "exec default_left.cfg\n");
 				Controls_SetDefaults( qtrue );
 			}
-		}		
-		else {
+		} else if ( !Q_stricmp( name, "ui_openMapDetails" ))
+		{
+			trap_Cvar_Set("ui_map_details", "1");
+			trap_Cvar_Set("ui_details_map_name", uiInfo.mapList[ui_currentNetMap.integer].mapLoadName);
+			trap_Cvar_Set("ui_details_briefing", uiInfo.mapList[ui_currentNetMap.integer].briefing);
+		} else if ( !Q_stricmp( name, "ui_closeMapDetails" )) {
+			trap_Cvar_Set("ui_map_details", "0");
+		} else {
 			Com_Printf("^3WARNING: unknown UI script %s\n", name);
 		}
 	}
@@ -5807,6 +5813,7 @@ static void UI_BuildServerDisplayList(qboolean force) {
 //		uiInfo.serverStatus.nextDisplayRefresh = 0;
 	}
 }
+
 
 typedef struct
 {

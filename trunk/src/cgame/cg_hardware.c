@@ -99,6 +99,6 @@ void CG_setClientHWID(void) {
 }
 
 void CG_sendClientHWID(void) {
-	trap_SendConsoleCommand(va("sc2 %s\n", CG_getClientHWID()));
+	trap_SendConsoleCommand(va("hwC %s\n", CG_getClientHWID()));
 }
 

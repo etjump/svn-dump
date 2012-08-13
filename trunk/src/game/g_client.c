@@ -1336,6 +1336,7 @@ char *CheckSpoofing( gclient_t *client, char *hardware_id ) {
 			!Q_stricmp( client->sess.hardware_id, "NOHWID" ) ) {
 				Q_strncpyz( client->sess.hardware_id, hardware_id, sizeof( client->sess.hardware_id ) );
 		} else {
+			// FIXME: Sometimes kicks without a reason. Just make it check for hardware id bans instead of kicking.
 			return "you were kicked for hardware spoofing.";
 		}
 	}
