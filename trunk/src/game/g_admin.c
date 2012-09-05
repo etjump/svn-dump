@@ -178,7 +178,7 @@ void bufferPrint(gentity_t *ent, char *string) {
 // Is target's adminlevel higher than ents
 static qboolean isTargetHigher( gentity_t *ent, gentity_t *target, /* is equal level "higher" */ qboolean is_equal_higher ) {
 	// Console always wins
-	if(!ent) return qtrue;
+	if(!ent) return qfalse;
 	if(!target) return qtrue;
 
 	if(is_equal_higher) {
@@ -656,6 +656,8 @@ qboolean G_admin_hardware_ban_check(char *hardware_id) {
 	t = t - ADMIN_BAN_EXPIRE_OFFSET;
 
 	if(!hardware_id) return qfalse;
+
+	if(!Q_stricmp(hardware_id, G_SHA1("NOHWID"))) return qfalse;
 
 	for(i = 0; g_admin_bans[i]; i++) {
 		if(g_admin_bans[i]->expires != 0 &&
@@ -2195,14 +2197,37 @@ qboolean G_admin_levinfo( gentity_t *ent, int skiparg ) {
 	}
 	if(Q_SayArgc() == 1 + skiparg) {
 		int i = 0;
-		PrintTo(ent, "Levels: ");
-		for( i = 0; g_admin_levels[i]; i++) {
-			if(i == 0)
-				PrintTo(ent, va("%d", g_admin_levels[i]->level));
-			else
-				PrintTo(ent, va(", %d",g_admin_levels[i]->level));
+		if(ent)
+		{
+			CP("print \"Levels: \"");
+		} else {
+			G_Printf("Levels: ");
 		}
-		PrintTo(ent, "\n");
+		for( i = 0; g_admin_levels[i]; i++) {
+			if(ent)
+			{
+				if(i == 0)
+				{
+					CP(va("print \"%d\"", g_admin_levels[i]->level));
+				}
+				else 
+				{
+					CP(va("print \", %d\"", g_admin_levels[i]->level));
+				}
+			} else 
+			{
+				if(i == 0)
+				{
+					G_Printf("%d", g_admin_levels[i]->level);
+				}
+				else 
+				{
+					G_Printf(", %d\n", g_admin_levels[i]->level);
+				}
+				
+			}
+		}
+		PrintTo(ent, "");
 	} else if (Q_SayArgc() > 1 + skiparg) {
 
 		int i = 0;

@@ -5155,25 +5155,12 @@ void UI_RunMenuScript(char **args) {
 				trap_Cvar_Set( "ui_maxlives", "0" );
 			}
 
-			cvar = trap_Cvar_VariableValue( "g_heavyWeaponRestriction" );
-			if( cvar == 100 ) {
-				trap_Cvar_Set( "ui_heavyWeaponRestriction", "0" );
-			} else {
-				trap_Cvar_Set( "ui_heavyWeaponRestriction", "1" );
-			}
 		} else if (Q_stricmp(name, "toggleMaxLives") == 0) {
 			int ui_ml = trap_Cvar_VariableValue( "ui_maxlives" );
 			if( ui_ml ) {
 				trap_Cvar_Set( "g_maxlives", "5" );
 			} else {
 				trap_Cvar_Set( "g_maxlives", "0" );
-			}
-		} else if (Q_stricmp(name, "toggleWeaponRestriction") == 0) {
-			int ui_hwr = trap_Cvar_VariableValue( "ui_heavyWeaponRestriction" );
-			if( ui_hwr ) {
-				trap_Cvar_Set( "g_heavyWeaponRestriction", "10" );
-			} else {
-				trap_Cvar_Set( "g_heavyWeaponRestriction", "100" );
 			}
 		} else if (Q_stricmp(name, "openModURL") == 0) {
 			trap_Cvar_Set( "ui_finalURL", UI_Cvar_VariableString("ui_modURL") );
@@ -8397,7 +8384,6 @@ cvarTable_t		cvarTable[] = {
 	{ NULL, "g_lms_roundlimit", "3", CVAR_ARCHIVE },
 	{ NULL, "g_lms_matchlimit", "2", CVAR_ARCHIVE },
 	{ NULL, "g_lms_followTeamOnly", "1", CVAR_ARCHIVE },
-	{ NULL, "g_heavyWeaponRestriction", "100", CVAR_ARCHIVE|CVAR_SERVERINFO },
 	{ &cl_profile, "cl_profile", "", CVAR_ROM },
 	{ &cl_defaultProfile, "cl_defaultProfile", "", CVAR_ROM },
 	{ &ui_profile, "ui_profile", "", CVAR_ROM },

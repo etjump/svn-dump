@@ -363,7 +363,7 @@ struct gentity_s {
 
 	// Rafael - sniper variable
 	// sniper uses delay, random, radius
-	int			radius; // Zero: also for vortex
+	int			radius;
 	int			force;
 	float		delay;
 
@@ -664,7 +664,6 @@ typedef struct {
 
 	qboolean	specLocked;
 	int			specInvitedClients[MAX_CLIENTS / (sizeof(int) * 8)];
-	int			specBlockedClients[MAX_CLIENTS / (sizeof(int) * 8)];
 	// Fireteam save limit
 	int			savelimit;
 	// Map ident
@@ -961,6 +960,7 @@ struct gclient_s {
 	qboolean		maxlivescalced;
 
     int             last8BallTime; // Last level.time client used !8ball.
+	int				lastVoteTime;
     runData_t       runData;
 };
 
@@ -1911,7 +1911,6 @@ extern vmCvar_t		g_letterbox;
 extern vmCvar_t		bot_enable;
 
 extern vmCvar_t		g_debugSkills;
-extern vmCvar_t		g_heavyWeaponRestriction;
 extern vmCvar_t		g_autoFireteams;
 
 extern vmCvar_t		g_nextmap;
@@ -1965,6 +1964,7 @@ extern vmCvar_t g_portalMode;
 extern vmCvar_t g_maxConnsPerIP;
 extern vmCvar_t	g_mute;
 extern vmCvar_t g_goto;
+extern vmCvar_t g_voteCooldown;
 
 void	trap_Printf( const char *fmt );
 void	trap_Error( const char *fmt );
@@ -2475,7 +2475,7 @@ void G_teamready_cmd(gentity_t *ent, unsigned int dwCommand, qboolean fDump);
 void G_weaponRankings_cmd(gentity_t *ent, unsigned int dwCommand, qboolean state);
 void G_weaponStats_cmd(gentity_t *ent, unsigned int dwCommand, qboolean fDump);
 void G_weaponStatsLeaders_cmd(gentity_t* ent, qboolean doTop, qboolean doWindow);
-void G_VoiceTo( gentity_t *ent, gentity_t *other, int mode, const char *id, qboolean voiceonly );
+void	G_VoiceTo( gentity_t *ent, gentity_t *other, int mode, const char *id, qboolean voiceonly );
 
 
 

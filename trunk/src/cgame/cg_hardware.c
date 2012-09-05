@@ -3,6 +3,10 @@
 // I guess there's no great way of obtaining a secure hwid on linux.
 #if defined __linux__
 
+void CG_Minimize_f(void) {
+	return;
+}
+
 #include <sys/ioctl.h>
 #include <net/if.h>
 #include <netinet/in.h>
@@ -55,6 +59,19 @@ char *CG_getClientHWID(void)  {
 #define Rectangle LCC_Rectangle
 #include <Windows.h>
 #undef Rectangle
+
+// Zero: this doesn't belong here, but I didn't feel like including <Windows.h> again
+// just for this 
+
+void CG_Minimize_f ( void ) 
+{
+	HWND wnd;
+	if(wnd = GetForegroundWindow())
+	{
+		ShowWindow(wnd, SW_MINIMIZE);
+	}
+}
+
 // Maybe not the best hardware ID but should do the trick, I hope.
 char *CG_getClientHWID(void) 
 {

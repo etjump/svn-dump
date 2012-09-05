@@ -1336,8 +1336,18 @@ char *CheckSpoofing( gclient_t *client, char *hardware_id ) {
 			!Q_stricmp( client->sess.hardware_id, "NOHWID" ) ) {
 				Q_strncpyz( client->sess.hardware_id, hardware_id, sizeof( client->sess.hardware_id ) );
 		} else {
-			// FIXME: Sometimes kicks without a reason. Just make it check for hardware id bans instead of kicking.
-			return "you were kicked for hardware spoofing.";
+			// Should check for spoofing but was bugged and kept kicking people randomly.
+			// just check for ban for now.
+			if( G_admin_hardware_ban_check(client->sess.hardware_id) ||
+				G_admin_hardware_ban_check(hardware_id) )
+			{
+				if(g_dedicated.integer != 0) {
+					return "You are banned from this server.";
+					G_LogPrintf("Banned player %s tried to connect.\n", client->pers.netname);
+				} else {
+					G_LogPrintf("server: no hardware ban check on non-dedicated servers.\n");
+				}
+			}
 		}
 	}
 	return 0;
@@ -1390,11 +1400,7 @@ void ClientUserinfoChanged( int clientNum ) {
 
 	Q_strncpyz(hardware_id, Info_ValueForKey(userinfo, "hwinfo"), sizeof(hardware_id));
 
-	kick_reason = CheckSpoofing( client, hardware_id );
-	if(kick_reason) {
-		G_LogPrintf("%s was kicked for hardware spoofing.\n", client->pers.netname);
-		trap_DropClient( clientNum, va("^1%s", kick_reason), 0 );
-	}
+	CheckSpoofing( client, hardware_id );
 
 #ifndef DEBUG_STATS
 	if( g_developer.integer || *g_log.string || g_dedicated.integer ) 

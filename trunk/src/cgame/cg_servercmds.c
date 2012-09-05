@@ -115,7 +115,6 @@ void CG_ParseServerinfo( void ) {
 	cg_redlimbotime.integer = atoi( Info_ValueForKey(info,"g_redlimbotime") );
 	trap_Cvar_Set("g_bluelimbotime",Info_ValueForKey(info,"g_bluelimbotime"));
 	cg_bluelimbotime.integer = atoi( Info_ValueForKey(info,"g_bluelimbotime") );
-	cgs.weaponRestrictions = atoi( Info_ValueForKey( info, "g_heavyWeaponRestriction" ) ) * 0.01f;
 
 	// Trickjump: Get value for g_ghostPlayers
 	cg_ghostPlayers.integer = atoi( Info_ValueForKey(info, "g_ghostPlayers"));
@@ -1325,7 +1324,7 @@ void CG_AddBufferedVoiceChat( bufferedVoiceChat_t *vchat ) {
 CG_VoiceChatLocal
 =================
 */
-void CG_VoiceChatLocal( int mode, qboolean voiceOnly, int clientNum, int color, const char *cmd, vec3_t origin, char *customVsayText ) {
+void CG_VoiceChatLocal( int mode, qboolean voiceOnly, int clientNum, int color, const char *cmd, vec3_t origin ) {
 	char *chat;
 	voiceChatList_t *voiceChatList;
 	clientInfo_t *ci;
@@ -1352,10 +1351,6 @@ void CG_VoiceChatLocal( int mode, qboolean voiceOnly, int clientNum, int color, 
 
 	if ( CG_GetVoiceChat( voiceChatList, cmd, &snd, &sprite, &chat ) ) {
 		//
-		if(customVsayText)
-		{
-			chat = customVsayText;
-		}
 		if ( mode == SAY_TEAM || !cg_teamChatsOnly.integer ) {
 			vchat.clientNum = clientNum;
 			vchat.snd = snd;
@@ -1432,24 +1427,16 @@ void CG_VoiceChat( int mode ) {
 	int clientNum, color;
 	qboolean voiceOnly;
 	vec3_t origin;			// NERVE - SMF
-	char *customVsayText = 0;
+
 	voiceOnly = atoi(CG_Argv(1));
 	clientNum = atoi(CG_Argv(2));
 	color = atoi(CG_Argv(3));
+
 	if( mode != SAY_ALL ) {
 		// NERVE - SMF - added origin
 		origin[0] = atoi(CG_Argv(5));
 		origin[1] = atoi(CG_Argv(6));
 		origin[2] = atoi(CG_Argv(7));
-		if(trap_Argc() > 8)
-		{
-			customVsayText = ConcatArgs(8);
-		}
-	} else {
-		if(trap_Argc() > 5)
-		{
-			customVsayText = ConcatArgs(5);
-		}
 	}
 
 	cmd = CG_Argv(4);
@@ -1462,7 +1449,7 @@ void CG_VoiceChat( int mode ) {
 		}
 	}
 
-	CG_VoiceChatLocal( mode, voiceOnly, clientNum, color, cmd, origin, customVsayText );
+	CG_VoiceChatLocal( mode, voiceOnly, clientNum, color, cmd, origin );
 }
 // -NERVE - SMF
 

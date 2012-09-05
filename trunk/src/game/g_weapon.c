@@ -2219,7 +2219,7 @@ qboolean G_AvailableAirstrikes( gentity_t* ent ) {
 }
 
 void G_AddAirstrikeToCounters( gentity_t* ent ) {
-	int max = min( 6, 2 * ( ceil( g_heavyWeaponRestriction.integer * G_TeamCount( ent, -1 ) * 0.1f * 10 * 0.01f ) ) );
+	int max = min( 6, 2 * ( ceil( G_TeamCount( ent, -1 ) * 0.1f * 10 * 0.01f ) ) );
 
 	
 

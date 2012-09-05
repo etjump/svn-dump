@@ -442,7 +442,6 @@ void SP_func_fakebrush (gentity_t *ent);
 void SP_target_savereset (gentity_t *self);
 void SP_target_increase_ident (gentity_t *self);
 void SP_target_save(gentity_t *self);
-void SP_func_vortex( gentity_t *ent );
 //Feen: PGM
 void SP_weapon_portalgun (gentity_t *self);
 
@@ -681,7 +680,6 @@ spawn_t	spawns[] = {
 	{"weapon_portalgun",	SP_weapon_portalgun }, //Feen: PGM
 	{"target_increase_ident", SP_target_increase_ident },
 	{"target_save",			SP_target_save },
-	{"func_vortex",			SP_func_vortex },
 
 	{0, 0}
 };

@@ -172,7 +172,6 @@ vmCvar_t		g_letterbox;
 vmCvar_t		bot_enable;
 
 vmCvar_t		g_debugSkills;
-vmCvar_t		g_heavyWeaponRestriction;
 vmCvar_t		g_autoFireteams;
 
 vmCvar_t		g_nextmap;
@@ -227,6 +226,7 @@ vmCvar_t		g_maxConnsPerIP;
 
 vmCvar_t		g_mute;
 vmCvar_t        g_goto;
+vmCvar_t		g_voteCooldown;
 
 cvarTable_t		gameCvarTable[] = {
 	// don't override the cheat state set by the system
@@ -410,8 +410,6 @@ cvarTable_t		gameCvarTable[] = {
 	{ &bot_enable,	"bot_enable",	"0", 0			},
 
 	{ &g_debugSkills,	"g_debugSkills", "0", 0		},
-
-	{ &g_heavyWeaponRestriction, "g_heavyWeaponRestriction", "100", CVAR_ARCHIVE|CVAR_SERVERINFO },
 	{ &g_autoFireteams, "g_autoFireteams", "1", CVAR_ARCHIVE },
 
 	{ &g_nextmap, "nextmap", "", CVAR_TEMP },
@@ -460,7 +458,8 @@ cvarTable_t		gameCvarTable[] = {
 
 	{ &g_maxConnsPerIP, "g_maxConnsPerIP", "2", CVAR_ARCHIVE },
 	{ &g_mute, "g_mute", "0", CVAR_ARCHIVE },
-    { &g_goto, "g_goto", "1", CVAR_ARCHIVE }
+    { &g_goto, "g_goto", "1", CVAR_ARCHIVE },
+	{ &g_voteCooldown, "g_voteCooldown", "15", CVAR_ARCHIVE }
 };
 
 // bk001129 - made static to avoid aliasing

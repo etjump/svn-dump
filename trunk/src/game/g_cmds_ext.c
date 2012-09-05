@@ -9,8 +9,6 @@ int iWeap = WS_MAX;
 static void Cmd_SpecInvite_f(gentity_t *ent, unsigned int dwCommand, qboolean invite /* or uninvite */);
 static void Cmd_SpecLock_f(gentity_t *ent, unsigned int dwCommand, qboolean lock);
 static void Cmd_SpecList_f(gentity_t *ent, unsigned int dwCommand, qboolean notUsed);
-static void Cmd_SpecBlock_f(gentity_t *ent, unsigned int dwCommand, qboolean block);
-
 char *lock_status[2] = { "unlock", "lock" };
 
 //
@@ -49,8 +47,6 @@ static const cmd_reference_t aCommandInfo[] = {
 	{ "specuninvite",	qtrue,	qfalse,	Cmd_SpecInvite_f, ":^7 Uninvites a player to spectate" },
 	{ "speclock",		qtrue,	qtrue,	Cmd_SpecLock_f, ":^7 Locks a player from spectators" },
 	{ "specunlock",		qtrue,	qfalse, Cmd_SpecLock_f, ":^7Unlocks a player from spectators" },
-	{ "specblock",		qtrue,	qtrue,	Cmd_SpecBlock_f, ":^7Blocks a player from spectating you" },
-	{ "specunblock",	qtrue,  qfalse, Cmd_SpecBlock_f, ":^7Unblock a player from spectating you" },
 	{ "speclist",		qtrue,	qtrue,	Cmd_SpecList_f, ":^7Lists specinvited players" },
 	{ "statsall",		qtrue,	qfalse,	G_statsall_cmd, ":^7 Shows weapon accuracy stats for all players" },
 	{ "statsdump",		qtrue,	qtrue,	NULL, ":^7 Shows player stats + match info saved locally to a file" },
@@ -728,59 +724,6 @@ static qboolean isSpectating(gentity_t *ent, gentity_t *target) {
 		return qtrue;
 	}
 	return qfalse;
-}
-
-void Cmd_SpecBlock_f ( gentity_t *ent, unsigned int dwCommand, qboolean block ) {
-	int			clientNum = MAX_CLIENTS;
-	gentity_t	*other = NULL;
-	char		arg[MAX_TOKEN_CHARS] = "\0";
-	char		error[MAX_STRING_CHARS] = "\0";
-
-	if(ClientIsFlooding(ent)) {
-		CP("print \"^1Spam Protection:^7 Specblock ignored\n\"");
-		return;
-	}
-
-	if(trap_Argc() != 2) {
-		CP("print \"^5Usage:^7 /specblock <player>\n\"");
-		return;
-	}
-
-	trap_Argv(1, arg, sizeof(arg));
-
-	other = getPlayerPtrForName(arg, error, sizeof(error));
-	clientNum = other->client->ps.clientNum;
-	if(!other) {
-		CP(va("print \"%s\n\"", error));
-		return;
-	}
-
-	if(other == ent) {
-		CP("print \"^7Can't specblock self.\n\"");
-		return;
-	}
-
-	if(block) {
-		if(COM_BitCheck(ent->client->sess.specBlockedClients, clientNum)) {
-			CP(va("print \"%s ^7is already specblocked.\n\"", other->client->pers.netname));
-			return;
-		}
-		COM_BitSet(ent->client->sess.specBlockedClients, clientNum);
-		CP(va("print \"%s ^7has been blocked from spectating you.\n\"", other->client->pers.netname));
-		// FIXME: if client is spectating adding client to specblockedclients list does not seem to work. 
-		// it just stops following but client can just do /follow
-		if(isSpectating(other, ent) &&
-			!G_AllowFollow(other, ent)) {
-				StopFollowing(other);
-		}
-	} else {
-		if(!COM_BitCheck(ent->client->sess.specBlockedClients, clientNum)) {
-			CP(va("print \"%s ^7is not specblocked.\n\"", other->client->pers.netname));
-			return;
-		}
-		COM_BitClear(ent->client->sess.specBlockedClients, clientNum);
-		CP(va("print \"%s ^7can now spectate you.\n\"", other->client->pers.netname));
-	}
 }
 
 /*

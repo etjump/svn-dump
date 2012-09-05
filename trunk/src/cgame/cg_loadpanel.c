@@ -318,12 +318,6 @@ void CG_DrawConnectScreen( qboolean interactive, qboolean forcerefresh ) {
 			CG_DrawPic( x, y, 16, 16, bg_filter_pb );
 		}
 
-		str = Info_ValueForKey( buffer, "g_heavyWeaponRestriction" );
-		if( str && *str && atoi( str ) != 100 ) {
-			x = 546;
-			CG_DrawPic( x, y, 16, 16, bg_filter_hw );
-		}
-
 		str = Info_ValueForKey( buffer, "g_antilag" );
 		if( str && *str && atoi( str ) ) {
 			x = 575;

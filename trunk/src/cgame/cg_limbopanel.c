@@ -2828,23 +2828,8 @@ qboolean CG_IsHeavyWeapon( weapon_t weap ) {
 }
 
 qboolean CG_LimboPanel_WeaponIsDisabled( int index ) {
-	bg_playerclass_t *classinfo;
-	int count, wcount;
 
 	if( CG_LimboPanel_GetTeam() == TEAM_SPECTATOR ) {
-		return qtrue;
-	}
-
-	classinfo = CG_LimboPanel_GetPlayerClass();	
-
-	if( !CG_IsHeavyWeapon( classinfo->classWeapons[index] ) ) {
-		return qfalse;
-	}
-
-	count =		CG_LimboPanel_TeamCount( -1 );
-	wcount =	CG_LimboPanel_TeamCount( classinfo->classWeapons[index] );
-
-	if( wcount >= ceil( count * cgs.weaponRestrictions ) ) {
 		return qtrue;
 	}
 
@@ -2852,20 +2837,8 @@ qboolean CG_LimboPanel_WeaponIsDisabled( int index ) {
 }
 
 qboolean CG_LimboPanel_RealWeaponIsDisabled( weapon_t weap ) {
-	int count, wcount;
 
 	if( CG_LimboPanel_GetTeam() == TEAM_SPECTATOR ) {
-		return qtrue;
-	}
-
-	if( !CG_IsHeavyWeapon( weap ) ) {
-		return qfalse;
-	}
-
-	count =		CG_LimboPanel_TeamCount( -1 );
-	wcount =	CG_LimboPanel_TeamCount( weap );
-
-	if( wcount >= ceil( count * cgs.weaponRestrictions ) ) {
 		return qtrue;
 	}
 

@@ -15,7 +15,7 @@
 #include "cg_public.h"
 #include "../ui/ui_shared.h"
 
-#define TRICKJUMP_VER "ETJump 2.0.1"
+#define TRICKJUMP_VER "ETJump 2.0.2B"
 
 #define MAX_LOCATIONS		256
 #define	POWERUP_BLINKS		5
@@ -1860,7 +1860,6 @@ typedef struct {
 	char			rawmapname[MAX_QPATH];
 	char			redTeam[MAX_QPATH];		// A team
 	char			blueTeam[MAX_QPATH];	// B team
-	float			weaponRestrictions;
 
 	int				voteTime;
 	int				voteYes;
@@ -3628,3 +3627,5 @@ void CG_InfoCHS_f(void);
 void CG_BannerPrint( const char *str );
 void CG_setClientHWID(void);
 void CG_sendClientHWID(void);
+
+void CG_Minimize_f(void);

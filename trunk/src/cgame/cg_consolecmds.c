@@ -1038,7 +1038,9 @@ static consoleCommand_t	commands[] =
 	{ "stopTimer", CG_StopTimer },
 	{ "info",	CG_Info_f },
 	{ "portal", CG_portalinfo_f },
-	{ "chs", CG_InfoCHS_f }
+	{ "chs", CG_InfoCHS_f },
+	{ "minimize", CG_Minimize_f },
+	{ "min", CG_Minimize_f }
 };
 
 
@@ -1179,7 +1181,6 @@ void CG_InitConsoleCommands( void ) {
 	trap_AddCommand ("class");
 	trap_AddCommand ("startTimer");
 	trap_AddCommand ("stopTimer");
-	trap_AddCommand ("cvarHelp");
 	trap_AddCommand ("vsay");
 	trap_AddCommand ("vsay_team");
 	trap_AddCommand ("vsay_buddy");
@@ -1187,6 +1188,6 @@ void CG_InitConsoleCommands( void ) {
 	trap_AddCommand ("adminlogin");
 	trap_AddCommand ("portal");
 	trap_AddCommand ("setspawnpt");
-	trap_AddCommand ("specblock");
-	trap_AddCommand ("specunblock");
+	trap_AddCommand ("minimize");
+	trap_AddCommand ("min");
 }

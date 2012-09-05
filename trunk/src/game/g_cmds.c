@@ -752,7 +752,7 @@ void Cmd_Noclip_f( gentity_t *ent ) {
 	char	*msg;
 
 	char	*name = ConcatArgs( 1 );
-	if(!g_developer.integer || g_dedicated.integer > 0) {
+	if(!g_developer.integer || g_dedicated.integer > 0 || (ent && ent->client->sess.sessionTeam != TEAM_SPECTATOR)) {
 	#ifdef EDITION999
 		if(!G_admin_hasPermission(ent, AF_ADMINBYPASS)) {
 			if ( !g_noclip.integer && !CheatsOk( ent ) ) {
@@ -1137,20 +1137,8 @@ int G_TeamCount( gentity_t* ent, weapon_t weap ) {
 }
 
 qboolean G_IsWeaponDisabled( gentity_t* ent, weapon_t weapon ) {
-	int count, wcount;
 
 	if( ent->client->sess.sessionTeam == TEAM_SPECTATOR ) {
-		return qtrue;
-	}
-
-	if( !G_IsHeavyWeapon( weapon ) ) {
-		return qfalse;
-	}
-
-	count =		G_TeamCount( ent, -1 );
-	wcount =	G_TeamCount( ent, weapon );
-
-	if( wcount >= ceil( count * g_heavyWeaponRestriction.integer * 0.01f ) ) {
 		return qtrue;
 	}
 
@@ -1635,7 +1623,7 @@ void Cmd_Say_f(gentity_t *ent, int mode, qboolean arg0, qboolean encoded)
 extern void BotRecordVoiceChat( int client, int destclient, const char *id, int mode, qboolean noResponse );
 
 // NERVE - SMF
-void	G_VoiceTo( gentity_t *ent, gentity_t *other, int mode, const char *id, qboolean voiceonly, char *customVsayText ) {
+void G_VoiceTo( gentity_t *ent, gentity_t *other, int mode, const char *id, qboolean voiceonly ) {
 	int color;
 	char *cmd;
 
@@ -1693,26 +1681,15 @@ void	G_VoiceTo( gentity_t *ent, gentity_t *other, int mode, const char *id, qboo
 		voiceonly = qfalse;
 	}
 
-	if(customVsayText)
-	{
-		// REMEMBER TO CHECK FOR OVERFLOW ON TOO LONG VSAYTEXT
-		if( mode == SAY_TEAM || mode == SAY_BUDDY ) {
-			CPx( other-g_entities, va("%s %d %d %d %s %i %i %i %s", cmd, voiceonly, ent - g_entities, color, id, (int)ent->s.pos.trBase[0], (int)ent->s.pos.trBase[1], (int)ent->s.pos.trBase[2], customVsayText ));
-		} else {
-			CPx( other-g_entities, va("%s %d %d %d %s %s %s", cmd, voiceonly, ent - g_entities, color, id, customVsayText ));
-		}
-	}
-	else
-	{
-		if( mode == SAY_TEAM || mode == SAY_BUDDY ) {
-			CPx( other-g_entities, va("%s %d %d %d %s %i %i %i", cmd, voiceonly, ent - g_entities, color, id, (int)ent->s.pos.trBase[0], (int)ent->s.pos.trBase[1], (int)ent->s.pos.trBase[2] ));
-		} else {
-			CPx( other-g_entities, va("%s %d %d %d %s", cmd, voiceonly, ent - g_entities, color, id ));
-		}
+	if( mode == SAY_TEAM || mode == SAY_BUDDY ) {
+		CPx( other-g_entities, va("%s %d %d %d %s %i %i %i", cmd, voiceonly, ent - g_entities, color, id, (int)ent->s.pos.trBase[0], (int)ent->s.pos.trBase[1], (int)ent->s.pos.trBase[2] ));
+	} else {
+		CPx( other-g_entities, va("%s %d %d %d %s", cmd, voiceonly, ent - g_entities, color, id ));
 	}
 }
 
-void G_Voice( gentity_t *ent, gentity_t *target, int mode, const char *id, qboolean voiceonly, const char *customVsayText ) {
+
+void G_Voice( gentity_t *ent, gentity_t *target, int mode, const char *id, qboolean voiceonly ) {
 	int			j;
 
 	// DHM - Nerve :: Don't allow excessive spamming of voice chats
@@ -1740,14 +1717,13 @@ void G_Voice( gentity_t *ent, gentity_t *target, int mode, const char *id, qbool
 	}*/
 
 	if ( target ) {
-		G_VoiceTo( ent, target, mode, id, voiceonly, customVsayText );
+		G_VoiceTo( ent, target, mode, id, voiceonly );
 		return;
 	}
 
 	// echo the text to the console
 	if ( g_dedicated.integer ) {
 		G_Printf( "voice: %s %s\n", ent->client->pers.netname, id);
-		G_LogPrintf( "voice: %s %s %s\n", ent->client->pers.netname, id, customVsayText );
 	}
 
 	if( mode == SAY_BUDDY ) {
@@ -1795,13 +1771,13 @@ void G_Voice( gentity_t *ent, gentity_t *target, int mode, const char *id, qbool
 				}
 			}
 
-			G_VoiceTo(ent, &g_entities[level.sortedClients[j]], mode, id, voiceonly, customVsayText);
+			G_VoiceTo(ent, &g_entities[level.sortedClients[j]], mode, id, voiceonly);
 		}
 	} else {
 
 		// send it to all the apropriate clients
 		for( j = 0; j < level.numConnectedClients; j++ ) {
-			G_VoiceTo(ent, &g_entities[level.sortedClients[j]], mode, id, voiceonly, customVsayText);
+			G_VoiceTo(ent, &g_entities[level.sortedClients[j]], mode, id, voiceonly);
 		}
 	}
 }
@@ -1812,33 +1788,11 @@ Cmd_Voice_f
 ==================
 */
 static void Cmd_Voice_f( gentity_t *ent, int mode, qboolean arg0, qboolean voiceonly ) {
-	char *customVsayText = 0;
-	char vsayId[MAX_TOKEN_CHARS];
-	// Custom text for vsay if argc != 2
-	if(trap_Argc() > 2)
-	{
-		// /vsay <id> <custom vsay text>
-		customVsayText = ConcatArgs(((arg0) ? 1 : 2));
-		if(strlen(customVsayText) > 256)
-		{
-			// Text does not have to be over 256 chars
-			customVsayText[256] = 0;
-		}
-	}
-
-	// Get the vsay ID to a char array
-	if(arg0)
-	{
-		trap_Argv(0, vsayId, sizeof(vsayId));
-	} else {
-		trap_Argv(1, vsayId, sizeof(vsayId));
-	}
-
 	if( mode != SAY_BUDDY ) {
 		if(trap_Argc() < 2 && !arg0) {
 			return;
 		}
-		G_Voice(ent, NULL, mode, vsayId, voiceonly, customVsayText);
+		G_Voice(ent, NULL, mode, ConcatArgs(((arg0) ? 0 : 1)), voiceonly);
 	} else {
 		char buffer[16];
 		int index;
@@ -1852,7 +1806,7 @@ static void Cmd_Voice_f( gentity_t *ent, int mode, qboolean arg0, qboolean voice
 		if( trap_Argc() < 3 + index && !arg0 ) {
 			return;
 		}
-		G_Voice(ent, NULL, mode, vsayId, voiceonly, customVsayText);
+		G_Voice(ent, NULL, mode, ConcatArgs(((arg0) ? 2 + index : 3 + index)), voiceonly);
 	}
 }
 
@@ -2012,6 +1966,11 @@ qboolean Cmd_CallVote_f( gentity_t *ent, unsigned int dwCommand, qboolean fRefCo
 		} 
 	}
 
+	if( ent && ent->client->sess.sessionTeam == TEAM_SPECTATOR ) {
+		PrintTo(ent, "^3callvote: ^7you are not allowed to call a vote as a spectator");
+		return qfalse;
+	}
+
 	if( ent && ent->client->sess.muted && g_mute.integer & 2) {
 		CP("print \"^3callvote: ^7not allowed to call a vote while muted.\n\"");
 		return qfalse;
@@ -2115,6 +2074,14 @@ qboolean Cmd_CallVote_f( gentity_t *ent, unsigned int dwCommand, qboolean fRefCo
 	level.voteInfo.voteNo = 0;
 	level.voteInfo.voter_cn = ent->client->ps.clientNum;
 	level.voteInfo.voter_team = ent->client->sess.sessionTeam;
+
+	if(level.time - ent->client->lastVoteTime < 1000 * g_voteCooldown.integer) {
+		ChatPrintTo(ent, va("^3callvote:^7 you must wait %d more seconds to vote again", 
+			g_voteCooldown.integer - ((level.time - ent->client->lastVoteTime) / 1000) ));
+		return qfalse;
+	}
+
+	ent->client->lastVoteTime = level.time;
 
 	// Don't send the vote info if a ref initiates (as it will automatically pass)
 	if(!fRefCommand) {
@@ -3853,10 +3820,6 @@ void Cmd_NoNading_f(gentity_t *ent) {
  */
 qboolean G_AllowFollow(gentity_t *ent, gentity_t *other)
 {
-	// Check if we're specblocked
-	if(COM_BitCheck(other->client->sess.specBlockedClients, ent->client->ps.clientNum)) {
-		return qfalse;
-	} 
 	// Check if target is speclocked, if it is check if we're invited
 	return (!other->client->sess.specLocked
 		|| COM_BitCheck(other->client->sess.specInvitedClients, ent->client->ps.clientNum));

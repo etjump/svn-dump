@@ -117,7 +117,7 @@ static vec3_t	flameChunkMaxs = {0, 0, 0};
 #define	FLAME_LENGTH			(FLAMETHROWER_RANGE + 50.0)	// NOTE: only modify the range, since this should always reflect that range
 
 #define	FLAME_LIFETIME			(int)((FLAME_LENGTH/FLAME_START_SPEED)*1000)	// life duration in milliseconds
-#define	FLAME_FRICTION_PER_SEC	(2.0*FLAME_START_SPEED)
+#define	FLAME_FRICTION_PER_SEC	( 2.0*FLAME_START_SPEED)
 #define	FLAME_BLUE_LIFE			(int)((FLAME_BLUE_LENGTH/FLAME_START_SPEED)*1000)
 #define	FLAME_FUEL_LIFE			(int)((FLAME_FUEL_LENGTH/FLAME_START_SPEED)*1000)
 #define	FLAME_FUEL_FADEIN_TIME	(0.2*FLAME_FUEL_LIFE)
