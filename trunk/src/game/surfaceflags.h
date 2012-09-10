@@ -74,7 +74,7 @@
 //Feen: New ETJump Surfaces...
 #define SURF_PORTALGATE			0x08000000  //Feen: I hereby declare these's SURF's in the name of ETJump!
 #define SURF_MONSLICK_N			0x10000000  //Feen: surfaceparm monsterslicknorth - Indicates a portalable surface
-#define SURF_MONSLICK_E			0x20000000
+#define SURF_MONSLICK_E			0x20000000	//Zero: I hereby declare this SURF as a portalable/unportalable surface (depends on level.portalSurfaces)
 #define SURF_MONSLICK_S			0x40000000
 //END New ETJump Surfaces
 

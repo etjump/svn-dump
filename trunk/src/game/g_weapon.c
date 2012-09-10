@@ -3409,6 +3409,13 @@ void Weapon_Portal_Fire( gentity_t *ent, int PortalNumber ) {
 	if ( tr.contents & CONTENTS_NOPORTAL )
 		return;
 
+	if ( level.portalSurfaces && tr.surfaceFlags & SURF_MONSLICK_E ) {
+		return;
+	}
+
+	if ( !level.portalSurfaces && !(tr.surfaceFlags & SURF_MONSLICK_E )) {
+		return;
+	}
 
 
 	//Go ahead and calc new endpos just in case....

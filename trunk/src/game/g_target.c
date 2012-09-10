@@ -1487,3 +1487,25 @@ void SP_target_save( gentity_t *self )
 {
 	self->use = target_save_use;
 }
+
+void target_remove_portals_use( gentity_t *self, gentity_t *other, gentity_t *activator ) {
+	if(activator->client->sess.sessionTeam == TEAM_SPECTATOR) {
+		return;
+	}
+
+	if(activator->portal_blue) {
+		G_FreeEntity(activator->portal_blue);
+		activator->portal_blue = NULL;
+	}
+
+	if(activator->portal_red) {
+		G_FreeEntity(activator->portal_red);
+		activator->portal_red = NULL;
+	}
+
+	CPPrintTo(activator, "^7Your portal gun portals have been reseted.");
+}
+
+void SP_target_remove_portals( gentity_t *self ) {
+	self->use = target_remove_portals_use;
+}

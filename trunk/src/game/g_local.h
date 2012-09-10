@@ -593,6 +593,7 @@ typedef struct {
 	char password[40+1];
 	char username[MAX_NAME_LENGTH];
 	char ip[MAX_IP_LEN];
+	char commands[MAX_COMMANDS];
 } admin_t;
 
 // client data that stays across multiple levels or tournament restarts
@@ -1232,6 +1233,7 @@ typedef struct {
 	int			nextBanner;
 
 	int			portalEnabled; //Feen: PGM - Enabled/Disabled by map key
+	qboolean	portalSurfaces;
 
 	persSavePos_t persSavedPositions[MAX_SERVER_SAVED_POSITIONS];
 

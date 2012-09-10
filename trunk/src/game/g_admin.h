@@ -73,8 +73,8 @@ typedef struct {
 	char banner[MAX_NAME_LENGTH];
 } admin_ban_t;
 
-#define EDITION999
-#define BETATEST
+//#define EDITION999
+//#define BETATEST
 
 #ifdef EDITION999
 #define AF_ADMINBYPASS 'Z'

@@ -444,6 +444,7 @@ void SP_target_increase_ident (gentity_t *self);
 void SP_target_save(gentity_t *self);
 //Feen: PGM
 void SP_weapon_portalgun (gentity_t *self);
+void SP_target_remove_portals(gentity_t *self);
 
 spawn_t	spawns[] = {
 	// info entities don't do anything at all, but provide positional
@@ -680,6 +681,7 @@ spawn_t	spawns[] = {
 	{"weapon_portalgun",	SP_weapon_portalgun }, //Feen: PGM
 	{"target_increase_ident", SP_target_increase_ident },
 	{"target_save",			SP_target_save },
+	{"target_remove_portals", SP_target_remove_portals },
 
 	{0, 0}
 };
@@ -1043,6 +1045,13 @@ void SP_worldspawn( void ) {
 	G_SpawnString("portalgun_spawn", "1", &s);
 	if (atoi(s))
 		level.portalEnabled = qtrue;
+
+	G_SpawnString("portalsurfaces", "1", &s);
+	if (atoi(s)) {
+		level.portalSurfaces = qtrue;
+	} else {
+		level.portalSurfaces = qfalse;
+	}
 
 	level.mapcoordsValid = qfalse;
 	if( G_SpawnVector2D( "mapcoordsmins", "-128 128", level.mapcoordsMins ) &&	// top left

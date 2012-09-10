@@ -4918,8 +4918,6 @@ static void CG_DrawPlayerStats( void ) {
         CG_Text_Paint_Ext( SKILLS_X - 28 + 2, 480 - 4, 0.2f, 0.2f, colorWhite, "HP", 0, 0, ITEM_TEXTSTYLE_SHADOWED, &cgs.media.limboFont1 );
     }
 
-    if(!cg_HUD_xpInfo.integer) { return; }
-
     if( cgs.gametype == GT_WOLF_LMS ) {
         return;
     }
@@ -4927,25 +4925,28 @@ static void CG_DrawPlayerStats( void ) {
     ps = &cg.snap->ps;
     ci = &cgs.clientinfo[ ps->clientNum ];
 
+	if(!cg_HUD_xpInfo.integer) {
 
-    for( i = 0; i < 3; i++ ) {
-        skill = CG_ClassSkillForPosition( ci, i );
+		for( i = 0; i < 3; i++ ) {
+			skill = CG_ClassSkillForPosition( ci, i );
 
-        CG_DrawSkillBar( i * SKILL_BAR_X_SCALE + SKILL_BAR_X, 480 - (5 * SKILL_BAR_Y_SCALE) + SKILL_BAR_Y, SKILL_BAR_WIDTH, 4 * SKILL_ICON_SIZE, ci->skill[skill] );
-        CG_DrawPic( i * SKILL_ICON_X_SCALE + SKILL_ICON_X, 480 + SKILL_ICON_Y, SKILL_ICON_SIZE, SKILL_ICON_SIZE, cgs.media.skillPics[skill] );
-    }
+			CG_DrawSkillBar( i * SKILL_BAR_X_SCALE + SKILL_BAR_X, 480 - (5 * SKILL_BAR_Y_SCALE) + SKILL_BAR_Y, SKILL_BAR_WIDTH, 4 * SKILL_ICON_SIZE, ci->skill[skill] );
+			CG_DrawPic( i * SKILL_ICON_X_SCALE + SKILL_ICON_X, 480 + SKILL_ICON_Y, SKILL_ICON_SIZE, SKILL_ICON_SIZE, cgs.media.skillPics[skill] );
+		}
 
-    if( cg.time - cg.xpChangeTime < 1000 ) {
-        clr = colorYellow;
-    } else {
-        clr = colorWhite;
-    }
+		if( cg.time - cg.xpChangeTime < 1000 ) {
+			clr = colorYellow;
+		} else {
+			clr = colorWhite;
+		}
 
 
-    str = va( "%i", cg.snap->ps.stats[STAT_XP] );
-    w = CG_Text_Width_Ext( str, 0.25f, 0, &cgs.media.limboFont1 );
-    CG_Text_Paint_Ext( SKILLS_X + 28 - w, 480 - 4, 0.25f, 0.25f, clr, str, 0, 0, ITEM_TEXTSTYLE_SHADOWED, &cgs.media.limboFont1 );
-    CG_Text_Paint_Ext( SKILLS_X + 28 + 2, 480 - 4, 0.2f, 0.2f, clr, "XP", 0, 0, ITEM_TEXTSTYLE_SHADOWED, &cgs.media.limboFont1 );
+		str = va( "%i", cg.snap->ps.stats[STAT_XP] );
+		w = CG_Text_Width_Ext( str, 0.25f, 0, &cgs.media.limboFont1 );
+		CG_Text_Paint_Ext( SKILLS_X + 28 - w, 480 - 4, 0.25f, 0.25f, clr, str, 0, 0, ITEM_TEXTSTYLE_SHADOWED, &cgs.media.limboFont1 );
+		CG_Text_Paint_Ext( SKILLS_X + 28 + 2, 480 - 4, 0.2f, 0.2f, clr, "XP", 0, 0, ITEM_TEXTSTYLE_SHADOWED, &cgs.media.limboFont1 );
+
+	}
 
     // draw treasure icon if we have the flag
     // rain - #274 - use the playerstate instead of the clientinfo
