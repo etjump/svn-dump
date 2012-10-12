@@ -4667,6 +4667,7 @@ void UI_RunMenuScript(char **args) {
 			trap_Key_SetCatcher( trap_Key_GetCatcher() & ~KEYCATCH_UI );
 			trap_Key_ClearStates();
 			trap_Cvar_Set( "cl_paused", "0" );
+			trap_Cvar_Set("ui_map_details", "0");
 			Menus_CloseAll();
 		} else if (Q_stricmp(name, "voteMap") == 0) {
 			if( ui_netGameType.integer == GT_WOLF_CAMPAIGN ) {

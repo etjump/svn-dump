@@ -653,7 +653,7 @@ cvarTable_t		cvarTable[] = {
       { &cg_HUD_playerHealth,             "cg_HUD_playerHealth", "0", CVAR_ARCHIVE }, 
       { &cg_HUD_weaponIcon,               "cg_HUD_weaponIcon", "1", CVAR_ARCHIVE },
       { &cg_HUD_xpInfo,                   "cg_HUD_xpInfo", "0", CVAR_ARCHIVE },
-      { &cg_logConsole,                   "cg_logConsole", "1", CVAR_ARCHIVE },
+      { &cg_logConsole,                   "cg_logConsole", "1", CVAR_ARCHIVE }
       };
 
 

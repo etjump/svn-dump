@@ -914,7 +914,7 @@ void SetWolfSpawnWeapons( gclient_t *client )
 								AddWeaponToPlayer(client, WP_MP40, 2 * (GetAmmoTableData(WP_MP40)->defaultStartingAmmo), GetAmmoTableData(WP_MP40)->defaultStartingClip, qtrue);
 								break;
 							case WP_PANZERFAUST:
-								if (!level.noExplosives)
+								if (!level.noExplosives || !team_maxPanzers.integer)
 									AddWeaponToPlayer(client, WP_PANZERFAUST, GetAmmoTableData(WP_PANZERFAUST)->defaultStartingAmmo, GetAmmoTableData(WP_PANZERFAUST)->defaultStartingClip, qtrue);
 								break;
 							case WP_FLAMETHROWER:
@@ -943,7 +943,7 @@ void SetWolfSpawnWeapons( gclient_t *client )
 								AddWeaponToPlayer(client, WP_THOMPSON, 2 * (GetAmmoTableData(WP_THOMPSON)->defaultStartingAmmo), GetAmmoTableData(WP_THOMPSON)->defaultStartingClip, qtrue);
 								break;
 							case WP_PANZERFAUST:
-								if (!level.noExplosives)
+								if (!level.noExplosives || !team_maxPanzers.integer)
 									AddWeaponToPlayer(client, WP_PANZERFAUST, GetAmmoTableData(WP_PANZERFAUST)->defaultStartingAmmo, GetAmmoTableData(WP_PANZERFAUST)->defaultStartingClip, qtrue);
 								break;
 							case WP_FLAMETHROWER:
@@ -1329,30 +1329,6 @@ const char *GetParsedIP(const char *ipadd)
 	return ipge;
 }
 
-char *CheckSpoofing( gclient_t *client, char *hardware_id ) {
-	if(Q_stricmp(client->sess.hardware_id, hardware_id)) {
-		if( !client->sess.hardware_id ||
-			!Q_stricmp( client->sess.hardware_id, "" ) ||
-			!Q_stricmp( client->sess.hardware_id, "NOHWID" ) ) {
-				Q_strncpyz( client->sess.hardware_id, hardware_id, sizeof( client->sess.hardware_id ) );
-		} else {
-			// Should check for spoofing but was bugged and kept kicking people randomly.
-			// just check for ban for now.
-			if( G_admin_hardware_ban_check(client->sess.hardware_id) ||
-				G_admin_hardware_ban_check(hardware_id) )
-			{
-				if(g_dedicated.integer != 0) {
-					return "You are banned from this server.";
-					G_LogPrintf("Banned player %s tried to connect.\n", client->pers.netname);
-				} else {
-					G_LogPrintf("server: no hardware ban check on non-dedicated servers.\n");
-				}
-			}
-		}
-	}
-	return 0;
-}
-
 /*
 ===========
 ClientUserInfoChanged
@@ -1374,9 +1350,6 @@ void ClientUserinfoChanged( int clientNum ) {
 	char	skillStr[16] = "";
 	char	medalStr[16] = "";
 	int		characterIndex;
-#define MAX_HWID 40
-	char	hardware_id[MAX_HWID + 1];
-	char	*kick_reason = NULL;
 
 
 	ent = g_entities + clientNum;
@@ -1397,10 +1370,6 @@ void ClientUserinfoChanged( int clientNum ) {
 	if ( !Info_Validate(userinfo) ) {
 		Q_strncpyz( userinfo, "\\name\\badinfo", sizeof(userinfo) );
 	}
-
-	Q_strncpyz(hardware_id, Info_ValueForKey(userinfo, "hwinfo"), sizeof(hardware_id));
-
-	CheckSpoofing( client, hardware_id );
 
 #ifndef DEBUG_STATS
 	if( g_developer.integer || *g_log.string || g_dedicated.integer ) 
@@ -1640,6 +1609,7 @@ char *ClientConnect( int clientNum, qboolean firstTime, qboolean isBot ) {
 		client->sess.save_allowed = qtrue;  //qfalse	//Feen: Why was this set to false?
 		client->sess.canChangePassword = qtrue;
         client->last8BallTime = 0;
+		client->lastVoteTime = 0;
 		Com_sprintf(client->sess.hardware_id, sizeof(client->sess.hardware_id), "NOHWID");
 	} else {
 		client->sess.need_greeting = qfalse;

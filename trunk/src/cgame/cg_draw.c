@@ -2530,31 +2530,6 @@ static void CG_DrawVote(void) {
 		return;
 	}
 
-	if ( cgs.autoFireteamCreateEndTime > cg.time && cgs.autoFireteamCreateNum == -1 ) {
-		Q_strncpyz( str1, BindingFromName( "vote yes" ), 32 );
-		Q_strncpyz( str2, BindingFromName( "vote no" ), 32 );
-
-		s = "Create a Fireteam?";
-		CG_DrawStringExt( 8, 200, s, color, qtrue, qtrue, TINYCHAR_WIDTH, TINYCHAR_HEIGHT, 80 );
-
-		s = va( CG_TranslateString( "Press '%s' for YES, or '%s' for No" ), str1, str2 );
-		CG_DrawStringExt( 8, 214, s, color, qtrue, qtrue, TINYCHAR_WIDTH, TINYCHAR_HEIGHT, 80 );
-		return;
-	}
-	
-	if ( cgs.autoFireteamJoinEndTime > cg.time && cgs.autoFireteamJoinNum == -1 ) {
-		Q_strncpyz( str1, BindingFromName( "vote yes" ), 32 );
-		Q_strncpyz( str2, BindingFromName( "vote no" ), 32 );
-
-		s = "Join a Fireteam?";
-		CG_DrawStringExt( 8, 200, s, color, qtrue, qtrue, TINYCHAR_WIDTH, TINYCHAR_HEIGHT, 80 );
-
-		s = va( CG_TranslateString( "Press '%s' for YES, or '%s' for No" ), str1, str2 );
-		CG_DrawStringExt( 8, 214, s, color, qtrue, qtrue, TINYCHAR_WIDTH, TINYCHAR_HEIGHT, 80 );
-		return;
-	}
-	
-
 	if( cgs.voteTime ) {
 		Q_strncpyz( str1, BindingFromName( "vote yes" ), 32 );
 		Q_strncpyz( str2, BindingFromName( "vote no" ), 32 );
@@ -4925,7 +4900,7 @@ static void CG_DrawPlayerStats( void ) {
     ps = &cg.snap->ps;
     ci = &cgs.clientinfo[ ps->clientNum ];
 
-	if(!cg_HUD_xpInfo.integer) {
+	if(cg_HUD_xpInfo.integer) {
 
 		for( i = 0; i < 3; i++ ) {
 			skill = CG_ClassSkillForPosition( ci, i );

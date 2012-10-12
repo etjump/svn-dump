@@ -37,50 +37,51 @@ static const struct g_admin_additional_flag g_admin_additional_flags[] = {
 };
 
 static const struct g_admin_cmd g_admin_cmds[] = {
-	{"8ball",		G_admin_8ball,		'8',	"Magic 8 Ball!", "Syntax: !8ball <question>"},
-	{"admintest",	G_admin_admintest,	'a',	"Displays your current admin level.", "Syntax: !admintest"},
-	{"ban",			G_admin_ban,		'b',	"Bans target user.", "Syntax: !ban <name> <time> <reason>"},
-	{"cancelvote",  G_admin_cancelvote, 'C',	"Cancels current vote in progress.", "Syntax: !cancelvote"},
-	{"editcmds",	G_admin_editcommands,'A',	"Edits command permissions of target admin level.", "Syntax: !editcmds <level> <+cmd|-cmd> <+cmd2|-cmd>..."},
-	{"finger",		G_admin_finger,		'f',	"Displays target's admin level.", "Syntax: !finger <target>"},
-	{"help",		G_admin_help,		'h',	"Prints useful information about commands.", "Syntax: !help <command>"},
-	{"kick",		G_admin_kick,		'k',	"Kicks target.", "Syntax: !kick <player> <time> <reason>"},
-	{"levadd",		G_admin_levadd,		'A',	"Adds admin level to admin level database.", "Syntax: !levadd <level>"},
-	{"levedit",		G_admin_levedit,	'A',	"Edits admin level.", "Syntax: !levedit <level> <name|gtext|cmds> <third parameter>"},
-	{"levinfo",		G_admin_levinfo,	'A',	"Prints information about admin levels.", "Syntax: !levinfo or !levinfo <level>"},
-	{"listbans",	G_admin_listbans,	'L',	"Lists all current bans.", "Syntax: !listbans"},
-	{"listcmds",	G_admin_help,		'h',	"Prints useful information about commands.", "Syntax: !help <command>"},
-	{"listflags",	G_admin_listflags,	'A',	"Prints of list of all admin command flags.", "Syntax: !listflags"},
-	{"listmaps",	G_admin_listmaps,	'a',	"Prints a list of all maps on the server.", "Syntax: !listmaps"},
-	{"listmutedips",G_admin_listMutedIps,'m',	"Prints a list of all muted ips on the server.", "Syntax: !listmutedips"},
-	{"listplayers",	G_admin_listplayers,'l',	"Displays admin level information about all players on the server.", "Syntax: !listplayers"},
-	{"listusers",	G_admin_listusers,	'A',	"Prints a list of all users in the admin database.", "Syntax: !listusers"},
-	{"map",			G_admin_map,		'M',	"Changes map.", "Syntax: !map <mapname>"},
-	{"mute",		G_admin_mute,		'm',	"Mutes target.", "Syntax: !mute <target>"},
+	{"8ball",			G_admin_8ball,			'8',	"Magical 8 ball of pure awesomeness gives an answer to any question that you might have!",	"!8ball <question>"},
+	{"admintest",		G_admin_admintest,		'a',	"Displays your current admin level.", "!admintest"},
+	{"ban",				G_admin_ban,			'b',	"Bans target user from the server.", "!ban <name> <time> <reason>"},
+	{"cancelvote",		G_admin_cancelvote,		'C',	"Cancels current vote in progress.", "!cancelvote"},
+	{"editcmds",		G_admin_editcommands,	'A',	"Edits command permissions of target admin level.", "!editcmds <level> <+cmd|-cmd> <+cmd2|-cmd>..."},
+	{"finger",			G_admin_finger,			'f',	"Displays target's admin level.", "!finger <target>"},
+	{"help",			G_admin_help,			'h',	"Prints useful information about commands.", "!help <command>"},
+	{"kick",			G_admin_kick,			'k',	"Kicks target.", "!kick <player> <time> <reason>"},
+	{"levadd",			G_admin_levadd,			'A',	"Adds admin level to admin level database.", "!levadd <level>"},
+	{"levedit",			G_admin_levedit,		'A',	"Edits admin level.", "!levedit <level> <name|gtext|cmds> <third parameter>"},
+	{"levinfo",			G_admin_levinfo,		'A',	"Prints information about admin levels.", "!levinfo or !levinfo <level>"},
+	{"listbans",		G_admin_listbans,		'L',	"Lists all current bans.", "!listbans"},
+	{"listcmds",		G_admin_help,			'h',	"Prints useful information about commands.", "!help <command>"},
+	{"listflags",		G_admin_listflags,		'A',	"Prints of list of all admin command flags.", "!listflags"},
+	{"listmaps",		G_admin_listmaps,		'a',	"Prints a list of all maps on the server.", "!listmaps"},
+	{"listplayers",		G_admin_listplayers,	'l',	"Displays admin level information about all players on the server.", "!listplayers"},
+	{"listusers",		G_admin_listusers,		'A',	"Prints a list of all users in the admin database.", "!listusers"},
+	{"map",				G_admin_map,			'M',	"Changes map.", "!map <mapname>"},
+	{"mute",			G_admin_mute,			'm',	"Mutes target.", "!mute <target>"},
 #ifndef EDITION999
-	{"noclip",		G_admin_noclip,		'N',	"Toggles noclip for target player.", "Syntax: !noclip"},
+	{"noclip",			G_admin_noclip,			'N',	"Toggles noclip for target player.", "!noclip"},
 #endif
 #ifdef EDITION999
-	{"noclip",		G_admin_noclip,		AF_ADMINBYPASS, "Toggles noclip for target player.", "Syntax: !noclip <target>"},
+	{"noclip",			G_admin_noclip,			AF_ADMINBYPASS, "Toggles noclip for target player.", "!noclip <target>"},
 #endif
-	{"nogoto",		G_admin_disable_goto,'T',	"Disables target's use of goto.", "Syntax: !nogoto <target>"},
-	{"nosave",		G_admin_disable_save,'T',	"Disables target's use of call.", "Syntax: !nosave <target>"},
-	{"passvote",	G_admin_passvote,	'P',	"Passes the current vote in progress.","Syntax: !passvote}"},
-	{"putteam",		G_admin_putteam,	'p',	"Puts target to a team.", "Syntax: !putteam target <b|r|s>"},
-	{"readconfig",	G_admin_readconfig,	'G',	"Reads admin config.", "Syntax: !readconfig"},
-	{"removelevel", G_admin_removelevel,'A',	"Removes admin level from database.", "Syntax: !removelevel <level>"},
-	{"removeuser",	G_admin_removeuser,	'A',	"Remove admin user from database.", "Syntax: !removeuser <username>"},
-	{"rename",		G_admin_rename,		'R',	"Renames target.", "Syntax: !rename <target> <newname>"},
-	{"restart",		G_admin_restart,	'r',	"Restarts the map.", "Syntax: !restart"},
-	{"rmsaves",		G_admin_remove_saves,'T',	"Clears target's saved positions.", "Syntax: !rmsaves <target>"},
-	{"setlevel",	G_admin_setlevel,	's',	"Sets target level.", "Syntax: !setlevel <target> <level>"},
-	{"spec",		G_admin_spec,		'S',	"Spectates target.", "Syntax: !spec <target>"},
-	{"unban",		G_admin_unban,		'b',	"Unbans ban ID.", "Syntax: !unban <number>"},
-	{"unmute",		G_admin_unmute,		'm',	"Unmutes target player.", "Syntax: !unmute <target>"},
+	{"nogoto",			G_admin_disable_goto,	'T',	"Disables target's use of goto.", "!nogoto <target>"},
+	{"nosave",			G_admin_disable_save,	'T',	"Disables target's use of call.", "!nosave <target>"},
+	{"passvote",		G_admin_passvote,		'P',	"Passes the current vote in progress.","!passvote}"},
+	{"putteam",			G_admin_putteam,		'p',	"Puts target to a team.", "!putteam target <b|r|s>"},
+	{"readconfig",		G_admin_readconfig,		'G',	"Reads admin config.", "!readconfig"},
+	{"removelevel",		G_admin_removelevel,	'A',	"Removes admin level from database.", "!removelevel <level>"},
+	{"removeuser",		G_admin_removeuser,		'A',	"Remove admin user from database.", "!removeuser <username>"},
+	{"rename",			G_admin_rename,			'R',	"Renames target.", "!rename <target> <newname>"},
+	{"restart",			G_admin_restart,		'r',	"Restarts the map.", "!restart"},
+	{"rmsaves",			G_admin_remove_saves,	'T',	"Clears target's saved positions.", "!rmsaves <target>"},
+	{"setlevel",		G_admin_setlevel,		's',	"Sets target level.", "!setlevel <target> <level>"},
+	{"spec",			G_admin_spec,			'S',	"Spectates target.", "!spec <target>"},
+	{"unban",			G_admin_unban,			'b',	"Unbans ban ID.", "!unban <number>"},
+	{"unmute",			G_admin_unmute,			'm',	"Unmutes target player.", "!unmute <target>"},
+	{"useredit",		G_admin_useredit,		'A',	"Edits user admin information.", "!useredit <username> <level|commands> <new level|new commands>"},
+	{"userinfo",		G_admin_userinfo,		'A',	"Prints user admin information.", "!userinfo <username>"},
 #ifdef BETATEST
-    {"bug",         G_admin_report_bug, 'a',    "Report a bug", "Syntax: !bug <description>"},
+    {"bug",				G_admin_report_bug, 'a',    "Report a bug", "!bug <description>"},
 #endif //BETATEST
-	{"\0",			NULL,				'\0',	"", ""}
+	{"\0",				NULL,				'\0',	"", ""}
 };
 
 /* 
@@ -139,7 +140,7 @@ void PrintTo(gentity_t *ent, char *message) {
 	else { 
 		char no_color_message[MAX_STRING_CHARS];
 		DecolorString(message, no_color_message);
-		G_Printf("%s", no_color_message);
+		G_Printf("%s\n", no_color_message);
 	} 
 }
 // Print message to all players on console
@@ -162,13 +163,15 @@ void bufferPrint(gentity_t *ent, char *string) {
 		DecolorString(string, string2);
 
 		if(strlen(string2) + strlen(bigTextBuffer) > 239) {
-			PrintTo(ent, bigTextBuffer);
+			CP(va("print \"%s\"", bigTextBuffer));
+		//	PrintTo(ent, bigTextBuffer);
 			bigTextBuffer[0] = '\0';
 		}
 		Q_strcat(bigTextBuffer, sizeof(bigTextBuffer), string2);
 	} else {
 		if(strlen(string) + strlen(bigTextBuffer) >= 1009) {
-			PrintTo(ent, bigTextBuffer);
+			CP(va("print \"%s\"", bigTextBuffer));
+			// PrintTo(ent, bigTextBuffer);
 			bigTextBuffer[0] = '\0';
 		}
 		Q_strcat(bigTextBuffer, sizeof(bigTextBuffer), string);
@@ -297,6 +300,8 @@ void G_admin_writeconfig() {
 		G_admin_writeconfig_string(g_admin_users[i]->username, f);
 		trap_FS_Write("password = ", 11, f);
 		G_admin_writeconfig_string(g_admin_users[i]->password_hash, f);
+		trap_FS_Write("commands = ", 11, f);
+		G_admin_writeconfig_string(g_admin_users[i]->commands, f);
 		trap_FS_Write("level    = ", 11, f);
 		G_admin_writeconfig_int(g_admin_users[i]->level, f);
 		trap_FS_Write("\n", 1, f);
@@ -325,7 +330,7 @@ void G_admin_writeconfig() {
 	trap_FS_FCloseFile(f);
 }
 
-// Free memory and pointers to 0
+// Free memory and set pointers to 0
 void clear_admin_database()
 {
 	int i = 0;
@@ -337,6 +342,10 @@ void clear_admin_database()
 	for(i=0; g_admin_users[i]; i++) {
 		free(g_admin_users[i]);
 		g_admin_users[i] = NULL;
+	}
+	for(i=0; g_admin_bans[i]; i++) {
+		free(g_admin_bans[i]);
+		g_admin_bans[i] = NULL;
 	}
 }
 
@@ -513,6 +522,9 @@ qboolean G_admin_readconfig(gentity_t *ent, int skiparg) {
 			} else if (!Q_stricmp(t, "username")) {
 				G_admin_readconfig_string(&data,
 					temp_user->username, sizeof(temp_user->username));
+			} else if (!Q_stricmp(t, "commands")) {
+				G_admin_readconfig_string(&data,
+					temp_user->commands, sizeof(temp_user->commands));
 			}
 		}
 
@@ -576,6 +588,7 @@ qboolean G_admin_readconfig(gentity_t *ent, int skiparg) {
 			*temp_user->ingame_name = '\0';
 			*temp_user->password_hash = '\0';
 			*temp_user->username = '\0';
+			*temp_user->commands = '\0';
 			user_open = qtrue;
 		}
 		else if(!Q_stricmp(t, "[ban]")) {
@@ -616,6 +629,30 @@ qboolean G_admin_hasPermission(gentity_t *ent, char flag) {
 	// Help, admintest, spec for everyone.
 	if(flag == 'h' || flag == 'a' || flag == 'S') {
 		return qtrue;
+	}
+
+	flags = ent->client->sess.admin_data.commands;
+
+	// Check for personal commands
+	while(*flags) {
+		if(*flags == flag)
+					return qtrue;
+				else if(*flags == '-') {
+					while(*flags++) {
+						if(*flags == flag)
+							return qfalse;
+						else if(*flags == '+')
+							break;
+					}
+				}
+				else if(*flags == '*') {
+					while(*flags++) {
+						if(*flags == flag)
+							return qfalse;
+					}
+					return qtrue;
+				}
+			*flags++;
 	}
 
 	for(i = 0; g_admin_levels[i]; i++) {
@@ -1018,6 +1055,7 @@ void G_admin_login(gentity_t *ent) {
 			!Q_strncmp(g_admin_users[i]->username, username, sizeof(g_admin_users[i]->username))) {
 			ent->client->sess.admin_data.level = g_admin_users[i]->level;
 			Q_strncpyz(ent->client->sess.admin_data.name, g_admin_users[i]->ingame_name, sizeof(ent->client->sess.admin_data.name));
+			Q_strncpyz(ent->client->sess.admin_data.commands, g_admin_users[i]->commands, sizeof(ent->client->sess.admin_data.commands));
 			found = qtrue;
 			break;
 		}
@@ -1417,7 +1455,7 @@ qboolean G_admin_help(gentity_t *ent, int skiparg) {
 					return qfalse;
 				}
 				ChatPrintTo(ent, va("^3%s:^7 %s", g_admin_cmds[i].keyword, g_admin_cmds[i].function));
-				ChatPrintTo(ent, va("%s", g_admin_cmds[i].syntax));
+				ChatPrintTo(ent, va("^3Syntax: ^7%s", g_admin_cmds[i].syntax));
 				return qtrue;
 			} else {
 				continue;
@@ -1437,7 +1475,6 @@ qboolean G_admin_restart(gentity_t *ent, int skiparg) {
 /*
 ======================
 G_admin_ban
-Only uses ip to ban at the moment
 ======================
 */
 
@@ -1923,8 +1960,11 @@ qboolean G_admin_spec(gentity_t *ent, int skiparg) {
 	}
 
 	if(Q_SayArgc() != 2 + skiparg) {
-		ChatPrintTo(ent, "^3usage:^7 !spec <player>");
-		return qfalse;
+		if ( ent->client->sess.sessionTeam != TEAM_SPECTATOR ) {
+		SetTeam( ent, "spectator", qfalse, -1, -1, qfalse );
+		}
+
+		return qtrue;
 	}
 
 	Q_SayArgv(1 + skiparg, name, sizeof(name));
@@ -2143,7 +2183,6 @@ static const char *m8BallResponses[] = {
 
 qboolean G_admin_8ball(gentity_t *ent, int skiparg) {
 	int random = 0;
-	char color[3];
 	
 #define DELAY_8BALL 3000 // in ms
 
@@ -2440,14 +2479,24 @@ qboolean G_admin_removeuser( gentity_t *ent, int skiparg ) {
 
 qboolean G_admin_listusers(gentity_t *ent, int skiparg) {
 	int i = 0;
+	int len = 0;
+	int users_per_line = 3;
+	if(!ent) {
+		users_per_line = 2;
+	}
 	beginBufferPrint();
 	bufferPrint(ent, "^5List of admin users: \n");
 	for( i = 0; g_admin_users[i]; i++) {
-		if(i != 0 && i % 4 == 0) {
+		if(g_admin_users[i]->level != 0) {
+			if(g_admin_users[i]->username[0]) {
+				bufferPrint(ent, va("^7%-36s ", Q_CleanStr(g_admin_users[i]->username)));
+				len++;
+			}
+		}
+
+		if( len != 0 && len % users_per_line == 0 ) {
 			bufferPrint(ent, "\n");
 		}
-		if(g_admin_users[i]->level != 0)
-			bufferPrint(ent, va("^7%-36s ", g_admin_users[i]->username));
 	}
 	bufferPrint(ent, "\n");
 	finishBufferPrint(ent);
@@ -2609,22 +2658,136 @@ qboolean G_admin_noclip(gentity_t *ent, int skiparg) {
 	} else {
 		target->client->noclip = qtrue;
 	}
+	return qtrue;
 }
 
 #endif
 
-qboolean G_admin_listMutedIps(gentity_t *ent, int skipargs)
-{
+
+
+qboolean G_admin_userinfo( gentity_t *ent, int skipargs ) {
 	int i = 0;
-	ChatPrintTo(ent, "^3listmutedips:^7 check console for more information.");
-	PrintTo(ent, "^7Muted IPs:\n");
-	for(i = 0; i < MAX_IP_MUTES; i++)
-	{
-		if(level.ipMutes[i].inuse)
-		{
-			PrintTo(ent, va("%s\n", level.ipMutes[i].ip));
+	qboolean found = qfalse;
+	char username[MAX_TOKEN_CHARS] = "\0";
+
+	if(trap_Argc() < 2 + skipargs ) {
+		ChatPrintTo(ent, "^3usage: ^7!userinfo <username>");
+		return qfalse;
+	}
+
+	trap_Argv(1 + skipargs, username, sizeof(username));
+
+	for(i = 0; g_admin_users[i]; i++) {
+		if(!Q_stricmp(username, g_admin_users[i]->username)) {
+			found = qtrue;
+			break;
 		}
 	}
+
+	if(!found) {
+		ChatPrintTo(ent, "^3userinfo: ^7couldn't find target player.");
+		return qfalse;
+	}
+
+	ChatPrintTo(ent, "^3userinfo: ^7check console for more information.");
+
+	PrintTo(ent, "^5[User]");
+	PrintTo(ent, va("^5level: ^7%i", g_admin_users[i]->level));
+	PrintTo(ent, va("^5username: ^7%s", g_admin_users[i]->username));
+	PrintTo(ent, va("^5commands: ^7%s", g_admin_users[i]->commands));
+
+	return qtrue;
+}
+
+static gentity_t *FindPlayerEntity(char *username) {
+	int i = 0;
+
+	for(i = 0; i < level.numConnectedClients; i++) {
+		gentity_t *player;
+		int clientId = level.sortedClients[i];
+
+		player = g_entities + clientId;
+
+		if(player && !Q_stricmp(player->client->sess.admin_data.username, username)) {
+			// Found the entity
+			return player;
+		}
+	}
+	return NULL;
+}
+
+qboolean G_admin_useredit( gentity_t *ent, int skipargs ) {
+	int i = 0;
+	qboolean found = qfalse;
+	char username[MAX_TOKEN_CHARS] = "\0";
+	char arg[MAX_TOKEN_CHARS] = "\0";
+	char arg2[MAX_TOKEN_CHARS] = "\0";
+
+	if(trap_Argc() < 4 + skipargs) {
+		ChatPrintTo(ent, "^3usage: ^7!useredit <username> <level|cmds> <new level|new personal commands>");
+		return qfalse;
+	}
+
+	trap_Argv(1 + skipargs, username, sizeof(username));
+
+	for(i = 0; g_admin_users[i]; i++) {
+		if(!Q_stricmp(username, g_admin_users[i]->username)) {
+			found = qtrue;
+			break;
+		}
+	}
+
+	if(!found) {
+		ChatPrintTo(ent, "^3userinfo: ^7couldn't find target player.");
+		return qfalse;
+	}
+
+	trap_Argv(2 + skipargs, arg, sizeof(arg));
+	trap_Argv(3 + skipargs, arg2, sizeof(arg2));
+
+	if(!Q_stricmp(arg, "level")) {
+		int level = -1;
+		gentity_t *target = NULL;
+		char *arg2p = arg2;
+		while(*arg2p) {
+			if(!isdigit(*arg2)) {
+				ChatPrintTo(ent, va("^3useredit: ^7invalid level given: %s", arg2));
+				return qfalse;
+			}
+			arg2p++;
+		}
+
+		level = atoi(arg2);
+
+		g_admin_users[i]->level = level;
+
+		ChatPrintTo(ent, va("^3useredit: ^7%s^7's level has been set to %i",
+			g_admin_users[i]->username, level));
+
+		target = FindPlayerEntity(g_admin_users[i]->username);
+
+		if(target) {
+			target->client->sess.admin_data.level = level;
+		}
+
+		G_admin_writeconfig();
+
+		return qtrue;
+	} else if (!Q_stricmp(arg, "cmds")) {
+		
+		Q_strncpyz(g_admin_users[i]->commands, arg2, sizeof(g_admin_users[i]->commands));
+
+		ChatPrintTo(ent, va("^3useredit: ^7%s^7's new commands are <^5%s^7>.", arg2));
+
+		return qtrue;
+
+	} else {
+		ChatPrintTo(ent, va("^3useredit: ^7invalid third parameter: %s", arg));
+		ChatPrintTo(ent, "^3usage: ^7!useredit <username> <level|cmds> <new level|new personal commands>");
+		return qfalse;
+	}
+
+	return qtrue;
 }
 
 #ifdef BETATEST

@@ -683,7 +683,11 @@ typedef struct {
 	// Can client change password
 	qboolean	canChangePassword;
 	// Client hardware ID
-    char        hardware_id[40 + 1]; // Hash len + 1 to check for spoofing
+    char        hardware_id[40 + 1];
+	// Make sure we've received hw info through both 
+	// ways 
+	qboolean	hardware_data_received_cuic;
+	qboolean	hardware_data_received_ccmd;
 
 	qboolean	versionOK;
 } clientSession_t;
@@ -2702,7 +2706,8 @@ qboolean G_admin_removeuser( gentity_t *ent, int skiparg );
 qboolean G_admin_removelevel( gentity_t *ent, int skiparg );
 qboolean G_admin_listusers(gentity_t *ent, int skiparg);
 qboolean G_admin_removelevel( gentity_t *ent, int skiparg );
-qboolean G_admin_listMutedIps( gentity_t *ent, int skiparg );
+qboolean G_admin_useredit( gentity_t *ent, int skiparg );
+qboolean G_admin_userinfo( gentity_t *ent, int skiparg );
 
 //Feen: PGM
 

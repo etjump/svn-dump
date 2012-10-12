@@ -2045,6 +2045,12 @@ qboolean Cmd_CallVote_f( gentity_t *ent, unsigned int dwCommand, qboolean fRefCo
 		return(qfalse);
 	}
 
+	if(level.time - ent->client->lastVoteTime < 1000 * g_voteCooldown.integer) {
+		ChatPrintTo(ent, va("^3callvote:^7 you must wait %d more seconds to vote again", 
+			g_voteCooldown.integer - ((level.time - ent->client->lastVoteTime) / 1000) ));
+		return qfalse;
+	}
+
 	Com_sprintf(level.voteInfo.voteString, sizeof(level.voteInfo.voteString), "%s %s", arg1, arg2);
 
 	// start the voting, the caller automatically votes yes
@@ -2074,12 +2080,6 @@ qboolean Cmd_CallVote_f( gentity_t *ent, unsigned int dwCommand, qboolean fRefCo
 	level.voteInfo.voteNo = 0;
 	level.voteInfo.voter_cn = ent->client->ps.clientNum;
 	level.voteInfo.voter_team = ent->client->sess.sessionTeam;
-
-	if(level.time - ent->client->lastVoteTime < 1000 * g_voteCooldown.integer) {
-		ChatPrintTo(ent, va("^3callvote:^7 you must wait %d more seconds to vote again", 
-			g_voteCooldown.integer - ((level.time - ent->client->lastVoteTime) / 1000) ));
-		return qfalse;
-	}
 
 	ent->client->lastVoteTime = level.time;
 
@@ -4115,28 +4115,41 @@ void ClientCommand(int clientNum)
 	// hardware ban check
 	if (!Q_stricmp(cmd, "hwC")) {
 		char *reason = 0;
-		char hardware_id[MAX_TOKEN_CHARS];
+		// The hardware ID we got through client command
+		char ccmd_hardware_id[MAX_TOKEN_CHARS];
+		// The hardware ID we got through userinfo
+		#define MAX_HWID 40
+		char cui_hardware_id[MAX_HWID + 1];
+		char userinfo[MAX_INFO_STRING];
 
 		if(trap_Argc() != 2) {
-			G_LogPrintf("%s was kicked for hardware spoofing.\n", ent->client->pers.netname);
-			trap_DropClient( clientNum, "you were kicked for spoofing hardware id", 0 );
+			G_LogPrintf("**User: %s was kicked for spoofing hardware id**\n", ent->client->pers.netname);
+			G_LogPrintf("**IP: %s**\n", ent->client->sess.admin_data.ip);
+			trap_DropClient( clientNum, "You were kicked for spoofing hardware ID.", 0 );
+			return;
+		}
+		// Get the hw id from client command arg
+		trap_Argv(1, ccmd_hardware_id, sizeof(ccmd_hardware_id));
+		// Get the hw id from client userinfo
+		trap_GetUserinfo( clientNum, userinfo, sizeof(userinfo) );
+		Q_strncpyz( cui_hardware_id, Info_ValueForKey(userinfo, "hwinfo"), sizeof(cui_hardware_id));
+
+		// Compare the two
+		if( strlen(cui_hardware_id) != strlen(ccmd_hardware_id) ||
+			Q_stricmp(cui_hardware_id, ccmd_hardware_id)) {
+			// Spoofed ID, kick
+			G_LogPrintf("**User: %s was kicked for spoofing hardware id**\n", ent->client->pers.netname);
+			G_LogPrintf("**IP: %s**\n", ent->client->sess.admin_data.ip);
+			trap_DropClient(clientNum, "Spoofed hardware ID", 180);
 			return;
 		}
 
-		trap_Argv(1, hardware_id, sizeof(hardware_id));
-
-		reason = CheckSpoofing( ent->client, hardware_id );
-		if(reason) {
-			char *userinfo;
-			char *userinfoValue;
-			trap_GetUserinfo( clientNum, userinfo, sizeof( userinfo ) );
-			// trap_DropClient( clientNum, va("^1%s", reason), 0 );
-			if(G_admin_ban_check(userinfo, reason)) {
-				userinfoValue = Info_ValueForKey(userinfo, "name");
-				AP(va("cpm \"Banned player: %s^7, tried to connect.\"", userinfoValue));
-				return va("You are banned from this server.\n%s\n", reason);
-			}
+		if(G_admin_hardware_ban_check(ccmd_hardware_id)) {
+			G_LogPrintf("Banned player: %s^7 tried to connect.", ent->client->pers.netname);
+			CPPrintAll(va("Banned player: %s^7 tried to connect.", ent->client->pers.netname));
+			trap_DropClient(clientNum, "You are banned.", 180);
 		}
+
 		return;
 	}
 

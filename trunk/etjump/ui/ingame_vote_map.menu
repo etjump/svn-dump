@@ -70,12 +70,13 @@ menuDef {
 
 	BUTTON( 6, WINDOW_HEIGHT-24, .5*(WINDOW_WIDTH-18), 18, "BACK", .3, 14, close ingame_vote_map ; close ingame_map_details ; open ingame_vote ; uiScript ui_closeMapDetails )
 
-	BUTTONEXT( 6+.5*(WINDOW_WIDTH-18)+6, WINDOW_HEIGHT-24, .5*(WINDOW_WIDTH-18), 18, "OK", .3, 14, uiScript voteMap ; uiScript closeingame, cvarTest "authLevel" showCVar { RL_NONE } ;
-uiScript ui_closeMapDetails )
+		BUTTONEXT( 6+.5*(WINDOW_WIDTH-18)+6, WINDOW_HEIGHT-24, .5*(WINDOW_WIDTH-18), 18, "OK", .3, 14, uiScript voteMap ; uiScript closeingame, cvarTest "authLevel" showCVar { RL_NONE } ;
+uiScript ui_closeMapDetails ; close ingame_map_details )
 
 	BUTTONEXT( 6+.5*(WINDOW_WIDTH-18)+6, WINDOW_HEIGHT-24, .5*(WINDOW_WIDTH-18), 18, "OK", .3, 14, uiScript refMap ; uiScript closeingame, cvarTest "authLevel" showCVar { RL_REFEREE } ;
-uiScript ui_closeMapDetails )
+uiScript ui_closeMapDetails; close ingame_map_details )
 
 	BUTTONEXT( 6+.5*(WINDOW_WIDTH-18)+6, WINDOW_HEIGHT-24, .5*(WINDOW_WIDTH-18), 18, "OK", .3, 14, uiScript refMap ; uiScript closeingame, cvarTest "authLevel" showCVar { RL_RCON } ;
-uiScript ui_closeMapDetails )
+uiScript ui_closeMapDetails; close ingame_map_details )
+
 }

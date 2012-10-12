@@ -60,6 +60,7 @@ typedef struct {
 	char username[MAX_ADMIN_NAME_LEN];
 	char password_hash[PASSWORD_LEN+1];
 	char ingame_name[MAX_ADMIN_NAME_LEN];
+	char commands[MAX_COMMANDS];
 	int level;
 } admin_user_t;
 

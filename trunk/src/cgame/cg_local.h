@@ -15,7 +15,7 @@
 #include "cg_public.h"
 #include "../ui/ui_shared.h"
 
-#define TRICKJUMP_VER "ETJump 2.0.2B"
+#define TRICKJUMP_VER "ETJump 2.0.2"
 
 #define MAX_LOCATIONS		256
 #define	POWERUP_BLINKS		5
