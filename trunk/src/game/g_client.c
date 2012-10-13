@@ -914,7 +914,7 @@ void SetWolfSpawnWeapons( gclient_t *client )
 								AddWeaponToPlayer(client, WP_MP40, 2 * (GetAmmoTableData(WP_MP40)->defaultStartingAmmo), GetAmmoTableData(WP_MP40)->defaultStartingClip, qtrue);
 								break;
 							case WP_PANZERFAUST:
-								if (!level.noExplosives || !team_maxPanzers.integer)
+								if (!level.noExplosives && team_maxPanzers.integer)
 									AddWeaponToPlayer(client, WP_PANZERFAUST, GetAmmoTableData(WP_PANZERFAUST)->defaultStartingAmmo, GetAmmoTableData(WP_PANZERFAUST)->defaultStartingClip, qtrue);
 								break;
 							case WP_FLAMETHROWER:
@@ -943,7 +943,7 @@ void SetWolfSpawnWeapons( gclient_t *client )
 								AddWeaponToPlayer(client, WP_THOMPSON, 2 * (GetAmmoTableData(WP_THOMPSON)->defaultStartingAmmo), GetAmmoTableData(WP_THOMPSON)->defaultStartingClip, qtrue);
 								break;
 							case WP_PANZERFAUST:
-								if (!level.noExplosives || !team_maxPanzers.integer)
+								if (!level.noExplosives && team_maxPanzers.integer)
 									AddWeaponToPlayer(client, WP_PANZERFAUST, GetAmmoTableData(WP_PANZERFAUST)->defaultStartingAmmo, GetAmmoTableData(WP_PANZERFAUST)->defaultStartingClip, qtrue);
 								break;
 							case WP_FLAMETHROWER:
