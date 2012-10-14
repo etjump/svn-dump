@@ -2774,10 +2774,18 @@ qboolean G_admin_useredit( gentity_t *ent, int skipargs ) {
 
 		return qtrue;
 	} else if (!Q_stricmp(arg, "cmds")) {
-		
+		gentity_t *target = NULL;
 		Q_strncpyz(g_admin_users[i]->commands, arg2, sizeof(g_admin_users[i]->commands));
 
 		ChatPrintTo(ent, va("^3useredit: ^7%s^7's new commands are <^5%s^7>.", g_admin_users[i]->username, arg2));
+
+		G_admin_writeconfig();
+
+		target = FindPlayerEntity(g_admin_users[i]->username);
+
+		if(target) {
+			Q_strncpyz(target->client->sess.admin_data.commands, arg2, sizeof(target->client->sess.admin_data.commands));
+		}
 
 		return qtrue;
 
